@@ -12,7 +12,7 @@ namespace CK\MarcSpec;
 * For Specification of MARC spec as string see
 * <http://cklee.github.io/marc-spec/marc-spec.html>
 */
-class MarcSpec {
+class MarcSpec implements \JsonSerializable{
 
     /**
     * @var string field tag
@@ -40,6 +40,11 @@ class MarcSpec {
     private $subfields = array();
     
     /**
+    * @var array Associative array of subfield indizes
+    */
+    private $subfieldIndex = array();
+    
+    /**
     * @var string indicator 1
     */
     private $indicator1;
@@ -48,7 +53,18 @@ class MarcSpec {
     * @var string indicator 2
     */
     private $indicator2;
-
+    
+    /**
+    * @var int fieldIndexStart
+    */
+    private $fieldIndexStart;
+    
+    /**
+    * @var int fieldIndexEnd
+    */
+    private $fieldIndexEnd;
+    
+    
     /**
     * Constructor
     *
@@ -68,7 +84,6 @@ class MarcSpec {
    */
     public function decode($spec)
     {
-        $this->checkIfString($spec);
         $this->validate($spec);
     }
     
@@ -79,45 +94,78 @@ class MarcSpec {
     *
     * 
     */
-    public function encode()
+    public function encode($encoding = "string")
     {
         if(!isset($this->fieldTag)) throw new \Exception("No field tag available. Assuming MarcSpec is not initialized.");
-        $marcspec = $this->fieldTag;
-        if(!is_null($charStart = $this->getCharStart()))
+        if("string" == $encoding)
         {
-            $marcspec .= "~".$charStart;
-            
-            if(!is_null($charEnd = $this->getCharEnd()))
+            $marcspec = $this->fieldTag;
+            if(!is_null($fieldIndexStart = $this->getFieldIndexStart()))
             {
-                $marcspec .= "-".$charEnd;
+                $marcspec .= "[".$fieldIndexStart;
+                if(!is_null($fieldIndexEnd = $this->getFieldIndexEnd()))
+                {
+                    $marcspec .= "-".$fieldIndexEnd;
+                }
+                $marcspec .= "]";
+            }
+            if(!is_null($charStart = $this->getCharStart()))
+            {
+                $marcspec .= "/".$charStart;
+                
+                if(!is_null($charEnd = $this->getCharEnd()))
+                {
+                    $marcspec .= "-".$charEnd;
+                }
+                
+                return $marcspec;
             }
             
-            return $marcspec;
-        }
-        
-        if(!is_null($_subfields = $this->getSubfields()))
-        {
-            $marcspec .= implode("",$_subfields);
-        }
-        
-        if(is_null($indicator1 = $this->getIndicator1()) & is_null($indicator2 = $this->getIndicator2()))
-        {
-            return $marcspec;
-        }
-        else
-        {
-            if(is_null($indicator2))
+            if(!is_null($_subfields = $this->getSubfields()))
             {
-                return $marcspec .= "_".$indicator1;
+                foreach($_subfields as $subfieldTag => $_sfSpec)
+                {
+                    if($_sfSpec['start'] === 0 && !array_key_exists('end',$_sfSpec))
+                    {
+                        $marcspec .= "$".$subfieldTag;
+                    }
+                    else
+                    {
+                        $marcspec .= "$".$subfieldTag."[".$_sfSpec['start']."-";
+                        if(array_key_exists('end',$_sfSpec))
+                        {
+                            $marcspec .= $_sfSpec['end'];
+                        }
+                        $marcspec .= "]";
+                    }
+                }
+                #var_dump($_subfields);
+                #$marcspec .= implode("",$_subfields);
             }
-            elseif(is_null($indicator1))
+            
+            if(is_null($indicator1 = $this->getIndicator1()) & is_null($indicator2 = $this->getIndicator2()))
             {
-                return $marcspec .= "__".$indicator2;
+                return $marcspec;
             }
             else
             {
-                return $marcspec .= "_".$indicator1.$indicator2;
+                if(is_null($indicator2))
+                {
+                    return $marcspec .= "_".$indicator1;
+                }
+                elseif(is_null($indicator1))
+                {
+                    return $marcspec .= "__".$indicator2;
+                }
+                else
+                {
+                    return $marcspec .= "_".$indicator1.$indicator2;
+                }
             }
+        } // end string encoding
+        elseif("json" == $encoding)
+        {
+            return json_encode($this,JSON_PRETTY_PRINT);
         }
     }
 
@@ -164,6 +212,7 @@ class MarcSpec {
     */
     public function setCharStart($arg)
     {
+        $this->checkFieldTag();
         if(is_int($arg) && 0 <= $arg)
         {
             $this->charStart = $arg;
@@ -207,6 +256,7 @@ class MarcSpec {
     */
     public function setCharEnd($arg)
     {
+        $this->checkFieldTag();
         if(is_int($arg) && 0 <= $arg)
         {
             if(!isset($this->charStart))
@@ -266,6 +316,7 @@ class MarcSpec {
     */
     public function setCharLength($arg)
     {
+        $this->checkFieldTag();
         if(is_int($arg) && 0 < $arg)
         {
             if(!isset($this->charStart))
@@ -307,6 +358,113 @@ class MarcSpec {
     }
     
     /**
+    * validates and sets subfields
+    *
+    * @access private
+    *
+    * @param string $arg    The subfield tag
+    *
+    * @return bool  True if subfield is valid
+    */
+    private function validateSubfield($arg)
+    {
+        $this->checkIfString($arg);
+        if("" == $arg)
+        {
+            throw new \InvalidArgumentException('Unexpected empty subfield tag');
+        }
+        $argLength = strlen($arg);
+
+        if($argLength > 1) // assuming index or subfield range
+        {
+            if($arg[1] == "[") // assuming index
+            {
+                if($argLength < 4)
+                {
+                    throw new \InvalidArgumentException('Assuming subfield index. String length must be 4 at minimum. "'.$arg.'" has only '.$argLength.'.');
+                }
+                else
+                {
+                    if(!strstr($arg,"]"))
+                    {
+                        throw new \InvalidArgumentException('Assuming subfield index. Missing closing bracket in "'.$arg.'".');
+                    }
+                    elseif(strpos($arg,"[") > strpos($arg,"]"))
+                    {
+                        throw new \InvalidArgumentException('Assuming subfield index. Bad open and closing bracket order in "'.$arg.'".');
+                    }
+                    elseif(strpos($arg,"[") !== 1)
+                    {
+                        
+                    }
+                    else
+                    {
+                        if(preg_match('/\[(.*)]/', $arg, $_assumedIndex))
+                        {
+                            $_index = $this->validateCharPos($_assumedIndex[1]);
+                            
+                            $this->subfields[$arg[0]]['tag']   = $arg[0];
+                            $this->subfields[$arg[0]]['start'] = (int)$_index[0];
+                            
+                            if(array_key_exists("1",$_index))
+                            {
+                                if(!empty($_index[1])) $this->subfields[$arg[0]]['end'] = (int)$_index[1];
+                            }
+                            else
+                            {
+                                $this->subfields[$arg[0]]['end'] = $this->subfields[$arg[0]]['start'];
+                            }
+                        }
+                        else
+                        {
+                            throw new \InvalidArgumentException('Assuming subfield index. Unknown error when parsing "'.$arg.'".');
+                        }
+                    }
+                }
+            }
+            else // assuming subfield range
+            {
+                if(!substr($arg,1,1) == "-")
+                {
+                    throw new \InvalidArgumentException('Assuming subfield range. But missing "-" in "'.$arg.'".');
+                }
+                elseif($argLength !== 3) 
+                {
+                    throw new \InvalidArgumentException('Assuming subfield range. String length is to high in "'.$arg.'".');
+                }
+                elseif(preg_match('/[a-z]/', $arg[0]) && !preg_match('/[a-z]/', $arg[2]))
+                {
+                    throw new \InvalidArgumentException('Assuming subfield range. Only ranges between "a-z", "A-Z" or "0-9" allowed. "'.$arg.'" given.');
+                }
+                elseif(preg_match('/[A-Z]/', $arg[0]) && !preg_match('/[A-Z]/', $arg[2]))
+                {
+                    throw new \InvalidArgumentException('Assuming subfield range. Only ranges between "a-z", "A-Z" or "0-9" allowed. "'.$arg.'" given.');
+                }
+                elseif(preg_match('/[0-9]/', $arg[0]) && !preg_match('/[0-9]/', $arg[2]))
+                {
+                    throw new \InvalidArgumentException('Assuming subfield range. Only ranges between "a-z", "A-Z" or "0-9" allowed. "'.$arg.'" given.');
+                }
+                else
+                {
+                    foreach(range($arg[0],$arg[2]) as $sfStep)
+                    {
+                        $this->subfields[$sfStep]['tag'] = $sfStep;
+                        $this->subfields[$sfStep]['start'] = 0;
+                    }
+                    return true;
+                }
+            }
+        }
+        else // assuming no index or subfield range
+        {
+            $this->subfields[$arg]['tag'] = $arg;
+            $this->subfields[$arg]['start'] = 0;
+            return true;
+        }
+    
+    }
+    
+    /**
     *
     * Add subfield tag
     *
@@ -322,13 +480,29 @@ class MarcSpec {
     */
     public function addSubfields($arg)
     {
-        if(isset($this->charStart) or "LDR" === $this->fieldTag) return false;
+        $this->checkFieldTag();
+        if(isset($this->charStart) or "LDR" === $this->fieldTag)
+        {
+            throw new \InvalidArgumentException('For leader or control fields subfield spec is not allowed.');
+        }
         $this->checkIfString($arg);
         for($x = 0; $x < strlen($arg); $x++)
         {
-            $this->subfields[$arg[$x]] = $arg[$x];
+            if(!preg_match("/[!\"#$%&'()*+,-.\/0-9:;<=>?[\]^_`a-z{}~]/", $arg[$x]))
+            {
+                throw new \InvalidArgumentException('For subfields only digits, lowercase alphabetic characters or one of "!"#$%&\'()*+,-./0-9:;<=>?[\]^_`a-z{}~" are allowed. But "'.$arg.'" given.');
+            }
         }
-        return true;
+        $sf_save = str_replace("$$","$|",$arg); // save subfield tag $
+        $_subfields = explode("$",$sf_save);
+        foreach(array_filter($_subfields) as $sf)
+        {
+            if("|" == $sf[0])
+            {
+                $sf[0] = "$"; // undo save subfield tag $
+            }
+            $this->validateSubfield($sf);
+        }
     }
     
     /**
@@ -362,15 +536,18 @@ class MarcSpec {
     public function setIndicators($arg)
     {
         $this->checkIfString($arg);
-        for($x = 0; $x < strlen($arg); $x++)
+        if($this->validateIndicators($arg))
         {
-            if(0 === $x)
+            for($x = 0; $x < strlen($arg); $x++)
             {
-                if("_" != $arg[$x]) $this->setIndicator1($arg[$x]);
-            }
-            if(1 === $x)
-            {
-                if("_" != $arg[$x]) $this->setIndicator2($arg[$x]);
+                if(0 === $x)
+                {
+                    if("_" != $arg[$x]) $this->setIndicator1($arg[$x]);
+                }
+                if(1 === $x)
+                {
+                    if("_" != $arg[$x]) $this->setIndicator2($arg[$x]);
+                }
             }
         }
     }
@@ -387,6 +564,7 @@ class MarcSpec {
     */
     public function setIndicator1($arg)
     {
+        $this->checkFieldTag();
         if($this->validateIndicators($arg)) $this->indicator1 = $arg;
     }
     
@@ -415,6 +593,7 @@ class MarcSpec {
     */
     public function setIndicator2($arg)
     {
+        $this->checkFieldTag();
         if($this->validateIndicators($arg)) $this->indicator2 = $arg;
     }
     
@@ -429,6 +608,95 @@ class MarcSpec {
     public function getIndicator2()
     {
         return (isset($this->indicator2)) ? $this->indicator2 : null;
+    }
+    
+    /**
+    *
+    * Set the field index starting position
+    *
+    *
+    * @access public
+    *
+    * @param int $arg
+    *
+    * @throws \InvalidArgumentException If the argument is not positive integer or 0
+    */
+    public function setFieldIndexStart($arg)
+    {
+        $this->checkFieldTag();
+        if(is_int($arg) && 0 <= $arg)
+        {
+            $this->fieldIndexStart = $arg;
+        }
+        else
+        {
+            throw new \InvalidArgumentException('Argument must be of type int.');
+        }
+    }
+    
+    /**
+    *
+    * Get the character starting position
+    *
+    * @access public
+    *
+    * @return null | int
+    */
+    public function getFieldIndexStart()
+    {
+        return (isset($this->fieldIndexStart)) ? $this->fieldIndexStart : null;
+    }
+    
+    /**
+    *
+    * Set the index ending position
+    *
+    *
+    * @access public
+    *
+    * @param int $arg
+    *
+    * @throws \InvalidArgumentException If the argument is not positive integer or 0
+    * @throws \Exception                If index starting position is not set
+    */
+    public function setFieldIndexEnd($arg)
+    {
+        $this->checkFieldTag();
+        if(is_int($arg) && 0 <= $arg)
+        {
+            if(!isset($this->fieldIndexStart))
+            {
+                throw new \Exception("Field index start position must be defined first. Use MarcSpec::setFieldIndexStart() first to set the field index start position.");
+            }
+            else
+            {
+                $this->fieldIndexEnd = $arg;
+            }
+        }
+        else
+        {
+            throw new \InvalidArgumentException('Argument must be of type positive int or 0.');
+        }
+    }
+    
+    /**
+    *
+    * Get the field index ending position
+    *
+    * @access public
+    *
+    * @return null | int
+    */
+    public function getFieldIndexEnd()
+    {
+        if(isset($this->fieldIndexEnd))
+        {
+            return $this->fieldIndexEnd;
+        }
+        else
+        {
+            return null;
+        }
     }
     
     /**
@@ -452,51 +720,79 @@ class MarcSpec {
         // check string length
         if(3 > strlen($spec))
         {
-            throw new \InvalidArgumentException("Marc spec must be 3 characters at minimum.");
+            throw new \InvalidArgumentException("MARCspec must be 3 characters at minimum.");
         }
         if(preg_match('/\s/', $spec))
         {
-            throw new \InvalidArgumentException('For Field Tag of Marc spec no whitespaces are allowed. But "'.$spec.'" given.');
+            throw new \InvalidArgumentException('For Field Tag of MARCspec no whitespaces are allowed. But "'.$spec.'" given.');
         }
         // check and set field tag
-        $fieldTag = substr($spec, 0, 3);
-        $this->setFieldTag($fieldTag);
+        $this->setFieldTag(substr($spec, 0, 3));
         
-        $dataRef = substr($spec, 3);
-        if("" != $dataRef)
+        if(3 < strlen($spec))
         {
-            if("~" == substr($spec, 3, 1))
+            $indexEnd = 2; // default index to continue without field index
+            if("[" == substr($spec, 3, 1))
             {
-                // check character postion or range
-                $charPos = substr($spec, 4);
-                if("" != strlen($charPos))
+                if($indexEnd = strpos($spec,"]"))
                 {
-                    if($_charPos = $this->validateCharPos($charPos))
+                    if( preg_match('/...\[(.*)].?/', $spec, $_assumedIndex) )
                     {
-                        $this->setCharStart((int)$_charPos[0]);
-                        if(array_key_exists(1,$_charPos))
+                        if( $_index = $this->validateCharPos($_assumedIndex[1]) )
                         {
-                            $this->setCharEnd((int)$_charPos[1]);
+                            $this->setFieldIndexStart((int)$_index[0]);
+                            if(array_key_exists("1",$_index))
+                            {
+                                if(!empty($_index[1])) $this->setFieldIndexEnd((int)$_index[1]);
+                            }
+                            else
+                            {
+                                $this->setFieldIndexEnd($this->fieldIndexStart);
+                            }
                         }
-                        else
-                        {
-                            $this->setCharLength(1);
-                            $this->setCharEnd($this->charStart);
-                        }
+                    }
+                    else
+                    {
+                        throw new \InvalidArgumentException('Assuming field index. But "'.$spec.'" given.');
                     }
                 }
                 else
                 {
-                    throw new \InvalidArgumentException('For character position or range minimum one digit is required. None given.');
+                    throw new \InvalidArgumentException('Assuming field index. No closing bracket "]" found. "'.$spec.'" given.');
                 }
             }
-            else
+            
+            $dataRef = substr($spec, $indexEnd+1);
+            if("" != $dataRef)
             {
-                if($_dataRef = $this->validateDataRef($dataRef))
+                if("/" == substr($dataRef, 0, 1))
                 {
-                    
-                    $this->addSubfields($_dataRef[0]);
-                    if(array_key_exists(1,$_dataRef)) $this->setIndicators($_dataRef[1]);
+                    // check character postion or range
+                    $charPos = substr($dataRef, 1);
+                    if("" != $charPos)
+                    {
+                        if($_charPos = $this->validateCharPos($charPos))
+                        {
+                            $this->setCharStart((int)$_charPos[0]);
+                            if(array_key_exists(1,$_charPos))
+                            {
+                                if(!empty($_charPos[1])) $this->setCharEnd((int)$_charPos[1]);
+                            }
+                            else
+                            {
+                                $this->setCharLength(1);
+                                $this->setCharEnd($this->charStart);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        throw new \InvalidArgumentException('For character position or range minimum one digit is required. None given.');
+                    }
+                }
+                else
+                {
+                    $this->parseDataRef($dataRef);
                 }
             }
         }
@@ -518,9 +814,9 @@ class MarcSpec {
     {
         $this->checkIfString($fieldTag);
         
-        if(!preg_match('/[X0-9]{3,3}|LDR/', $fieldTag))
+        if(!preg_match('/[.0-9a-z]{3,3}|[.0-9A-Z]{3,3}/', $fieldTag))
         {
-            throw new \InvalidArgumentException('For Field Tag of Marc spec only digits, "X" or "LDR" is allowed. But "'.$fieldTag.'" given.');
+            throw new \InvalidArgumentException('For Field Tag of MARCspec only "." and digits and lowercase alphabetic or digits and upper case alphabetics characters are allowed. But "'.$fieldTag.'" given.');
         }
         return true;
     }
@@ -540,43 +836,38 @@ class MarcSpec {
     private function validateCharPos($charPos)
     {
         $this->checkIfString($charPos);
-        
-        if(1 > strlen($charPos))
+        $charPosLength = strlen($charPos);
+        if(1 >$charPosLength)
         {
-            throw new \InvalidArgumentException('For character position or range minimum one digit is required. None given.');
+            throw new \InvalidArgumentException('Assuming index or charater position or range. Minimum one character is required. None given.');
+        }
+        for($x = 0; $x < $charPosLength; $x++)
+        {
+            if(!preg_match('/[0-9-]/', $charPos[$x]))
+            {
+                throw new \InvalidArgumentException('Assuming index or charater position or range. Only digits and one "-" is allowed. But "'.$charPos.'" given.');
+            }
+        }
+        if(strstr($charPos,"-") && 2 > $charPosLength)
+        {
+            throw new \InvalidArgumentException('Assuming index or charater position or range. At least one digit must be present. "'.$charPos.'" given.');
+        }
+        if(0 === strpos($charPos,"-"))
+        {
+            throw new \InvalidArgumentException('Assuming index or charater position or range. First character must not be "-". "'.$charPos.'" given.');
+        }
+        if(strpos($charPos,"-") !== strrpos($charPos,"-"))
+        {
+            throw new \InvalidArgumentException('Assuming index or charater position or range. Only one "-" character allowed. But "'.$charPos.'" given.');
         }
         $_charPos = explode("-",$charPos);
         if(2 < count($_charPos))
         {
-            throw new \InvalidArgumentException('For character position or range only digits and one "-" is allowed. But "'.$charPos.'" given.');
+            throw new \InvalidArgumentException('Assuming index or charater position or range. Only digits and one "-" is allowed. But "'.$charPos.'" given.');
         }
         return $_charPos;
     }
     
-    /**
-    * validate subfield tags and indicators
-    *
-    * @access private
-    *
-    * @param string $dataFieldRef   The specification for subfields and indicators
-    *
-    * @throws \InvalidArgumentException If the argument consits of characters not allowed
-    */
-    private function validateDataRef($dataFieldRef)
-    {
-        $this->checkIfString($dataFieldRef);
-        
-        $_ref = explode("_",$dataFieldRef,2);
-        
-        if($this->validateSubfields($_ref[0]))
-        {
-            if(array_key_exists(1,$_ref))
-            {
-                $this->validateIndicators($_ref[1]);
-            }
-        }
-        return $_ref;
-    }
     
     /**
     * validate subfield tags and indicators
@@ -585,20 +876,41 @@ class MarcSpec {
     *
     * @param string $dataFieldRef   The specification for subfields and indicators
     *
-    * @throws \InvalidArgumentException If the argument consits of characters not allowed
-    *
-    * @return true
     */
-    private function validateSubfields($subfields)
+    private function parseDataRef($dataFieldRef)
     {
-        for($x = 0; $x < strlen($subfields); $x++)
+        $this->checkIfString($dataFieldRef);
+        
+        if(substr($dataFieldRef,0,1) == "_")
         {
-            if(!preg_match("/[a-z0-9!\"#$%&'()*+-.\/:;<=>?]/", $subfields[$x]))
+            $_ref = explode("$",$dataFieldRef,2);
+            
+            $this->setIndicators(substr($_ref[0],1));
+            if(array_key_exists(1,$_ref))
             {
-                throw new \InvalidArgumentException('For subfields only digits, lowercase alphabetic characters or one of "!\"#$%&\'()*+-./:;<=>?" are allowed. But "'.$subfields.'" given.');
+                $this->addSubfields($_ref[1]);
             }
         }
-        return true;
+        elseif(substr($dataFieldRef,0,1) == "$")
+        {
+            if($lastIndexOf_ = strrpos($dataFieldRef,"_"))
+            {
+                if(substr($dataFieldRef,$lastIndexOf_-1,1) != "$") // assuming indicators given
+                {
+                    $indicators = substr($dataFieldRef,$lastIndexOf_+1);
+                    $this->setIndicators($indicators);
+                    $this->addSubfields( substr($dataFieldRef,0,(strlen($indicators)+1)*-1) );
+                }
+            }
+            else // assuming no indicators given
+            {
+                $this->addSubfields($dataFieldRef);
+            }
+        }
+        else
+        {
+            throw new \InvalidArgumentException('Either subfield specs are not valid or indicators are not prefixed correctly. "'.$dataFieldRef.'" given.');
+        }
     }
     
     /**
@@ -616,11 +928,14 @@ class MarcSpec {
     private function validateIndicators($indicators)
     {
             $this->checkIfString($indicators);
-            
-            if(2 < strlen($indicators))
+            $indLength = strlen($indicators);
+            if(2 < $indLength)
             {
-                throw new \InvalidArgumentException('For indicators only two characters are allowed. "'.strlen($indicators).'" characters given.');
-
+                throw new \InvalidArgumentException('For indicators only two characters at are allowed. "'.$indLength.'" characters given.');
+            }
+            elseif(preg_match("/_{2,2}/", $indicators))
+            {
+                throw new \InvalidArgumentException('At minimum one indicator must be a digit or a lowercase alphabetic character. But "'.$indicators.'" given.');
             }
             for($x = 0; $x < strlen($indicators); $x++)
             {
@@ -648,10 +963,46 @@ class MarcSpec {
     
     /**
     * clear all properties
+    * @access private
     */
     private function clear()
     {
-        unset($this->fieldTag,$this->charStart,$this->charEnd,$this->charLength,$this->indicator1,$this->indicator2);
+        unset($this->fieldTag,$this->charStart,$this->charEnd,$this->charLength,$this->indicator1,$this->indicator2,$this->fieldIndexStart,$this->fieldIndexEnd);
         $this->subfields = array();
     }
+
+    /**
+    * check if field tag is set
+    * @access private
+    * @throws \Exception If field tag is not set
+    */
+    private function checkFieldTag()
+    {
+        if($this->getFieldTag() == null)
+        {
+            throw new \Exception("Field tag must be set first. Use CK\MarcSpec::setFieldTag() first.");
+        }
+        else
+        {
+            return true;
+        }
+    }
+    
+    public function jsonSerialize() {
+        if(($fieldTag = $this->getFieldTag()) !== null) $_marcSpec["fieldTag"] = $fieldTag;
+        if(($charStart = $this->getCharStart()) !== null) $_marcSpec["charStart"] = $charStart;
+        if(($charEnd = $this->getCharEnd()) !== null) $_marcSpec["charEnd"] = $charEnd;
+        if(($charLength = $this->getCharLength()) !== null) $_marcSpec["charLength"] = $charLength;
+        if(($fieldIndexStart = $this->getFieldIndexStart()) !== null) $_marcSpec["fieldIndexStart"] = $fieldIndexStart;
+        if(($fieldIndexEnd = $this->getFieldIndexEnd()) !== null) $_marcSpec["fieldIndexEnd"] = $fieldIndexEnd;
+        if(($indicator1 = $this->getIndicator1()) !== null) $_marcSpec["indicator1"] = $indicator1;
+        if(($indicator2 = $this->getIndicator2()) !== null) $_marcSpec["indicator2"] = $indicator2;
+        if(($subfields = $this->getSubfields()) !== null) $_marcSpec["subfields"] = $subfields;
+        return ["marcspec"=> $_marcSpec];
+    }
 }
+
+$marcSpec = new MarcSpec('007/0-4');
+#$marcSpec = new MarcSpec('300$a[1-]');
+#print $marcSpec->getFieldTag();
+print $marcSpec->encode('json');

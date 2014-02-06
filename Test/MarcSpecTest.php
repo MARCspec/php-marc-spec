@@ -28,20 +28,30 @@ class MarcSpecTest extends \PHPUnit_Framework_TestCase
     {
         return new MarcSpec;
     }
+    
+    /****
+    * invalid data types
+    ***/
+    
     /**
      * @expectedException InvalidArgumentException
      */
     public function testInvalidArgument1Decode()
     {
-            $this->decoder((int)'245a');
+            $this->decoder((int)'245$a');
     }
     /**
      * @expectedException InvalidArgumentException
      */
     public function testInvalidArgument2Decode()
     {
-            $this->decoder(array('245a'));
+            $this->decoder(array('245$a'));
     }
+    
+    /****
+    * invalid field tags
+    ***/
+    
     /**
      * @expectedException InvalidArgumentException
      */
@@ -52,18 +62,315 @@ class MarcSpecTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException InvalidArgumentException
      */
-    public function testInvalidMarcSpec2()
+    public function testInvalidMarcSpec11()
     {
             $this->decoder('24/');
     }
     /**
      * @expectedException InvalidArgumentException
      */
-    public function testInvalidMarcSpec3()
+    public function testInvalidMarcSpec12()
     {
-            $this->decoder('24x');
+            $this->decoder('2Xx');
     }
     
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testInvalidMarcSpec13()
+    {
+            $this->decoder('007/');
+    }
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testInvalidMarcSpec14()
+    {
+            $this->decoder('007/1-2-');
+    }
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testInvalidMarcSpec15()
+    {
+            $this->decoder('24#');
+    }
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testInvalidMarcSpec16()
+    {
+            $this->decoder('007/-2');
+    }
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testInvalidMarcSpec17()
+    {
+            $this->decoder('245[-2]');
+    }
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testInvalidMarcSpec18()
+    {
+            $this->decoder('245[1-2-]');
+    }
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testInvalidMarcSpec19()
+    {
+            $this->decoder('245[1-2');
+    }
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testInvalidMarcSpec110()
+    {
+            $this->decoder('007/1-X');
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testInvalidMarcSpec111()
+    {
+            $this->decoder('245[0-2a]');
+    }
+    
+    /****
+    * invalid subfields
+    ***/
+    
+    
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testInvalidMarcSpec20()
+    {
+            $this->decoder('245$aX');
+    }    
+    
+    
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testInvalidMarcSpec21()
+    {
+            $this->decoder('245a');
+    }    
+    
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testInvalidMarcSpec22()
+    {
+            $this->decoder('245$|');
+    }    
+    
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testInvalidMarcSpec23()
+    {
+            $this->decoder('245$|');
+    }    
+    
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testInvalidMarcSpec24()
+    {
+            $this->decoder('245$ab');
+    }    
+    
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testInvalidMarcSpec25()
+    {
+            $this->decoder('245$a[]');
+    }    
+    
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testInvalidMarcSpec26()
+    {
+            $this->decoder('245$a[-1]');
+    }    
+    
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testInvalidMarcSpec27()
+    {
+            $this->decoder('245$a-b[1]');
+    }    
+    
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testInvalidMarcSpec28()
+    {
+            $this->decoder('245$a-');
+    }    
+    
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testInvalidMarcSpec29()
+    {
+            $this->decoder('245$a-9');
+    }    
+    
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testInvalidMarcSpec210()
+    {
+            $this->decoder('245$-9');
+    }    
+    
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testInvalidMarcSpec211()
+    {
+            $this->decoder('245$a[1-2-3]');
+    }    
+    
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testInvalidMarcSpec212()
+    {
+            $this->decoder('245$a[1-2x]');
+    }    
+    
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testInvalidMarcSpec213()
+    {
+            $this->decoder('245a-c');
+    }    
+  
+    
+    /****
+    * invalid indicators
+    ***/
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testInvalidMarcSpec30()
+    {
+            $this->decoder('245$a$b_1+');
+    }
+    
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testInvalidMarcSpec31()
+    {
+            $this->decoder('245$a$b_123');
+    }    
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testInvalidMarcSpec32()
+    {
+            $this->decoder('245$a$b_$');
+    }    
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testInvalidMarcSpec33()
+    {
+            $this->decoder('245$a$b_1|');
+    }    
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testInvalidMarcSpec34()
+    {
+            $this->decoder('245$a$b_10_');
+    }    
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testInvalidMarcSpec35()
+    {
+            $this->decoder('245$a$b___');
+    }    
+    
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testInvalidMarcSpec36()
+    {
+            $this->decoder('245$a$b-_1');
+    }    
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testInvalidMarcSpec37()
+    {
+            $this->decoder('245_1+$a$b');
+    }    
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testInvalidMarcSpec38()
+    {
+            $this->decoder('245_123$a$b');
+    }    
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testInvalidMarcSpec39()
+    {
+            $this->decoder('245_$$a$b');
+    }    
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testInvalidMarcSpec310()
+    {
+            $this->decoder('245_1|$a$b');
+    }    
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testInvalidMarcSpec311()
+    {
+            $this->decoder('245_10_$a$b');
+    }    
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testInvalidMarcSpec312()
+    {
+            $this->decoder('245___$a$b');
+    }    
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testInvalidMarcSpec313()
+    {
+            $this->decoder('245_1$a$b-');
+    }
+
     /**
      * assert same field tag
      */
@@ -76,58 +383,57 @@ class MarcSpecTest extends \PHPUnit_Framework_TestCase
             $marcSpec->decode('245');
             $this->assertSame('245', $marcSpec->getFieldTag());
             
-            $marcSpec->decode('XXX');
-            $this->assertSame('XXX', $marcSpec->getFieldTag());
+            $marcSpec->decode('...');
+            $this->assertSame('...', $marcSpec->getFieldTag());
             
-            $marcSpec->decode('245abc');
+            $marcSpec->decode('245[1]');
             $this->assertSame('245', $marcSpec->getFieldTag());
-            $this->assertSame(array('a'=>'a','b'=>'b','c'=>'c'), $marcSpec->getSubfields());
+            $this->assertSame(1, $marcSpec->getFieldIndexStart());
             
-            $marcSpec->decode('245!"#$%&\'()*+-./:;<=>?');
+            $marcSpec->decode('245[1-3]$a');
+            $this->assertSame('245', $marcSpec->getFieldTag());
+            $this->assertSame(1, $marcSpec->getFieldIndexStart());
+            $this->assertSame(3, $marcSpec->getFieldIndexEnd());
+            
+           $marcSpec->decode('245$a$b$c');
+            $this->assertSame('245', $marcSpec->getFieldTag());
+            $this->assertSame(['a'=>['tag'=>'a','start'=>0],'b'=>['tag'=>'b','start'=>0],'c'=>['tag'=>'c','start'=>0]], $marcSpec->getSubfields());
+            
+           
+            $marcSpec->decode('245$![0]$"[1-3]$#[0-]$$$%$&$\'$($)$*$+$-$.$/$:$;$<$=$>$?$[$]');
             $this->assertSame(
-                array(
-                    "!"=>"!",
-                    "\""=>"\"",
-                    "#"=>"#",
-                    "$"=>"$",
-                    "%"=>"%",
-                    "&"=>"&",
-                    "'"=>"'",
-                    "("=>"(",
-                    ")"=>")",
-                    "*"=>"*",
-                    "+"=>"+",
-                    "-"=>"-",
-                    "."=>".",
-                    "/"=>"/",
-                    ":"=>":",
-                    ";"=>";",
-                    "<"=>"<",
-                    "="=>"=",
-                    ">"=>">",
-                    "?"=>"?"
-                ), $marcSpec->getSubfields());
+                [
+                    "!"=>['tag'=>"!",'start'=>0,'end'=>0],
+                    "\""=>['tag'=>"\"",'start'=>1,'end'=>3],
+                    "#"=>['tag'=>"#",'start'=>0],
+                    "$"=>['tag'=>"$",'start'=>0],
+                    "%"=>['tag'=>"%",'start'=>0],
+                    "&"=>['tag'=>"&",'start'=>0],
+                    "'"=>['tag'=>"'",'start'=>0],
+                    "("=>['tag'=>"(",'start'=>0],
+                    ")"=>['tag'=>")",'start'=>0],
+                    "*"=>['tag'=>"*",'start'=>0],
+                    "+"=>['tag'=>"+",'start'=>0],
+                    "-"=>['tag'=>"-",'start'=>0],
+                    "."=>['tag'=>".",'start'=>0],
+                    "/"=>['tag'=>"/",'start'=>0],
+                    ":"=>['tag'=>":",'start'=>0],
+                    ";"=>['tag'=>";",'start'=>0],
+                    "<"=>['tag'=>"<",'start'=>0],
+                    "="=>['tag'=>"=",'start'=>0],
+                    ">"=>['tag'=>">",'start'=>0],
+                    "?"=>['tag'=>"?",'start'=>0],
+                    "["=>['tag'=>"[",'start'=>0],
+                    "]"=>['tag'=>"]",'start'=>0]
+                ], $marcSpec->getSubfields());
             
-            $marcSpec->decode('245ab_1a');
+            $marcSpec->decode('245$a$b_1a');
             $this->assertSame('1', $marcSpec->getIndicator1());
             $this->assertSame('a', $marcSpec->getIndicator2());
+
     }
     
-    /**
-     * @expectedException InvalidArgumentException
-     */
-    public function testInvalidMarcSpec4()
-    {
-            $this->decoder('007~');
-    }
-    
-    /**
-     * @expectedException InvalidArgumentException
-     */
-    public function testInvalidMarcSpec5()
-    {
-            $this->decoder('007~1-2-');
-    }
+
     
     /**
      * test character position and range
@@ -135,7 +441,7 @@ class MarcSpecTest extends \PHPUnit_Framework_TestCase
     public function testValidMarcSpec2()
     {
             $marcSpec = $this->marcspec();
-            $marcSpec->decode('LDR~0-3');
+            $marcSpec->decode('LDR/0-3');
             $this->assertSame('LDR', $marcSpec->getFieldTag());
             $this->assertSame(0, $marcSpec->getCharStart());
             $this->assertSame(3, $marcSpec->getCharEnd());
@@ -143,29 +449,16 @@ class MarcSpecTest extends \PHPUnit_Framework_TestCase
     }
     
     /**
-     * @expectedException InvalidArgumentException
+     * test index and subfield range
      */
-    public function testInvalidMarcSpec6()
+    public function testValidMarcSpec21()
     {
-            $this->decoder('245aX');
+            $marcSpec = $this->marcspec();
+            $marcSpec->decode('245$-[1-2]');
     }
+
     
-    /**
-     * @expectedException InvalidArgumentException
-     */
-    public function testInvalidMarcSpec7()
-    {
-            $this->decoder('245ab_1+');
-    }
-    
-    /**
-     * @expectedException InvalidArgumentException
-     */
-    public function testInvalidMarcSpec8()
-    {
-            $this->decoder('245ab_123');
-    }
-    
+
     /**
      * test character position and range
      */
@@ -182,13 +475,24 @@ class MarcSpecTest extends \PHPUnit_Framework_TestCase
             
             $marcSpec = $this->marcspec();
             $marcSpec->setFieldTag('245');
-            $marcSpec->addSubfields('abc');
+            $marcSpec->addSubfields('$a-c');
+            $marcSpec->addSubfields('$d[3]');
+            $marcSpec->addSubfields('$e[4-]');
+            $marcSpec->addSubfields('$f[5-6]');
             $marcSpec->setIndicator1('x');
             $marcSpec->setIndicator2('0');
             $this->assertSame('245', $marcSpec->getFieldTag());
             $this->assertSame('x', $marcSpec->getIndicator1());
             $this->assertSame('0', $marcSpec->getIndicator2());
-            $this->assertSame(array('a'=>'a','b'=>'b','c'=>'c'), $marcSpec->getSubfields());
+            $this->assertSame(
+                [
+                    'a'=>['tag'=>'a','start'=>0],
+                    'b'=>['tag'=>'b','start'=>0],
+                    'c'=>['tag'=>'c','start'=>0],
+                    'd'=>['tag'=>'d','start'=>3,'end'=>3],
+                    'e'=>['tag'=>'e','start'=>4],
+                    'f'=>['tag'=>'f','start'=>5,'end'=>6],
+                ], $marcSpec->getSubfields());
             
     }
     
@@ -197,55 +501,43 @@ class MarcSpecTest extends \PHPUnit_Framework_TestCase
      */
     public function testEncode()
     {
-        $marcSpec = new MarcSpec("245");
+        $marcSpec = new MarcSpec('245');
         $this->assertSame('245', $marcSpec->encode());
         
-        $marcSpec = new MarcSpec("245a");
-        $this->assertSame('245a', $marcSpec->encode());
+        $marcSpec = new MarcSpec('245$a');
+        $this->assertSame('245$a', $marcSpec->encode());
         
-        $marcSpec = new MarcSpec("245_1");
+        $marcSpec = new MarcSpec('245_01$a');
+        $this->assertSame('245$a_01', $marcSpec->encode());
+        
+        $marcSpec = new MarcSpec('245_1');
         $this->assertSame('245_1', $marcSpec->encode());
         
-        $marcSpec = new MarcSpec("245__0");
+        $marcSpec = new MarcSpec('245__0');
         $this->assertSame('245__0', $marcSpec->encode());
         
-        $marcSpec = new MarcSpec("245_1_");
+        $marcSpec = new MarcSpec('245_1_');
         $this->assertSame('245_1', $marcSpec->encode());
         
-        $marcSpec = new MarcSpec("007~1");
-        $this->assertSame('007~1-1', $marcSpec->encode());
+        $marcSpec = new MarcSpec('007/1');
+        $this->assertSame('007/1-1', $marcSpec->encode());
         
-        $marcSpec = new MarcSpec("007~1-3");
-        $this->assertSame('007~1-3', $marcSpec->encode());
-    }
-
-    /**
-     * test validity
-     */
-    public function testValidity()
-    {
-        $marcSpec = new MarcSpec;
-        $this->assertTrue($marcSpec->validate('245'));
-        $this->assertTrue($marcSpec->validate('245ab'));
-        $this->assertTrue($marcSpec->validate('XXXab'));
-        $this->assertTrue($marcSpec->validate('245ab_1'));
-        $this->assertTrue($marcSpec->validate('245ab__0'));
-        $this->assertTrue($marcSpec->validate('245ab_10'));
-        $this->assertTrue($marcSpec->validate('245ab_1_'));
-    }
-    
-    /**
-     * test invalidity
-     * @expectedException InvalidArgumentException
-     */
-    public function testInValidity()
-    {
-        $marcSpec = new MarcSpec;
-        $this->assertTrue($marcSpec->validate('24'));
-        $this->assertTrue($marcSpec->validate('LXR'));
-        $this->assertTrue($marcSpec->validate('245ab_123'));
-        $this->assertTrue($marcSpec->validate('245ab__.'));
-        $this->assertTrue($marcSpec->validate('004ab~1'));
-        $this->assertTrue($marcSpec->validate('004~-1'));
+        $marcSpec = new MarcSpec('007/1-3');
+        $this->assertSame('007/1-3', $marcSpec->encode());
+        
+        $marcSpec = new MarcSpec('300[1]');
+        $this->assertSame('300[1-1]', $marcSpec->encode());
+        
+        $marcSpec = new MarcSpec('300[1-3]');
+        $this->assertSame('300[1-3]', $marcSpec->encode());        
+        
+        $marcSpec = new MarcSpec('300$a[0]');
+        $this->assertSame('300$a[0-0]', $marcSpec->encode());        
+        
+        $marcSpec = new MarcSpec('300$a[1-3]');
+        $this->assertSame('300$a[1-3]', $marcSpec->encode());
+        
+        $marcSpec = new MarcSpec('300$a[1-]');
+        $this->assertSame('300$a[1-]', $marcSpec->encode());
     }
 }
