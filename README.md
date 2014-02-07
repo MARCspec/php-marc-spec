@@ -1,6 +1,6 @@
 # PHP MarcSpec
 
-PHP based *MARC spec as string* parser and validator. For specification of **MARC spec as string** see http://cklee.github.io/marc-spec/marc-spec.html .
+PHP based *MARCspec* parser and validator. For currently supported version of **MARCspec - A common MARC record path language** see http://cklee.github.io/marc-spec/marc-spec-4482fbb.html .
 
 # Usage
 
