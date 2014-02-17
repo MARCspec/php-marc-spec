@@ -5,7 +5,7 @@
 * For the full copyright and license information, please view the LICENSE
 * file that was distributed with this source code.
 */
-namespace CK\MarcSpec\Test;
+namespace CK\MARCspec\Test;
 
 
 
@@ -13,20 +13,20 @@ ini_set('include_path', '/usr/share/pear');
 require_once "autoload.php";
 require_once "/home/sbb-zdb2/htdocs/php/phpunit-3.7/PHPUnit/Autoload.php";
 
-use CK\MarcSpec\MarcSpec;
+use CK\MARCspec\MARCspec;
 
 
-class MarcSpecTest extends \PHPUnit_Framework_TestCase
+class MARCspecTest extends \PHPUnit_Framework_TestCase
 {
     public function decoder($arg)
     {
-        $ms = new MarcSpec;
+        $ms = new MARCspec;
         return $ms->decode($arg);
     }
     
     public function marcspec()
     {
-        return new MarcSpec;
+        return new MARCspec;
     }
     
     /****
@@ -501,43 +501,43 @@ class MarcSpecTest extends \PHPUnit_Framework_TestCase
      */
     public function testEncode()
     {
-        $marcSpec = new MarcSpec('245');
+        $marcSpec = new MARCspec('245');
         $this->assertSame('245', $marcSpec->encode());
         
-        $marcSpec = new MarcSpec('245$a');
+        $MARCspec = new MarcSpec('245$a');
         $this->assertSame('245$a', $marcSpec->encode());
         
-        $marcSpec = new MarcSpec('245_01$a');
+        $marcSpec = new MARCspec('245_01$a');
         $this->assertSame('245$a_01', $marcSpec->encode());
         
-        $marcSpec = new MarcSpec('245_1');
+        $marcSpec = new MARCspec('245_1');
         $this->assertSame('245_1', $marcSpec->encode());
         
-        $marcSpec = new MarcSpec('245__0');
+        $marcSpec = new MARCspec('245__0');
         $this->assertSame('245__0', $marcSpec->encode());
         
-        $marcSpec = new MarcSpec('245_1_');
+        $marcSpec = new MARCspec('245_1_');
         $this->assertSame('245_1', $marcSpec->encode());
         
-        $marcSpec = new MarcSpec('007/1');
+        $marcSpec = new MARCspec('007/1');
         $this->assertSame('007/1-1', $marcSpec->encode());
         
-        $marcSpec = new MarcSpec('007/1-3');
+        $marcSpec = new MARCspec('007/1-3');
         $this->assertSame('007/1-3', $marcSpec->encode());
         
-        $marcSpec = new MarcSpec('300[1]');
+        $marcSpec = new MARCspec('300[1]');
         $this->assertSame('300[1-1]', $marcSpec->encode());
         
-        $marcSpec = new MarcSpec('300[1-3]');
+        $marcSpec = new MARCspec('300[1-3]');
         $this->assertSame('300[1-3]', $marcSpec->encode());        
         
-        $marcSpec = new MarcSpec('300$a[0]');
+        $marcSpec = new MARCspec('300$a[0]');
         $this->assertSame('300$a[0-0]', $marcSpec->encode());        
         
-        $marcSpec = new MarcSpec('300$a[1-3]');
+        $marcSpec = new MARCspec('300$a[1-3]');
         $this->assertSame('300$a[1-3]', $marcSpec->encode());
         
-        $marcSpec = new MarcSpec('300$a[1-]');
+        $marcSpec = new MARCspec('300$a[1-]');
         $this->assertSame('300$a[1-]', $marcSpec->encode());
     }
 }

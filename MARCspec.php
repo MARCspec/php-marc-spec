@@ -5,14 +5,14 @@
 * For the full copyright and license information, please view the LICENSE
 * file that was distributed with this source code.
 */
-namespace CK\MarcSpec;
+namespace CK\MARCspec;
 
 /**
 * Class to decode, validate and encode MARC spec as string.
 * For Specification of MARC spec as string see
 * <http://cklee.github.io/marc-spec/marc-spec.html>
 */
-class MarcSpec implements \JsonSerializable{
+class MARCspec implements \JsonSerializable{
 
     /**
     * @var string field tag
@@ -88,7 +88,7 @@ class MarcSpec implements \JsonSerializable{
     }
     
     /**
-    * Encode the MarcSpec object as string
+    * Encode the MARCspec object as string
     *
     * @access public
     *
@@ -96,7 +96,7 @@ class MarcSpec implements \JsonSerializable{
     */
     public function encode($encoding = "string")
     {
-        if(!isset($this->fieldTag)) throw new \Exception("No field tag available. Assuming MarcSpec is not initialized.");
+        if(!isset($this->fieldTag)) throw new \Exception("No field tag available. Assuming MARCspec is not initialized.");
         if("string" == $encoding)
         {
             $marcspec = $this->fieldTag;
@@ -261,7 +261,7 @@ class MarcSpec implements \JsonSerializable{
         {
             if(!isset($this->charStart))
             {
-                throw new \Exception("Character start position must be defined first. Use MarcSpec::setCharStart() first to set the character start position.");
+                throw new \Exception("Character start position must be defined first. Use MARCspec::setCharStart() first to set the character start position.");
             }
             else
             {
@@ -321,7 +321,7 @@ class MarcSpec implements \JsonSerializable{
         {
             if(!isset($this->charStart))
             {
-                throw new \Exception("Character start position must be defined first. Use MarcSpec::setCharStart() first to set the character start position.");
+                throw new \Exception("Character start position must be defined first. Use MARCspec::setCharStart() first to set the character start position.");
             }
             $this->charLength = $arg;
             $charEnd = $this->charStart + $this->charLength - 1;
@@ -666,7 +666,7 @@ class MarcSpec implements \JsonSerializable{
         {
             if(!isset($this->fieldIndexStart))
             {
-                throw new \Exception("Field index start position must be defined first. Use MarcSpec::setFieldIndexStart() first to set the field index start position.");
+                throw new \Exception("Field index start position must be defined first. Use MARCspec::setFieldIndexStart() first to set the field index start position.");
             }
             else
             {
@@ -980,7 +980,7 @@ class MarcSpec implements \JsonSerializable{
     {
         if($this->getFieldTag() == null)
         {
-            throw new \Exception("Field tag must be set first. Use CK\MarcSpec::setFieldTag() first.");
+            throw new \Exception("Field tag must be set first. Use CK\MARCspec::setFieldTag() first.");
         }
         else
         {
@@ -1001,8 +1001,3 @@ class MarcSpec implements \JsonSerializable{
         return ["marcspec"=> $_marcSpec];
     }
 }
-
-$marcSpec = new MarcSpec('007/0-4');
-#$marcSpec = new MarcSpec('300$a[1-]');
-#print $marcSpec->getFieldTag();
-print $marcSpec->encode('json');
