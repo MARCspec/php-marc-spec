@@ -1,18 +1,18 @@
-# PHP MarcSpec
+# PHP MARCspec parser
 
-PHP based *MARC spec as string* parser and validator. For specification of **MARC spec as string** see http://cklee.github.io/marc-spec/marc-spec.html .
+PHP based *MARCspec* parser and validator. For specification of **MARCspec** see http://cklee.github.io/marc-spec/marc-spec.html .
 
 # Usage
 
 ```php
 <?php
 
-require_once "MarcSpec.php";
+require_once "MARCspec.php";
 
-use CK\MarcSpec\MarcSpec;
+use CK\MARCspec\MARCspec;
 
 // parse Marc spec
-$marcSpec = new MarcSpec("245$a-c_10");
+$marcSpec = new MARCspec("245$a-c_10");
 
 // get parsed elements
 $fieldTag = $marcSpec->getFieldTag(); // '245'
@@ -21,7 +21,7 @@ $indicator1 = $marcSpec->getIndicator1(); // '1'
 $indicator2 = $marcSpec->getIndicator2(); // '0'
 
 // parse Marc spec
-$marcSpec = new MarcSpec("LDR/0-4");
+$marcSpec = new MARCspec("LDR/0-4");
 
 // get parsed elements
 $fieldTag = $marcSpec->getFieldTag(); // 'LDR'
@@ -30,7 +30,7 @@ $charEnd = $marcSpec->getCharEnd(); // 4
 $charLength = $marcSpec->getCharLength(); // 5
 
 // initialize empty instance
-$marcSpec = new MarcSpec;
+$marcSpec = new MARCspec;
 
 $marcSpec->setFieldTag('245');
 $marcSpec->addSubfields('$a$b$e');
@@ -40,7 +40,7 @@ $marcSpec->setIndicator2('0');
 $enc = $marcSpec->encode(); // '245$a$b$e_10'
 
 // initialize empty instance
-$marcSpec = new MarcSpec;
+$marcSpec = new MARCspec;
 
 $marcSpec->setFieldTag('007');
 $marcSpec->setCharStart(0);
@@ -50,7 +50,7 @@ $enc = $marcSpec->encode(); // '007/0-4'
 $enc = $marcSpec->encode('json'); // { "marcspec": { "fieldTag": "007", "charStart": 0, "charEnd": 4, "charLength": 5 } }
 
 // initialize empty instance
-$marcSpec = new MarcSpec;
+$marcSpec = new MARCspec;
 
 marcSpec->validate('245$a_1'); // true
 marcSpec->validate('004$a/1'); // InvalidArgumentException
@@ -58,19 +58,19 @@ marcSpec->validate('004$a/1'); // InvalidArgumentException
 
 ## Public methods
 
-### CK\MarcSpec\MarcSpec::__construct()
+### CK\MARCspec\MARCspec::__construct()
 
 Params:
 
 * string $spec: The MARC spec as string
 
-### CK\MarcSpec\MarcSpec::decode()
+### CK\MARCspec\MARCspec::decode()
 
 Params:
 
 * string $spec: The MARC spec as string
 
-### CK\MarcSpec\MarcSpec::encode()
+### CK\MARCspec\MARCspec::encode()
 
 Params:
 
@@ -78,83 +78,83 @@ Params:
 
 Return: string or JSON
 
-### CK\MarcSpec\MarcSpec::validate()
+### CK\MARCspec\MARCspec::validate()
 
 Return: true | InvalidArgumentException
 
-### CK\MarcSpec\MarcSpec::setFieldTag()
+### CK\MARCspec\MARCspec::setFieldTag()
 
 Params:
 
 * string $fieldTag: The field tag
 
-### CK\MarcSpec\MarcSpec::addSubfields()
+### CK\MARCspec\MARCspec::addSubfields()
 
 Params:
 
 * string $subfields: The string of subfield tags
 
-### CK\MarcSpec\MarcSpec::setIndicators()
+### CK\MARCspec\MARCspec::setIndicators()
 
 Params:
 
 * string $indicators: The string of indicators 1 and 2
 
-### CK\MarcSpec\MarcSpec::setIndicator1()
+### CK\MARCspec\MARCspec::setIndicator1()
 
 Params:
 
 * string $indicator1: Indicator 1
 
-### CK\MarcSpec\MarcSpec::setIndicator2()
+### CK\MARCspec\MARCspec::setIndicator2()
 
 Params:
 
 * string $indicator1: Indicator 2
 
-### CK\MarcSpec\MarcSpec::setCharStart()
+### CK\MARCspec\MARCspec::setCharStart()
 
 Params:
 
 * int : charcter start position
 
-### CK\MarcSpec\MarcSpec::setCharEnd()
+### CK\MARCspec\MARCspec::setCharEnd()
 
 Params:
 
 * int : charcter end position
 
-### CK\MarcSpec\MarcSpec::setCharLength()
+### CK\MARCspec\MARCspec::setCharLength()
 
 Params:
 
 * int : charcter range length
 
-### CK\MarcSpec\MarcSpec::getFieldTag()
+### CK\MARCspec\MARCspec::getFieldTag()
 
 Return: string
 
-### CK\MarcSpec\MarcSpec::getSubfields()
+### CK\MARCspec\MARCspec::getSubfields()
 
 Return: array
 
-### CK\MarcSpec\MarcSpec::getIndicator1()
+### CK\MARCspec\MARCspec::getIndicator1()
 
 Return: string
 
-### CK\MarcSpec\MarcSpec::getIndicator2()
+### CK\MARCspec\MARCspec::getIndicator2()
 
 Return: string
 
-### CK\MarcSpec\MarcSpec::getCharStart()
+### CK\MARCspec\MARCspec::getCharStart()
 
 Return: int
 
-### CK\MarcSpec\MarcSpec::getCharEnd()
+### CK\MARCspec\MARCspec::getCharEnd()
 
 Return: int
 
-### CK\MarcSpec\MarcSpec::getCharLength()
+### CK\MARCspec\MARCspec::getCharLength()
 
 Return: int
 
