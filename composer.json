@@ -1,5 +1,5 @@
 {
-    "name": "ck/php-marspec",
+    "name": "ck/php-marcspec",
     "type": "library",
     "description": "PHP based MARCspec parser and validator",
     "keywords": [ "MARCspec", "MARC 21" ],
