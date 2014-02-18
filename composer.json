@@ -15,7 +15,7 @@
         "php": ">=5.4.0"
     },
     "autoload": {
-        "psr-0": { "CK\\MarcSpec": "" }
+        "psr-0": { "CK\\MARCspec": "" }
     },
     "target-dir": "CK/MarcSpec"
 }
