@@ -6,15 +6,11 @@
 * file that was distributed with this source code.
 */
 namespace CK\MARCspec\Test;
-
-
-
 ini_set('include_path', '/usr/share/pear');
 require_once "autoload.php";
 require_once "/home/sbb-zdb2/htdocs/php/phpunit-3.7/PHPUnit/Autoload.php";
 
 use CK\MARCspec\MARCspec;
-
 
 class MARCspecTest extends \PHPUnit_Framework_TestCase
 {
@@ -129,14 +125,30 @@ class MARCspecTest extends \PHPUnit_Framework_TestCase
     public function testInvalidMarcSpec110()
     {
             $this->decoder('007/1-X');
-    }
-
+    }    
+    
     /**
      * @expectedException InvalidArgumentException
      */
     public function testInvalidMarcSpec111()
     {
+            $this->decoder('007/#-');
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testInvalidMarcSpec112()
+    {
             $this->decoder('245[0-2a]');
+    }
+    
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testInvalidMarcSpec113()
+    {
+        $this->decoder('300$a[1-]');
     }
     
     /****
@@ -255,7 +267,23 @@ class MARCspecTest extends \PHPUnit_Framework_TestCase
     public function testInvalidMarcSpec213()
     {
             $this->decoder('245a-c');
+    }
+    
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testInvalidMarcSpec214()
+    {
+            $this->decoder('245$');
     }    
+    
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testInvalidMarcSpec215()
+    {
+            $this->decoder('245/1$a');
+    }
   
     
     /****
@@ -400,12 +428,12 @@ class MARCspecTest extends \PHPUnit_Framework_TestCase
             $this->assertSame(['a'=>['tag'=>'a','start'=>0],'b'=>['tag'=>'b','start'=>0],'c'=>['tag'=>'c','start'=>0]], $marcSpec->getSubfields());
             
            
-            $marcSpec->decode('245$![0]$"[1-3]$#[0-]$$$%$&$\'$($)$*$+$-$.$/$:$;$<$=$>$?$[$]');
+            $marcSpec->decode('245$![0]$"[1-3]$#[0-1]$$$%$&$\'$($)$*$+$-$.$/$:$;$<$=$>$?$[$]');
             $this->assertSame(
                 [
                     "!"=>['tag'=>"!",'start'=>0,'end'=>0],
                     "\""=>['tag'=>"\"",'start'=>1,'end'=>3],
-                    "#"=>['tag'=>"#",'start'=>0],
+                    "#"=>['tag'=>"#",'start'=>0,'end'=>1],
                     "$"=>['tag'=>"$",'start'=>0],
                     "%"=>['tag'=>"%",'start'=>0],
                     "&"=>['tag'=>"&",'start'=>0],
@@ -457,6 +485,27 @@ class MARCspecTest extends \PHPUnit_Framework_TestCase
             $marcSpec->decode('245$-[1-2]');
     }
 
+        
+     /**
+     * test character range
+     */
+    public function testValidMarcSpec22()
+    {
+            $marcSpec = $this->marcspec();
+            $marcSpec->decode('245/#');
+            $this->assertSame(1, $marcSpec->getCharLength());
+            $marcSpec->decode('245/#-#');
+            $this->assertSame(1, $marcSpec->getCharLength());
+            $marcSpec->decode('245/#-0');
+            $this->assertSame(1, $marcSpec->getCharLength());
+            $marcSpec->decode('245/#-1');
+            $this->assertSame(2, $marcSpec->getCharLength());
+            $marcSpec->decode('245/0-#');
+            $this->assertSame(0, $marcSpec->getCharStart());
+            $this->assertSame("#", $marcSpec->getCharEnd());
+            $this->assertSame(null, $marcSpec->getCharLength());
+    }
+
     
 
     /**
@@ -466,10 +515,33 @@ class MARCspecTest extends \PHPUnit_Framework_TestCase
     {
             $marcSpec = $this->marcspec();
             $marcSpec->setFieldTag('LDR');
-            $marcSpec->setCharStart(0);
-            $marcSpec->setCharEnd(3);
+            $marcSpec->setCharStartEnd(0,3);
             $this->assertSame('LDR', $marcSpec->getFieldTag());
             $this->assertSame(0, $marcSpec->getCharStart());
+            $this->assertSame(3, $marcSpec->getCharEnd());
+            $this->assertSame(4, $marcSpec->getCharLength());
+            
+            $marcSpec = $this->marcspec();
+            $marcSpec->setFieldTag('LDR');
+            $marcSpec->setCharStartEnd("#",3);
+            $this->assertSame('LDR', $marcSpec->getFieldTag());
+            $this->assertSame("#", $marcSpec->getCharStart());
+            $this->assertSame(3, $marcSpec->getCharEnd());
+            $this->assertSame(4, $marcSpec->getCharLength());
+            
+            $marcSpec = $this->marcspec();
+            $marcSpec->setFieldTag('LDR');
+            $marcSpec->setCharStartLength(0,4);
+            $this->assertSame('LDR', $marcSpec->getFieldTag());
+            $this->assertSame(0, $marcSpec->getCharStart());
+            $this->assertSame(3, $marcSpec->getCharEnd());
+            $this->assertSame(4, $marcSpec->getCharLength());
+                        
+            $marcSpec = $this->marcspec();
+            $marcSpec->setFieldTag('LDR');
+            $marcSpec->setCharStartLength("#",4);
+            $this->assertSame('LDR', $marcSpec->getFieldTag());
+            $this->assertSame("#", $marcSpec->getCharStart());
             $this->assertSame(3, $marcSpec->getCharEnd());
             $this->assertSame(4, $marcSpec->getCharLength());
             
@@ -477,7 +549,7 @@ class MARCspecTest extends \PHPUnit_Framework_TestCase
             $marcSpec->setFieldTag('245');
             $marcSpec->addSubfields('$a-c');
             $marcSpec->addSubfields('$d[3]');
-            $marcSpec->addSubfields('$e[4-]');
+            $marcSpec->addSubfields('$e[4]');
             $marcSpec->addSubfields('$f[5-6]');
             $marcSpec->setIndicator1('x');
             $marcSpec->setIndicator2('0');
@@ -490,7 +562,7 @@ class MARCspecTest extends \PHPUnit_Framework_TestCase
                     'b'=>['tag'=>'b','start'=>0],
                     'c'=>['tag'=>'c','start'=>0],
                     'd'=>['tag'=>'d','start'=>3,'end'=>3],
-                    'e'=>['tag'=>'e','start'=>4],
+                    'e'=>['tag'=>'e','start'=>4,'end'=>4],
                     'f'=>['tag'=>'f','start'=>5,'end'=>6],
                 ], $marcSpec->getSubfields());
             
@@ -501,43 +573,43 @@ class MARCspecTest extends \PHPUnit_Framework_TestCase
      */
     public function testEncode()
     {
-        $marcSpec = new MARCspec('245');
+        $marcSpec = $this->marcspec();
+        $marcSpec->decode('245');
         $this->assertSame('245', $marcSpec->encode());
         
-        $MARCspec = new MarcSpec('245$a');
+        $marcSpec->decode('245$a');
         $this->assertSame('245$a', $marcSpec->encode());
         
-        $marcSpec = new MARCspec('245_01$a');
+        $marcSpec->decode('245_01$a');
         $this->assertSame('245$a_01', $marcSpec->encode());
         
-        $marcSpec = new MARCspec('245_1');
+        $marcSpec->decode('245_1');
         $this->assertSame('245_1', $marcSpec->encode());
         
-        $marcSpec = new MARCspec('245__0');
+        $marcSpec->decode('245__0');
         $this->assertSame('245__0', $marcSpec->encode());
         
-        $marcSpec = new MARCspec('245_1_');
+        $marcSpec->decode('245_1_');
         $this->assertSame('245_1', $marcSpec->encode());
         
-        $marcSpec = new MARCspec('007/1');
-        $this->assertSame('007/1-1', $marcSpec->encode());
+        $marcSpec->decode('007/1');
+        $this->assertSame('007/1', $marcSpec->encode());
+        $this->assertSame(1, $marcSpec->getCharLength());
         
-        $marcSpec = new MARCspec('007/1-3');
+        $marcSpec->decode('007/1-3');
         $this->assertSame('007/1-3', $marcSpec->encode());
+        $this->assertSame(3, $marcSpec->getCharLength());
         
-        $marcSpec = new MARCspec('300[1]');
-        $this->assertSame('300[1-1]', $marcSpec->encode());
+        $marcSpec->decode('300[1]');
+        $this->assertSame('300[1]', $marcSpec->encode());
         
-        $marcSpec = new MARCspec('300[1-3]');
+        $marcSpec->decode('300[1-3]');
         $this->assertSame('300[1-3]', $marcSpec->encode());        
         
-        $marcSpec = new MARCspec('300$a[0]');
-        $this->assertSame('300$a[0-0]', $marcSpec->encode());        
+        $marcSpec->decode('300$a[0]');
+        $this->assertSame('300$a[0]', $marcSpec->encode());        
         
-        $marcSpec = new MARCspec('300$a[1-3]');
+        $marcSpec->decode('300$a[1-3]');
         $this->assertSame('300$a[1-3]', $marcSpec->encode());
-        
-        $marcSpec = new MARCspec('300$a[1-]');
-        $this->assertSame('300$a[1-]', $marcSpec->encode());
     }
 }
