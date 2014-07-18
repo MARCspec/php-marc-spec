@@ -1,0 +1,96 @@
+<?php
+/**
+ * MARCspec is the specification of a reference, encoded as string, to a set of data from within a MARC record.
+ * 
+ * @author Carsten Klee <mailme.klee@yahoo.de>
+ * @package CK\MARCspec
+ * @copyright For the full copyright and license information, please view the LICENSE 
+ * file that was distributed with this source code.
+ */
+namespace CK\MARCspec;
+
+use CK\MARCspec\Exception\InvalidMARCspecException;
+/**
+* A MARCspec comparison string class
+*/
+class ComparisonString implements ComparisonStringInterface {
+
+    /**
+     * @var string The escaped comparison string
+     */ 
+    private $raw;
+
+    /**
+    *
+    * {@inheritdoc}
+    * 
+    * @throws \InvalidArgumentException if argument is not a string or comparison string is not properly escaped
+    */
+    public function __construct($raw)
+    {
+        
+        if(!is_string($raw)) throw new \InvalidArgumentException('Argument must be of type string. Got '.gettype($raw).'.');
+        
+        $specialChars = ['{','}','!','=','~','?'];
+        
+        for($i = 0; $i < count($specialChars);$i++)
+        {
+            if( preg_match('/(?<!\\\)'.preg_quote($specialChars[$i]).'/',$raw) )
+            {
+                throw new InvalidMARCspecException(
+                    InvalidMARCspecException::CS.
+                    InvalidMARCspecException::ESCAPE,
+                    $raw
+                );
+            }
+        }
+        
+        $this->raw = $raw;
+    }
+    
+    /**
+    * {@inheritdoc}
+    */
+    public function getComparable()
+    {
+        $comparable = str_replace('\s',' ',$this->raw);
+        return stripcslashes($comparable);
+    }
+    
+    /**
+    * {@inheritdoc}
+    */
+    public function getRaw()
+    {
+        return $this->raw;
+    }
+    
+    /**
+    * {@inheritdoc}
+    */
+    public static function escape($arg)
+    {
+        $specialChars = ['{','}','!','=','~','?'];
+        for($i = 0; $i < count($specialChars);$i++)
+        {
+            $arg = str_replace($specialChars[$i],'\\'.$specialChars[$i],$arg);
+        }
+        return $arg = str_replace(' ','\s',$arg);
+    }
+    
+    /**
+     * {@inheritdoc}
+     */
+    public function __toString()
+    {
+        return "\\".$this->raw;
+    }
+    
+    /**
+     * {@inheritdoc}
+     */
+    public function jsonSerialize()
+    {
+        return ['comparisonString'=>$this->raw];
+    }
+} // EOC
