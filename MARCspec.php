@@ -16,7 +16,7 @@ use CK\MARCspec\Exception\InvalidMARCspecException;
 * For Specification of MARC spec as string see
 * <http://cklee.github.io/marc-spec/marc-spec.html>
 */
-class MARCspec implements MARCspecInterface, \JsonSerializable{
+class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess{
 
     /**
     * @var Field The field object
@@ -581,5 +581,67 @@ class MARCspec implements MARCspecInterface, \JsonSerializable{
             $marcspec .= "$subfield";
         }
         return $marcspec;
+    }
+    
+    /**
+     * Access object like an associative array
+     * 
+     * @api
+     * 
+     * @param string $offset Key field|subfield
+     */ 
+    public function offsetExists($offset)
+    {
+        switch($offset)
+        {
+            case 'field': return isset($this->field);
+            break;
+            case 'subfields': return (0 < count($this->subfields)) ? true : false;
+            break;
+            default: return false;
+        }
+    }
+    /**
+     * Access object like an associative array
+     * 
+     * @api
+     * 
+     * @param string $offset Key field|subfield
+     */ 
+    public function offsetGet($offset)
+    {
+        switch($offset)
+        {
+            case 'field': return $this->getField();
+            break;
+            case 'subfields': return $this->getSubfields();
+            break;
+            default: return $this->getSubfield($offset);
+        }
+    }
+    /**
+     * Access object like an associative array
+     * 
+     * @api
+     * 
+     * @param string $offset Key subfield
+     */ 
+    public function offsetSet($offset,$value)
+    {
+        switch($offset)
+        {
+            case 'subfields': $this->addSubfields($value);
+            break;
+            default: throw new \UnexpectedValueException("Offset $offset cannot be set.");
+        }
+    }
+    /**
+     * Access object like an associative array
+     * 
+     * @param string $offset
+     */ 
+    public function offsetUnset($offset)
+    {
+        throw new \BadMethodCallException("Offset $offset can not be unset.");
     }
 } // EOC

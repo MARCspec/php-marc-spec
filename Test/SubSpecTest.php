@@ -10,6 +10,7 @@ namespace CK\MARCspec\Test;
 use CK\MARCspec\MARCspec;
 use CK\MARCspec\SubSpec;
 use CK\MARCspec\Field;
+use CK\MARCspec\Subfield;
 use CK\MARCspec\Exception\InvalidMARCspecException;
 
 class SubSpecTest extends \PHPUnit_Framework_TestCase
@@ -29,37 +30,34 @@ class SubSpecTest extends \PHPUnit_Framework_TestCase
     ***/
     
     /**
-     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
+     * @expectedException InvalidArgumentException
      */
-    public function testInvalidArgument1Decode()
+    public function testInvalidSubSpec1Decode()
     {
-        $fieldSpec = $this->subspec('245','=','300');
+        $this->subspec('245','=','300');
     }
     
     /**
      * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
-    public function testInvalidArgument2Decode()
+    public function testInvalidSubSpec2Decode()
     {
-        $fieldSpec = $this->subspec(new Field('245'),'=',new Field('245'));
+        $this->subspec(new Field('245'),'=',new Subfield('245'));
     }
     
     /**
      * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
-    public function testInvalidArgument3Decode()
+    public function testInvalidSubSpec3Decode()
     {
         $this->marcspec('...{$a{$b}}');
     }
-
-    
-
 
 
     /**
      * assert true
      */
-    public function testValidFieldSpec1()
+    public function testValidSubSpec1()
     {
         $marcspec1 = $this->marcspec('245$a');
         $marcspec2 = $this->marcspec('245$b');
@@ -73,23 +71,6 @@ class SubSpecTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('CK\MARCspec\Subfield',$subfields[0] );
         $this->assertSame('=', $operator);
     }
-    
-    /**
-     * assert true
-     */
-    public function testValidFieldSpec2()
-    {
-        $marcspec1 = $this->marcspec('245$a');
-        $marcspec2 = $this->marcspec('245$b');
-        $subspec = $this->subspec($marcspec1,null,$marcspec2);
-        $this->assertNull($subspec->getLeftSubTerm());
-        $right = $subspec->getRightSubTerm();
-        $operator = $subspec->getOperator();
-        $subfields = $right->getSubfields();
-        $this->assertInstanceOf('CK\MARCspec\Subfield',$subfields[0] );
-        $this->assertSame('?', $operator);
-    }
-    
 
 
 }

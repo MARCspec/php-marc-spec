@@ -51,6 +51,8 @@ class InvalidMARCspecException extends \UnexpectedValueException {
     const PR4          = 'Assuming index or character position or range. First character must not be "-".';
     const PR5          = 'Assuming index or character position or range. Only one "-" character allowed.';
     const PR6          = 'Assuming index or character position or range. Only digits and one "-" is allowed.';
+    const PR7          = 'Assuming index or character position or range. Starting index must be positive int, 0 or "#".';
+    const PR8          = 'Assuming index or character position or range. Ending index must be a higher number (or equal) than starting index.';
     const MISSINGTAG   = 'Unexpected empty subfield tag';
     const SFCHAR       = 'For subfields only digits, lowercase alphabetic characters or one of "!"#$%&\'()*+,-./0-9:;<=>?[\]^_`a-z{}~" are allowed.';
     const SFRANGE      = 'Assuming subfield range. Use CK\MARCspec::addSubfields() to add multiple subfields via a subfield range.';

@@ -13,7 +13,7 @@ use CK\MARCspec\Exception\InvalidMARCspecException;
 /**
 * A MARCspec comparison string class
 */
-class ComparisonString implements ComparisonStringInterface {
+class ComparisonString implements ComparisonStringInterface, \JsonSerializable, \ArrayAccess {
 
     /**
      * @var string The escaped comparison string
@@ -92,5 +92,64 @@ class ComparisonString implements ComparisonStringInterface {
     public function jsonSerialize()
     {
         return ['comparisonString'=>$this->raw];
+    }
+    
+    /**
+     * Access object like an associative array
+     * 
+     * @api
+     * 
+     * @param string $offset Key raw|comparable
+     */ 
+    public function offsetExists($offset)
+    {
+        switch($offset)
+        {
+            case 'raw': 
+            case 'comparable': return true;
+            break;
+            default: return false;
+        }
+    }
+    
+    /**
+     * Access object like an associative array
+     * 
+     * @api
+     * 
+     * @param string $offset Key operator|leftSubTerm|rightSubTerm
+     */ 
+    public function offsetGet($offset)
+    {
+        switch($offset)
+        {
+            case 'raw': return $this->getRaw();
+            break;
+            case 'comparable': return $this->getComparable();
+            break;
+            default: throw new \UnexpectedValueException("Offset $offset does not exist.");
+        }
+    }
+    
+    /**
+     * Access object like an associative array
+     * 
+     * @api
+     * 
+     * @param string $offset
+     */ 
+    public function offsetSet($offset,$value)
+    {
+        throw new \UnexpectedValueException("Offset $offset cannot be set.");
+    }
+    
+    /**
+     * Access object like an associative array
+     * 
+     * @param string $offset
+     */ 
+    public function offsetUnset($offset)
+    {
+        throw new \BadMethodCallException("Offset $offset can not be unset.");
     }
 } // EOC

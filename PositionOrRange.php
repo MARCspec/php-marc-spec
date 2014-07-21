@@ -238,8 +238,9 @@ class PositionOrRange {
         }
         else
         {
-            throw new \UnexpectedValueException(
-                'First argument must be positive int, 0 or "#".',
+            throw new InvalidMARCspecException(
+                InvalidMARCspecException::PR.
+                InvalidMARCspecException::PR7,
                 $start
             );
         }
@@ -256,17 +257,19 @@ class PositionOrRange {
                 
                 if($_startEnd[1] < $_startEnd[0])
                 {
-                    throw new \UnexpectedValueException(
-                        'Second argument must be higher number (or equal) than first argument.',
-                        $end
+                    throw new InvalidMARCspecException(
+                        InvalidMARCspecException::PR.
+                        InvalidMARCspecException::PR8,
+                        $start.'-'.$end
                     );
                 }
             }
             else
             {
-                throw new \UnexpectedValueException(
-                    'Second argument must be positive int, 0 or "#".',
-                    $end
+                throw new InvalidMARCspecException(
+                    InvalidMARCspecException::PR.
+                    InvalidMARCspecException::PR8,
+                    $start.'-'.$end
                 );
             }
         }

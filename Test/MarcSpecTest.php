@@ -56,19 +56,16 @@ class MARCspecTest extends \PHPUnit_Framework_TestCase
      {
           
          $marcSpec = $this->marcspec('245$a-c');
-         $_subfields = $marcSpec->getSubfields();
-         $this->assertSame(3, count($_subfields));
+         $this->assertSame(3, count($marcSpec['subfields']));
      }
      /**
       * assert same subfields
      */
      public function testValidMarcSpec2()
      {
-          
          $marcSpec = $this->marcspec('245');
-         $marcSpec->addSubfields('$d-f');
-         $_subfields = $marcSpec->getSubfields();
-         $this->assertSame(3, count($_subfields));
+         $marcSpec['subfields'] = '$d-f';
+         $this->assertSame(3, count($marcSpec['subfields']));
      }
     
      /**
@@ -88,14 +85,13 @@ class MARCspecTest extends \PHPUnit_Framework_TestCase
     {
         $field = new Field('245');
         $marcSpec = MARCspec::setField($field);
-        $marcSpec->addSubfields('$d{$c/#=\.}{?$a}');
-        $_subfields = $marcSpec->getSubfields();
+        $marcSpec['subfields'] = '$d{$c/#=\.}{?$a}';
+        $_subfields = $marcSpec['subfields'];
         $this->assertSame(1, count($_subfields));
-        $_sf = $marcSpec->getSubfield('d');
-        $sub = $_sf[0]->getSubSpecs();
-        $left = $sub[0]->getLeftSubTerm();
-        $leftField = $left->getField();
-        $this->assertSame('245', $leftField->getTag());
+        $leftFieldTag = $marcSpec['d'][0]['subSpecs'][0]['leftSubTerm']['field']['tag'];
+        $this->assertSame('245',$leftFieldTag);
+        $rightSubfieldTag = $marcSpec['d'][0]['subSpecs'][1]['rightSubTerm']['subfields'][0]['tag'];
+        $this->assertSame('.',$marcSpec['d'][0]['subSpecs'][0]['rightSubTerm']['comparable']);
     }
     
 

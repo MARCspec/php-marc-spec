@@ -14,7 +14,7 @@ use CK\MARCspec\Exception\InvalidMARCspecException;
 /**
 * A MARCspec fieldspec class
 */
-class Field extends PositionOrRange implements FieldInterface, \JsonSerializable {
+class Field extends PositionOrRange implements FieldInterface, \JsonSerializable, \ArrayAccess {
 
     /**
      * @var string field tag
@@ -439,5 +439,124 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
             }
         }
         return $fieldSpec;
+    }
+
+    /**
+     * Access object like an associative array
+     * 
+     * @api
+     * 
+     * @param string $offset Key indexStart|indexEnd|charStart|charEnd|charLength|indicator1|indicator2|subSpecs
+     */ 
+    public function offsetExists($offset)
+    {
+        switch($offset)
+        {
+            case 'tag': return isset($this->tag);
+            break;
+            case 'indexStart': return isset($this->indexStart);
+            break;
+            case 'indexEnd': return isset($this->indexEnd);
+            break;
+            case 'charStart': return isset($this->charStart);
+            break;
+            case 'charEnd': return isset($this->charEnd);
+            break;
+            case 'indicator1': return isset($this->indicator1);
+            break;
+            case 'indicator2': return isset($this->indicator2);
+            break;
+            case 'subSpecs': return (0 < count($this->subSpecs)) ? true : false;
+            break;
+            default: return false;
+        }
+    }
+
+    /**
+     * Access object like an associative array
+     * 
+     * @api
+     * 
+     * @param string $offset Key indexStart|indexEnd|charStart|charEnd|charLength|indicator1|indicator2|subSpecs
+     */ 
+    public function offsetGet($offset)
+    {
+        switch($offset)
+        {
+            case 'tag': return $this->getTag();
+            break;
+            case 'indexStart': return $this->getIndexStart();
+            break;
+            case 'indexEnd': return $this->getIndexEnd();
+            break;
+            case 'charStart': return $this->getCharStart();
+            break;
+            case 'charEnd': return $this->getCharEnd();
+            break;
+            case 'charLength': return $this->getCharLength();
+            break;
+            case 'indicator1': return $this->getIndicator1();
+            break;
+            case 'indicator2': return $this->getIndicator2();
+            break;
+            case 'subSpecs': $this->getSubSpecs();
+            break;
+            default: return null;
+        }
+    }
+
+    /**
+     * Access object like an associative array
+     * 
+     * @api
+     * 
+     * @param string $offset Key indexStart|indexEnd|charStart|charEnd|charLength|indicator1|indicator2|subSpecs
+     */ 
+    public function offsetSet($offset,$value)
+    {
+        switch($offset)
+        {
+            case 'indexStart': $this->setIndexStartEnd($value);
+            break;
+            case 'indexEnd':
+                if(!isset($this['indexStart']))
+                {
+                    $this->setIndexStartEnd($value,$value);
+                }
+                else
+                {
+                    $this->setIndexStartEnd($this['indexStart'],$value);
+                }
+            break;
+            case 'charStart': $this->setCharStartEnd($value);
+            break;
+            case 'charEnd':
+                if(!isset($this['charStart']))
+                {
+                    $this->setCharStartEnd($value,$value);
+                }
+                else
+                {
+                    $this->setCharStartEnd($this['charStart'],$value);
+                }
+            break;
+            case 'charLength': throw new \UnexpectedValueException("CharLength is always calculated.");
+            break;
+            case 'indicator1': $this->setIndicator1();
+            break;
+            case 'indicator2': $this->setIndicator2();
+            break;
+            case 'subSpecs': $this->addSubSpec($value);
+            break;
+            default: throw new \UnexpectedValueException("Offset $offset cannot be set.");
+        }
+    }
+
+    /**
+     * Access object like an associative array
+     */ 
+    public function offsetUnset($offset)
+    {
+        throw new \BadMethodCallException("Offset $offset can not be unset.");
     }
 } // EOC

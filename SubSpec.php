@@ -14,7 +14,7 @@ use CK\MARCspec\Exception\InvalidMARCspecException;
 /**
 * A MARCspec subspec class
 */
-class SubSpec implements SubSpecInterface {
+class SubSpec implements SubSpecInterface, \JsonSerializable, \ArrayAccess {
 
     /**
      * @var string Operator
@@ -121,5 +121,67 @@ class SubSpec implements SubSpecInterface {
         $_subSpec['operator'] = $this->operator;
         $_subSpec['rightSubTerm'] = $this->rightSubTerm->jsonSerialize();
         return $_subSpec;
+    }
+
+    /**
+     * Access object like an associative array
+     * 
+     * @api
+     * 
+     * @param string $offset Key operator|leftSubTerm|rightSubTerm
+     */ 
+    public function offsetExists($offset)
+    {
+        switch($offset)
+        {
+            case 'operator': 
+            case 'leftSubTerm':
+            case 'rightSubTerm': return true;
+            break;
+            default: return false;
+        }
+    }
+    
+    /**
+     * Access object like an associative array
+     * 
+     * @api
+     * 
+     * @param string $offset Key operator|leftSubTerm|rightSubTerm
+     */ 
+    public function offsetGet($offset)
+    {
+        switch($offset)
+        {
+            case 'operator': return $this->getOperator();
+            break;
+            case 'leftSubTerm': return $this->getLeftSubTerm();
+            break;
+            case 'rightSubTerm': return $this->getRightSubTerm();
+            break;
+            default: throw new \UnexpectedValueException("Offset $offset does not exist.");
+        }
+    }
+    
+    /**
+     * Access object like an associative array
+     * 
+     * @api
+     * 
+     * @param string $offset
+     */ 
+    public function offsetSet($offset,$value)
+    {
+        throw new \UnexpectedValueException("Offset $offset cannot be set.");
+    }
+    
+    /**
+     * Access object like an associative array
+     * 
+     * @param string $offset
+     */ 
+    public function offsetUnset($offset)
+    {
+        throw new \BadMethodCallException("Offset $offset can not be unset.");
     }
 } // EOC
