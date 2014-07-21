@@ -44,28 +44,28 @@ class SubfieldTest extends \PHPUnit_Framework_TestCase
     ***/
     
     /**
-     * @expectedException InvalidMARCspecException
+     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidSubfieldSpec01()
     {
         $this->subfieldspec('a');
     }    
     /**
-     * @expectedException InvalidMARCspecException
+     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidSubfieldSpec1()
     {
         $this->subfieldspec(' $a ');
     }
     /**
-     * @expectedException InvalidMARCspecException
+     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidSubfieldSpec11()
     {
             $this->subfieldspec('$a/');
     }
     /**
-     * @expectedException InvalidMARCspecException
+     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidSubfieldSpec12()
     {
@@ -73,56 +73,56 @@ class SubfieldTest extends \PHPUnit_Framework_TestCase
     }
     
     /**
-     * @expectedException InvalidMARCspecException
+     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidSubfieldSpec13()
     {
             $this->subfieldspec('|');
     }
     /**
-     * @expectedException InvalidMARCspecException
+     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidSubfieldSpec14()
     {
             $this->subfieldspec('$a/1-2-');
     }
     /**
-     * @expectedException InvalidMARCspecException
+     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidSubfieldSpec15()
     {
             $this->subfieldspec('$|');
     }
     /**
-     * @expectedException InvalidMARCspecException
+     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidSubfieldSpec16()
     {
             $this->subfieldspec('$a/-2');
     }
     /**
-     * @expectedException InvalidMARCspecException
+     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidSubfieldSpec17()
     {
             $this->subfieldspec('$a[-2]');
     }
     /**
-     * @expectedException InvalidMARCspecException
+     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidSubfieldSpec18()
     {
             $this->subfieldspec('$a[1-2-]');
     }
     /**
-     * @expectedException InvalidMARCspecException
+     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidSubfieldSpec19()
     {
             $this->subfieldspec('$a[1-2');
     }
     /**
-     * @expectedException InvalidMARCspecException
+     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidSubfieldSpec110()
     {
@@ -130,7 +130,7 @@ class SubfieldTest extends \PHPUnit_Framework_TestCase
     }    
     
     /**
-     * @expectedException InvalidMARCspecException
+     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidSubfieldSpec111()
     {
@@ -138,7 +138,7 @@ class SubfieldTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException InvalidMARCspecException
+     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidSubfieldSpec112()
     {
@@ -146,7 +146,7 @@ class SubfieldTest extends \PHPUnit_Framework_TestCase
     }
     
     /**
-     * @expectedException InvalidMARCspecException
+     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidSubfieldSpec113()
     {
@@ -154,7 +154,7 @@ class SubfieldTest extends \PHPUnit_Framework_TestCase
     }
     
     /**
-     * @expectedException InvalidMARCspecException
+     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidSubfieldSpec114()
     {

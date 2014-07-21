@@ -268,13 +268,32 @@ class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerial
         if(($charStart = $this->getCharStart()) !== null) $_subfieldSpec['charStart'] = $charStart;
         if(($charEnd = $this->getCharEnd()) !== null) $_subfieldSpec['charEnd'] = $charEnd;
         if(($charLength = $this->getCharLength()) !== null) $_subfieldSpec['charLength'] = $charLength;
+        if(($subSpecs = $this->getSubSpecs()) !== null)
+        {
+            $_subfieldSpec['subSpecs'] = [];
+            foreach($subSpecs as $key => $subSpec)
+            {
+                if(is_array($subSpec))
+                {
+                    foreach($subSpec as $altSubSpec)
+                    {
+                        $_subfieldSpec['subSpecs'][$key][] = $altSubSpec->jsonSerialize();
+                    }
+                    
+                }
+                else
+                {
+                    $_subfieldSpec['subSpecs'][$key] = $subSpec->jsonSerialize();
+                }
+            }
+        }
         return $_subfieldSpec;
     }
     
     /**
      * {@inheritdoc}
      */
-    public function __toString()
+    public function getBaseSpec()
     {
         $subfieldSpec = '$'.$this->getTag();
         if(($indexStart = $this->getIndexStart()) !== null)
@@ -288,6 +307,15 @@ class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerial
             $subfieldSpec .= "/".$charStart;
             if(($charEnd = $this->getCharEnd()) !== null) $subfieldSpec .= "-".$charEnd;
         }
+        return $subfieldSpec;
+    }
+    /**
+     * {@inheritdoc}
+     */
+    public function __toString()
+    {
+        $subfieldSpec = $this->getBaseSpec();
+        
         if(($subSpecs = $this->getSubSpecs()) !== null)
         {
             foreach($subSpecs as $subSpec)
@@ -298,11 +326,11 @@ class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerial
                     {
                         $subSpec[$orKey] = $orSubSpec->__toString();
                     }
-                    $subfieldSpec .= implode('|',$subSpec);
+                    $subfieldSpec .= '{'.implode('|',$subSpec).'}';
                 }
                 else
                 {
-                    $subfieldSpec .= $subSpec->__toString();
+                    $subfieldSpec .= '{'.$subSpec->__toString().'}';
                 }
             }
         }

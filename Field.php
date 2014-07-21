@@ -389,9 +389,9 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
     }
     
     /**
-    * {@inheritdoc}
-    */
-    public function __toString()
+     * {@inheritdoc}
+     */
+    public function getBaseSpec()
     {
         $fieldSpec = $this->getTag();
         if(($indexStart = $this->getIndexStart()) !== null)
@@ -409,9 +409,34 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
         $indicator2 = ($this->getIndicator2() !== null) ? $this->indicator2 : "_";
         $indicators = $indicator1.$indicator2;
         if($indicators != "__") $fieldSpec .= "_".$indicators;
+        
+        return $fieldSpec;
+    }
+    
+    /**
+    * {@inheritdoc}
+    */
+    public function __toString()
+    {
+        $fieldSpec = $this->getBaseSpec();
+        
         if(($subSpecs = $this->getSubSpecs()) !== null)
         {
-            foreach($subSpecs as $subSpec) $fieldSpec .= $subSpecs->__toString();
+            foreach($subSpecs as $subSpec)
+            {
+                if(is_array($subSpec))
+                {
+                    foreach($subSpec as $orKey => $orSubSpec)
+                    {
+                        $subSpec[$orKey] = $orSubSpec->__toString();
+                    }
+                    $fieldSpec .= '{'.implode('|',$subSpec).'}';
+                }
+                else
+                {
+                    $fieldSpec .= '{'.$subSpec->__toString().'}';
+                }
+            }
         }
         return $fieldSpec;
     }

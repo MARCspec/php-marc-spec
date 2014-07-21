@@ -29,7 +29,7 @@ class SubSpecTest extends \PHPUnit_Framework_TestCase
     ***/
     
     /**
-     * @expectedException InvalidMARCspecException
+     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidArgument1Decode()
     {
@@ -37,7 +37,7 @@ class SubSpecTest extends \PHPUnit_Framework_TestCase
     }
     
     /**
-     * @expectedException InvalidMARCspecException
+     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidArgument2Decode()
     {
@@ -45,7 +45,7 @@ class SubSpecTest extends \PHPUnit_Framework_TestCase
     }
     
     /**
-     * @expectedException InvalidMARCspecException
+     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidArgument3Decode()
     {
@@ -81,7 +81,7 @@ class SubSpecTest extends \PHPUnit_Framework_TestCase
     {
         $marcspec1 = $this->marcspec('245$a');
         $marcspec2 = $this->marcspec('245$b');
-        $subspec = $this->subspec(null,null,new MARCspec('245$a'));
+        $subspec = $this->subspec($marcspec1,null,$marcspec2);
         $this->assertNull($subspec->getLeftSubTerm());
         $right = $subspec->getRightSubTerm();
         $operator = $subspec->getOperator();

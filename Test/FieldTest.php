@@ -44,21 +44,21 @@ class FieldTest extends \PHPUnit_Framework_TestCase
     ***/
     
     /**
-     * @expectedException InvalidMARCspecException
+     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidFieldSpec1()
     {
             $this->fieldspec(' 24 ');
     }
     /**
-     * @expectedException InvalidMARCspecException
+     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidFieldSpec11()
     {
             $this->fieldspec('24/');
     }
     /**
-     * @expectedException InvalidMARCspecException
+     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidFieldSpec12()
     {
@@ -66,56 +66,56 @@ class FieldTest extends \PHPUnit_Framework_TestCase
     }
     
     /**
-     * @expectedException InvalidMARCspecException
+     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidFieldSpec13()
     {
             $this->fieldspec('007/');
     }
     /**
-     * @expectedException InvalidMARCspecException
+     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidFieldSpec14()
     {
             $this->fieldspec('007/1-2-');
     }
     /**
-     * @expectedException InvalidMARCspecException
+     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidFieldSpec15()
     {
             $this->fieldspec('24#');
     }
     /**
-     * @expectedException InvalidMARCspecException
+     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidFieldSpec16()
     {
             $this->fieldspec('007/-2');
     }
     /**
-     * @expectedException InvalidMARCspecException
+     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidFieldSpec17()
     {
             $this->fieldspec('245[-2]');
     }
     /**
-     * @expectedException InvalidMARCspecException
+     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidFieldSpec18()
     {
             $this->fieldspec('245[1-2-]');
     }
     /**
-     * @expectedException InvalidMARCspecException
+     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidFieldSpec19()
     {
             $this->fieldspec('245[1-2');
     }
     /**
-     * @expectedException InvalidMARCspecException
+     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidFieldSpec110()
     {
@@ -123,7 +123,7 @@ class FieldTest extends \PHPUnit_Framework_TestCase
     }    
     
     /**
-     * @expectedException InvalidMARCspecException
+     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidFieldSpec111()
     {
@@ -131,7 +131,7 @@ class FieldTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException InvalidMARCspecException
+     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidFieldSpec112()
     {
@@ -139,7 +139,7 @@ class FieldTest extends \PHPUnit_Framework_TestCase
     }
     
     /**
-     * @expectedException InvalidMARCspecException
+     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidFieldSpec113()
     {
@@ -155,7 +155,7 @@ class FieldTest extends \PHPUnit_Framework_TestCase
     
 
     /**
-     * @expectedException InvalidMARCspecException
+     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidFieldSpec30()
     {
@@ -163,35 +163,35 @@ class FieldTest extends \PHPUnit_Framework_TestCase
     }
     
     /**
-     * @expectedException InvalidMARCspecException
+     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidFieldSpec31()
     {
             $this->fieldspec('245_123');
     }    
     /**
-     * @expectedException InvalidMARCspecException
+     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidFieldSpec32()
     {
             $this->fieldspec('245_$');
     }    
     /**
-     * @expectedException InvalidMARCspecException
+     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidFieldSpec33()
     {
             $this->fieldspec('245_1|');
     }    
     /**
-     * @expectedException InvalidMARCspecException
+     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidFieldSpec34()
     {
             $this->fieldspec('245_10_');
     }    
     /**
-     * @expectedException InvalidMARCspecException
+     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidFieldSpec35()
     {
@@ -199,21 +199,21 @@ class FieldTest extends \PHPUnit_Framework_TestCase
     }    
     
     /**
-     * @expectedException InvalidMARCspecException
+     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidFieldSpec37()
     {
             $this->fieldspec('245_1+');
     }    
     /**
-     * @expectedException InvalidMARCspecException
+     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidFieldSpec38()
     {
             $this->fieldspec('245_123');
     }    
     /**
-     * @expectedException InvalidMARCspecException
+     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidFieldSpec39()
     {
@@ -221,7 +221,7 @@ class FieldTest extends \PHPUnit_Framework_TestCase
     }
     
     /**
-     * @expectedException InvalidMARCspecException
+     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidArgument310Decode()
     {

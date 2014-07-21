@@ -109,7 +109,7 @@ class SubSpec implements SubSpecInterface {
      */
     public function __toString()
     {
-        return "{"."$this->leftSubTerm".$this->operator."$this->rightSubTerm"."}";
+        return "$this->leftSubTerm".$this->operator."$this->rightSubTerm";
     }
     
     /**

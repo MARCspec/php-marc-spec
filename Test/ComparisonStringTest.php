@@ -31,7 +31,7 @@ class ComparisonStringTest extends \PHPUnit_Framework_TestCase
     }    
     
     /**
-     * @expectedException InvalidMARCspecException
+     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidArgument2Decode()
     {

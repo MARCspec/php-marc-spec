@@ -35,6 +35,7 @@ class MARCspec implements MARCspecInterface, \JsonSerializable{
     */ 
     public function __construct($spec)
     {
+    #print "Construct MS $spec \n";
         if($spec instanceof FieldInterface)
         {
             $this->field = $spec;
@@ -96,9 +97,11 @@ class MARCspec implements MARCspecInterface, \JsonSerializable{
             // process rest
             if(!empty($specMatches[2]))
             {
+            #print "Construct calling parseRef: ".$specMatches[2]."\n";
                 $this->createInstances($this->parseDataRef($specMatches[2]));
             }
         }
+        #print "MS created $this\n";
     }
     
     /**
@@ -180,7 +183,7 @@ class MARCspec implements MARCspecInterface, \JsonSerializable{
                     $subfields
                 );
             }
-            
+            #print "AddSubfields calling parseRef: ".$subfields."\n";
             $this->createInstances($this->parseDataRef($subfields));
         }
     }
@@ -273,6 +276,7 @@ class MARCspec implements MARCspecInterface, \JsonSerializable{
     */
     public static function parseDataRef($arg)
     {
+    #print "parseRef: $arg\n";
         $open = 0;
         $close = 0;
         $_nocount = ['$','\\'];
@@ -388,6 +392,9 @@ class MARCspec implements MARCspecInterface, \JsonSerializable{
      */ 
     private function createInstances($_detected)
     {
+    #print "createInstances";
+    #print_r($_detected);
+    #print "\n";
         foreach($_detected as $key => $_dataRef)
         {
             if(array_key_exists('subfield',$_dataRef))
@@ -408,7 +415,8 @@ class MARCspec implements MARCspecInterface, \JsonSerializable{
                     {
                         foreach($_dataRef['subspec'] as $subspec)
                         {
-                            $_Subspecs = $this->createSubSpec($subspec,$this);
+                            #print "creating SubSpec $subspec\n";
+                            $_Subspecs = $this->createSubSpec($subspec,$Subfield);
                             $Subfield->addSubSpec($_Subspecs);
                         }
                     }
@@ -418,7 +426,7 @@ class MARCspec implements MARCspecInterface, \JsonSerializable{
             {
                 foreach($_dataRef['subspec'] as $subKey => $subspec)
                 {
-                    $Subspec = $this->createSubSpec($subspec,$this);
+                    $Subspec = $this->createSubSpec($subspec);
                     $this->field->addSubSpec($Subspec);
                 }
             }
@@ -426,25 +434,29 @@ class MARCspec implements MARCspecInterface, \JsonSerializable{
     }
     
     /**
-     * Detects and creates SubSpecs
+     * Creates SubSpecs
      * 
-     * @api
+     * @internal
      *
      * @param string $assumedSubspecs A string with assumed subSpecs
-     * @param string|MARCspec $context The field or subfield spec as a context for abbreviated specs
      * 
      * @return SubSpecInterface|$_subSpec[SubSpecInterface] Instance of SubSpecInterface
      * or numeric array of instances of SubSpecInterface
      * 
      * @throws InvalidMARCspecException
      */
-    public static function createSubSpec($assumedSubspecs,$context)
+    private function createSubSpec($assumedSubspecs,$Subfield=null)
     {
-        $context = "$context"; // object in string context
+        $context = $this->field->getBaseSpec();
+        if(!is_null($Subfield))
+        {
+            $context .= $Subfield->getBaseSpec();
+        }
+        #$context = "$this"; // object in string context
         $_nocount = ['$','\\'];
         $_operators = ['?','!','~','='];
         $specLength = strlen($assumedSubspecs);
-        
+#print "create SubSpec ".$context.$assumedSubspecs."\n";
         $_subTermSets = preg_split('/(?<!\\\\)\|/', substr($assumedSubspecs,1,$specLength-2));
         
         foreach($_subTermSets as $key => $subTermSet)
@@ -550,11 +562,12 @@ class MARCspec implements MARCspecInterface, \JsonSerializable{
     public function jsonSerialize() 
     {
         $_marcSpec['field'] = $this->field->jsonSerialize();
+        
         foreach($this->subfields as $subfield)
         {
             $_marcSpec['subfields'][] = $subfield->jsonSerialize();
         }
-        return ['marcspec'=>$_marcSpec];
+        return $_marcSpec;
     }
     
     /**

@@ -112,6 +112,15 @@ interface FieldInterface {
      */
      public function addSubSpec(SubSpecInterface $subSpec);
      
+     /**
+      * Get the basic spec without subspecs
+      * 
+      * @api
+      * 
+      * @return string
+      */
+     public function getBaseSpec();
+     
     /**
      * encodes Field as string
      *
