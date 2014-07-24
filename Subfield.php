@@ -56,10 +56,8 @@ class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerial
     */
     public function __construct($subfieldspec)
     {
-        if(!is_string($subfieldspec))
-        {
-            throw new \InvalidArgumentException("Method only accepts string as argument. " .gettype($subfieldspec)." given.");
-        }
+        $this->checkIfString($subfieldspec);
+
         if('$' !== $subfieldspec[0])
         {
             throw new InvalidMARCspecException(

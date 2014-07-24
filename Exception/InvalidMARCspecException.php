@@ -58,6 +58,7 @@ class InvalidMARCspecException extends \UnexpectedValueException {
     const SFRANGE      = 'Assuming subfield range. Use CK\MARCspec::addSubfields() to add multiple subfields via a subfield range.';
     const MISSINGSLASH = 'Assuming subfield character position or range. Missing "/" delimiter';
     const OPERATOR     = 'Operator must be one of "=" / "!=" / "~" / "!~" / "!" / "?".';
+    const HINTESCAPED  = 'Hint: Check for unescaped characters.';
     
     public function __construct($message, $context = null)
     {

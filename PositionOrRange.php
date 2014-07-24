@@ -14,7 +14,7 @@ use CK\MARCspec\Exception\InvalidMARCspecException;
 /**
 * class for index or character position or range spec
 */
-class PositionOrRange {
+class PositionOrRange implements PositionOrRangeInterface {
 
     /**
      * {@inheritdoc}
@@ -139,7 +139,7 @@ class PositionOrRange {
     * 
     * @return array $_pos[string] An numeric array of character or index positions. $_pos[1] might be empty.
     */
-    static function validatePos($pos)
+    protected function validatePos($pos)
     {
         $posLength = strlen($pos);
         

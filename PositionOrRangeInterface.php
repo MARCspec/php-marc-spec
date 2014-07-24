@@ -15,139 +15,120 @@ namespace CK\MARCspec;
  */
 interface PositionOrRangeInterface {
 
-
-    
     /**
-        *
-     * Set the field index starting and ending position
-        *
-     * @api
-     * 
-     * @access public
-     * 
-     * @param int|string $start The index starting position
-     * @param int|string|null $end The index ending position
-     */
+    *
+    * Set the field index starting and ending position
+    *
+    * @api
+    * 
+    * @access public
+    * 
+    * @param int|string $start The index starting position
+    * @param int|string|null $end The index ending position
+    */
     public function setIndexStartEnd($start,$end = null);
-    
+
     /**
-        *
-     * Set the field index starting and ending position via length
-        *
-     * @api
-     * 
-     * @access public
-        *
-     * @param int|string $start The index starting position
-     * @param int $length The length count
-     */
+    *
+    * Set the field index starting and ending position via length
+    *
+    * @api
+    * 
+    * @access public
+    *
+    * @param int|string $start The index starting position
+    * @param int $length The length count
+    */
     public function setIndexStartLength($start,$length);
-    
+
     /**
-        *
-     * Get the character starting position
-        *
-     * @api
-     * 
-     * @access public
-     * 
-     * @return null|int|string $indexStart The field index starting position
-     */
+    *
+    * Get the character starting position
+    *
+    * @api
+    * 
+    * @access public
+    * 
+    * @return null|int|string $indexStart The field index starting position
+    */
     public function getIndexStart();
-    
+
     /**
-        *
-     * Get the field index ending position
-        *
-     * @api
-     * 
-     * @access public
-     * 
-     * @return null|int $indexEnd The field index ending position
-     */
+    *
+    * Get the field index ending position
+    *
+    * @api
+    * 
+    * @access public
+    * 
+    * @return null|int $indexEnd The field index ending position
+    */
     public function getIndexEnd();
-    
+
     /**
-        *
-     * Set character starting and ending position
-        *
-     * @api
-     * 
-     * @access public
-     * 
-     * @param int|string $start The character starting position
-     * @param int|string|null $end The character ending position
-        *
-     */
+    *
+    * Set character starting and ending position
+    *
+    * @api
+    * 
+    * @access public
+    * 
+    * @param int|string $start The character starting position
+    * @param int|string|null $end The character ending position
+    *
+    */
     public function setCharStartEnd($start,$end = null);
-    
+
     /**
-        *
-     * Set character starting and ending position via start and length
-     * 
-     * @api
-     * 
-     * @access public
-     * 
-     * @param int|string $start The character starting position
-     * @param int $length The character length count
-        *
-     */
+    *
+    * Set character starting and ending position via start and length
+    * 
+    * @api
+    * 
+    * @access public
+    * 
+    * @param int|string $start The character starting position
+    * @param int $length The character length count
+    *
+    */
     public function setCharStartLength($start,$length);
-    
+
     /**
-        *
-     * Get the character starting position
-        *
-     * @api
-     * 
-     * @access public
-     * 
-     * @return null|int $charStart The character starting position 
-     */
+    *
+    * Get the character starting position
+    *
+    * @api
+    * 
+    * @access public
+    * 
+    * @return null|int $charStart The character starting position 
+    */
     public function getCharStart();
-    
-    
+
+
     /**
-        *
-     * Get the character ending position
-        *
-     * @api
-     * 
-     * @access public
-     * 
-     * @return null|int $charEnd The character ending position 
-     */
+    *
+    * Get the character ending position
+    *
+    * @api
+    * 
+    * @access public
+    * 
+    * @return null|int $charEnd The character ending position 
+    */
     public function getCharEnd();
-    
+
     /**
-        *
-     * Get length of character range
-        *
-     * @api
-     * 
-     * @access public
-     * 
-     * @return null|int $length The character length
-     * 
-     * @throws \InvalidArgumentException if length is less than 1
-     */
+    *
+    * Get length of character range
+    *
+    * @api
+    * 
+    * @access public
+    * 
+    * @return null|int $length The character length
+    * 
+    * @throws \InvalidArgumentException if length is less than 1
+    */
     public function getCharLength();
-    
-    /**
-     * validate a position or range
-     * 
-     * @access protected
-     * 
-     * @param string $pos The position or range
-     * 
-     * @throws \InvalidArgumentException if the argument is less than 1 char long
-     * @throws \InvalidArgumentException if it consits of characters not allowed
-     * @throws \InvalidArgumentException for index or character range if argument is less than 3 characters long
-     * @throws \InvalidArgumentException for index or character range if first character is "-"
-     * @throws \InvalidArgumentException for index or character range if more than one "-" is present
-     * 
-     * @return array $pos An array of character or index positions
-     */
-    static function validatePos($pos);
 } // EOI

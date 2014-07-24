@@ -31,11 +31,11 @@ class ComparisonString implements ComparisonStringInterface, \JsonSerializable, 
         
         if(!is_string($raw)) throw new \InvalidArgumentException('Argument must be of type string. Got '.gettype($raw).'.');
         
-        $specialChars = ['{','}','!','=','~','?'];
+        $specialChars = ['{','}','!','=','~','?','$'];
         
         for($i = 0; $i < count($specialChars);$i++)
         {
-            if( preg_match('/(?<!\\\)'.preg_quote($specialChars[$i]).'/',$raw) )
+            if( preg_match('/(?<!\\\)'.preg_quote($specialChars[$i]).'/','\\'.$raw) )
             {
                 throw new InvalidMARCspecException(
                     InvalidMARCspecException::CS.

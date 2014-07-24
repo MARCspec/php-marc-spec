@@ -285,41 +285,34 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess{
         $subSpecCount = 0;
         for($i = 0;$i < strlen($arg);$i++)
         {
+        
+            if(0 < $i)
+            {
+                $previous = (!in_array($arg[$i-1],$_nocount)) ? $arg[$i-1] : null;
+                
+                if('$' == $arg[$i] && !in_array($previous,$_nocount) && ($open === $close))
+                {
+                    $subfieldCount++;
+                }
+            }
+            else
+            {
+                $previous = null;
+            }
+        
             if($open === $close)
             {
-                if(0 < $i)
+                if('{' == $arg[$i] && !in_array($previous,$_nocount))
                 {
-                    if('{' == $arg[$i] && !in_array($arg[$i-1],$_nocount))
-                    {
-                        $open++;
-                    }
-                    if('}' == $arg[$i] && !in_array($arg[$i-1],$_nocount))
-                    {
-                        throw new InvalidMARCspecException(
-                            InvalidMARCspecException::MS.
-                            InvalidMARCspecException::BRACKET,
-                            $arg
-                        );
-                    }
-                    if('$' == $arg[$i] && !in_array($arg[$i-1],$_nocount))
-                    {
-                        $subfieldCount++;
-                    }
+                    $open++;
                 }
-                else // 0 == $i
+                if('}' == $arg[$i] && !in_array($previous,$_nocount))
                 {
-                    if('{' == $arg[$i])
-                    {
-                        $open++;
-                    }
-                    if('}' == $arg[$i])
-                    {
-                        throw new InvalidMARCspecException(
-                            InvalidMARCspecException::MS.
-                            InvalidMARCspecException::BRACKET,
-                            $arg
-                        );
-                    }
+                    throw new InvalidMARCspecException(
+                        InvalidMARCspecException::MS.
+                        InvalidMARCspecException::BRACKET,
+                        $arg
+                    );
                 }
                 
                 if($open !== $close)
@@ -358,11 +351,11 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess{
             else // open != close
             {
                 
-                if('{' == $arg[$i] && !in_array($arg[$i-1],$_nocount))
+                if('{' == $arg[$i] && !in_array($previous,$_nocount))
                 {
                     $open++;
                 }
-                if('}' == $arg[$i] && !in_array($arg[$i-1],$_nocount))
+                if('}' == $arg[$i] && !in_array($previous,$_nocount))
                 {
                     $close++;
                 }
@@ -378,10 +371,12 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess{
         {
             throw new InvalidMARCspecException(
                 InvalidMARCspecException::MS.
-                InvalidMARCspecException::BRACKET,
+                InvalidMARCspecException::BRACKET." ".
+                InvalidMARCspecException::HINTESCAPED,
                 $arg
             );
         }
+        #print_r($_detected);
         return $_detected;
     }
     
@@ -393,10 +388,11 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess{
     private function createInstances($_detected)
     {
     #print "createInstances";
-    #print_r($_detected);
+    print_r($_detected);
     #print "\n";
         foreach($_detected as $key => $_dataRef)
         {
+            $_subfields = [];
             if(array_key_exists('subfield',$_dataRef))
             {
                 if(2 == strpos($_dataRef['subfield'],'-')) // assuming subfield range
