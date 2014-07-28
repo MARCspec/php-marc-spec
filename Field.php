@@ -101,7 +101,8 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
          * $specMatches[4] => indicatorSpec
          * $specMatches[5] => useless
          */
-        if(0 === preg_match('/^(.{3,3})(\[.*\])?(\/[^_]*)?(_[^{]*)?(.*)?/',$fieldspec,$specMatches))
+        #if(0 === preg_match('/^(.{3,3})(\[.*\])?(\/[^_]*)?(_[^{]*)?(.*)?/',$fieldspec,$specMatches))
+        if(0 === preg_match('/^([a-z0-9]{3,3}|[A-Z0-9]{3,3}|[0-9\.]{3,3})(\[(?:(?:(?:[0-9]+|#)\-(?:[0-9]+|#))|(?:[0-9]+|#))\])?(?:(\/(?:(?:(?:[0-9]+|#)\-(?:[0-9]+|#))|(?:[0-9]+|#)))|(_[_a-z0-9][_a-z0-9]{0,1}))?(.*)?/',$fieldspec,$specMatches))
         {
             throw new InvalidMARCspecException(
                 InvalidMARCspecException::FS.
@@ -149,6 +150,15 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
                         $fieldspec
                     );
                 }
+            }
+            
+            if(!empty($specMatches[3]) && !empty($specMatches[4]))
+            {
+                throw new InvalidMARCspecException(
+                    InvalidMARCspecException::FS.
+                    InvalidMARCspecException::CHARORIND,
+                    $fieldspec
+                );
             }
             
             if(!empty($specMatches[3]))
@@ -353,10 +363,31 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
         }
         return true;
     }
-    
-    public function addSubSpec(SubSpecInterface $subSpec)
+    /**
+    *
+    * {@inheritdoc}
+    */
+    public function addSubSpec($SubSpec)
     {
-        $this->subSpecs[] = $subSpec;
+        if($SubSpec instanceOf SubSpecInterface)
+        {
+            $this->subSpecs[] = $SubSpec;
+        }
+        elseif(is_array($SubSpec))
+        {
+            foreach($SubSpec as $sub)
+            {
+                if( !($sub instanceOf SubSpecInterface) )
+                {
+                    throw new \InvalidArgumentException('Values of array of subSpecs must be instances of SubSpecInterface.');
+                }
+            }
+            $this->subSpecs[] = $SubSpec;
+        }
+        else
+        {
+            throw new \InvalidArgumentException('Param 1 must be instance of SubSpecInterface or array with instances of SubSpecInterface. Got "'.gettype($subSpec).'".');
+        }
     }
     
     /**
@@ -383,7 +414,22 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
         if(($indicator2 = $this->getIndicator2()) !== null) $_fieldSpec['indicator2'] = $indicator2;
         if(($subSpecs = $this->getSubSpecs()) !== null)
         {
-            foreach($subSpecs as $subSpec) $_fieldSpec['subSpecs'][] = $subSpec->jsonSerialize();
+            $_fieldSpec['subSpecs'] = [];
+            foreach($subSpecs as $key => $subSpec)
+            {
+                if(is_array($subSpec))
+                {
+                    foreach($subSpec as $altSubSpec)
+                    {
+                        $_fieldSpec['subSpecs'][$key][] = $altSubSpec->jsonSerialize();
+                    }
+                    
+                }
+                else
+                {
+                    $_fieldSpec['subSpecs'][$key] = $subSpec->jsonSerialize();
+                }
+            }
         }
         return $_fieldSpec;
     }
@@ -440,7 +486,7 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
         }
         return $fieldSpec;
     }
-
+    
     /**
      * Access object like an associative array
      * 
@@ -499,7 +545,7 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
             break;
             case 'indicator2': return $this->getIndicator2();
             break;
-            case 'subSpecs': $this->getSubSpecs();
+            case 'subSpecs': return $this->getSubSpecs();
             break;
             default: return null;
         }

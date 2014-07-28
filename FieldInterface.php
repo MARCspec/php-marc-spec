@@ -108,9 +108,11 @@ interface FieldInterface {
      *
      * @api
      * 
+     * @param SubSpecInterface|array[SubSpecInterface]
+     * 
      * @return null|array
      */
-     public function addSubSpec(SubSpecInterface $subSpec);
+     public function addSubSpec($SubSpec);
      
      /**
       * Get the basic spec without subspecs

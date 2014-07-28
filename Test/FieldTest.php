@@ -225,7 +225,15 @@ class FieldTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidArgument310Decode()
     {
-        $fieldSpec = $this->fieldspec('245{$c=$d}$a');
+        $this->fieldspec('245{$c=$d}$a');
+    }
+    
+    /**
+     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
+     */
+    public function testInvalidArgument311Decode()
+    {
+        $this->fieldspec('245[1]/1_01');
     }
 
     /**
@@ -317,7 +325,7 @@ class FieldTest extends \PHPUnit_Framework_TestCase
             $this->assertSame('0', $fieldSpec->getindicator2());
             $fieldSpec = $this->fieldspec('245_0_');
             $this->assertSame('0', $fieldSpec->getindicator1());
-            $fieldSpec = $this->fieldspec('245[1]/1_01');
+            $fieldSpec = $this->fieldspec('245[1]_01');
             $this->assertSame('0', $fieldSpec->getindicator1());
             $this->assertSame('1', $fieldSpec->getindicator2());
 

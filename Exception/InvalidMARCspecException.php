@@ -59,6 +59,7 @@ class InvalidMARCspecException extends \UnexpectedValueException {
     const MISSINGSLASH = 'Assuming subfield character position or range. Missing "/" delimiter';
     const OPERATOR     = 'Operator must be one of "=" / "!=" / "~" / "!~" / "!" / "?".';
     const HINTESCAPED  = 'Hint: Check for unescaped characters.';
+    const CHARORIND    = 'Either characterSpec or indicators are allowed.';
     
     public function __construct($message, $context = null)
     {

@@ -27,7 +27,18 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess{
     * @var array Array of subfields
     */
     private $subfields = [];
+
+    /**
+     * @constant string Regex for leftSubTerm
+     */
+    const LEFTSUBTERM = '^(?<leftsubterm>(?:\\\(?:(?<=\\\)[\!\=\~\?]|[^\!\=\~\?])+)|(?:(?<=\$)[\!\=\~\?]|[^\!\=\~\?])+)?';
     
+    /**
+     * @constant string Regex for operator
+     */
+    const OPERATOR = '(?<operator>\!\~|\!\=|\=|\~|\!|\?)';
+    
+
     /**
     * {@inheritdoc}
     * 
@@ -35,7 +46,6 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess{
     */ 
     public function __construct($spec)
     {
-    #print "Construct MS $spec \n";
         if($spec instanceof FieldInterface)
         {
             $this->field = $spec;
@@ -97,11 +107,9 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess{
             // process rest
             if(!empty($specMatches[2]))
             {
-            #print "Construct calling parseRef: ".$specMatches[2]."\n";
                 $this->createInstances($this->parseDataRef($specMatches[2]));
             }
         }
-        #print "MS created $this\n";
     }
     
     /**
@@ -183,7 +191,6 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess{
                     $subfields
                 );
             }
-            #print "AddSubfields calling parseRef: ".$subfields."\n";
             $this->createInstances($this->parseDataRef($subfields));
         }
     }
@@ -276,7 +283,6 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess{
     */
     public static function parseDataRef($arg)
     {
-    #print "parseRef: $arg\n";
         $open = 0;
         $close = 0;
         $_nocount = ['$','\\'];
@@ -376,7 +382,6 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess{
                 $arg
             );
         }
-        #print_r($_detected);
         return $_detected;
     }
     
@@ -387,9 +392,6 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess{
      */ 
     private function createInstances($_detected)
     {
-    #print "createInstances";
-    print_r($_detected);
-    #print "\n";
         foreach($_detected as $key => $_dataRef)
         {
             $_subfields = [];
@@ -411,7 +413,6 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess{
                     {
                         foreach($_dataRef['subspec'] as $subspec)
                         {
-                            #print "creating SubSpec $subspec\n";
                             $_Subspecs = $this->createSubSpec($subspec,$Subfield);
                             $Subfield->addSubSpec($_Subspecs);
                         }
@@ -448,11 +449,11 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess{
         {
             $context .= $Subfield->getBaseSpec();
         }
-        #$context = "$this"; // object in string context
+
         $_nocount = ['$','\\'];
         $_operators = ['?','!','~','='];
         $specLength = strlen($assumedSubspecs);
-#print "create SubSpec ".$context.$assumedSubspecs."\n";
+
         $_subTermSets = preg_split('/(?<!\\\\)\|/', substr($assumedSubspecs,1,$specLength-2));
         
         foreach($_subTermSets as $key => $subTermSet)
@@ -465,49 +466,12 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess{
                     $assumedSubspecs
                 );
             }
+            $_subTermSet = [];
+            $_subTerms = $this->subTermsToArray($subTermSet);
             
-            $leftSubTerm = null;
-            $rightSubTerm = null;
-            $operator = null;
-            $subTermSetLength = strlen($subTermSet);
-            $_subTermSet = null;
-            
-            for($i = 0; $i<$subTermSetLength;$i++)
+            foreach(['leftSubTerm'=>$_subTerms['leftSubTerm'],'rightSubTerm'=>$_subTerms['rightSubTerm']] as $subTermKey => $subTerm)
             {
-                $previous = (0 < $i) ? $i-1 : 0;
-                if(in_array($subTermSet[$i],$_operators) && !in_array($subTermSet[$previous],$_nocount))
-                {
-                    $operator .= $subTermSet[$i];
-                    $pos = $i;
-                    $len = strlen($operator);
-                }
-            }
-            
-            if(!is_null($operator))
-            {
-                $operatorStartPos = $pos + 1 - $len;
-                $_subTermSet['leftSubTerm'] = substr($subTermSet,0,$operatorStartPos); // might be empty
-                $_subTermSet['rightSubTerm'] = substr($subTermSet,$pos+1);
-                if(empty($_subTermSet['rightSubTerm']))
-                {
-                    throw new InvalidMARCspecException(
-                        InvalidMARCspecException::SS.
-                        InvalidMARCspecException::MISSINGRIGHT,
-                        $subTermSet
-                    );
-                }
-            }
-            else
-            {
-                $operator = '?';
-                $_subTermSet['rightSubTerm'] = $subTermSet;
-                $_subTermSet['leftSubTerm'] = null;
-            }
-
-            foreach($_subTermSet as $subTermKey => $subTerm)
-            {
-            
-                if(!empty($subTerm))
+                if(!is_null($subTerm))
                 {
                     if('\\' == $subTerm[0]) // is a comparisonString
                     {
@@ -547,9 +511,47 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess{
                     $_subTermSet[$subTermKey] = new MARCspec($context);
                 }
             }
-            $_subSpec[$key] = new SubSpec($_subTermSet['leftSubTerm'],$operator,$_subTermSet['rightSubTerm']);
+            $_subSpec[$key] = new SubSpec($_subTermSet['leftSubTerm'],$_subTerms['operator'],$_subTermSet['rightSubTerm']);
         }
         return (1 < count($_subSpec)) ? $_subSpec : $_subSpec[0];
+    }
+    
+    private function subTermsToArray($subTermSet)
+    {
+        $_subTermSet = [];
+        if(preg_match_all('/(?:'.self::LEFTSUBTERM.self::OPERATOR.')?(?<rightsubterm>.+)/',$subTermSet,$_subTermMatches,PREG_SET_ORDER))
+        {
+            if(array_key_exists('leftsubterm',$_subTermMatches[0]) && !empty($_subTermMatches[0]['leftsubterm']))
+            {
+                $_subTermSet['leftSubTerm'] = $_subTermMatches[0]['leftsubterm'];
+            }
+            else
+            {
+                $_subTermSet['leftSubTerm'] = null;
+            }
+            if(array_key_exists('rightsubterm',$_subTermMatches[0]) && !empty($_subTermMatches[0]['rightsubterm']))
+            {
+                $_subTermSet['rightSubTerm'] = $_subTermMatches[0]['rightsubterm'];
+            }
+            else
+            {
+                throw new InvalidMARCspecException(
+                InvalidMARCspecException::SS.
+                InvalidMARCspecException::MISSINGRIGHT,
+                $subTermSet
+                );
+            }
+            if(array_key_exists('operator',$_subTermMatches[0]) && !empty($_subTermMatches[0]['operator']))
+            {
+                $_subTermSet['operator'] = $_subTermMatches[0]['operator'];
+            }
+            else
+            {
+                $_subTermSet['operator'] = '?';
+            }
+            return $_subTermSet;
+        }
+        return null;
     }
 
     /**

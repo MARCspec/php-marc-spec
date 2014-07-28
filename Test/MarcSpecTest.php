@@ -47,6 +47,13 @@ class MARCspecTest extends \PHPUnit_Framework_TestCase
      {
              $this->marcspec(array('245$a'));
      }
+     /**
+      * @expectedException InvalidArgumentException
+     */
+     public function testInvalidArgument3Decode()
+     {
+             $this->marcspec(array('245/#$a'));
+     }
     
 
      /**
@@ -79,7 +86,7 @@ class MARCspecTest extends \PHPUnit_Framework_TestCase
     
 
     /**
-     * assert same subspecs
+     * assert same specs
      */
     public function testValidMarcSpec3()
     {
@@ -92,6 +99,76 @@ class MARCspecTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('245',$leftFieldTag);
         $rightSubfieldTag = $marcSpec['d'][0]['subSpecs'][1]['rightSubTerm']['subfields'][0]['tag'];
         $this->assertSame('.',$marcSpec['d'][0]['subSpecs'][0]['rightSubTerm']['comparable']);
+    }
+    
+    /**
+     * assert same specs
+     */
+    public function testValidMarcSpec5()
+    {
+        $ms = $this->marcspec('245[0]{$a!=$b|300_01$a!~\abc}{\!\=!=\!}$a{$c|!$d}');
+        
+        // field
+        $this->assertSame('245',$ms['field']['tag']);
+        $this->assertSame(0,$ms['field']['indexStart']);
+        $this->assertSame(2,count($ms['field']['subSpecs']));
+        
+        // field subspecs
+        
+        // subspec 00
+        $this->assertSame('245',$ms['field']['subSpecs'][0][0]['leftSubTerm']['field']['tag']);
+        $this->assertSame(0,$ms['field']['subSpecs'][0][0]['leftSubTerm']['field']['indexStart']);
+        $this->assertSame('a',$ms['field']['subSpecs'][0][0]['leftSubTerm']['subfields'][0]['tag']);
+        
+        $this->assertSame('!=',$ms['field']['subSpecs'][0][0]['operator']);
+        
+        $this->assertSame('245',$ms['field']['subSpecs'][0][0]['rightSubTerm']['field']['tag']);
+        $this->assertSame(0,$ms['field']['subSpecs'][0][0]['rightSubTerm']['field']['indexStart']);
+        $this->assertSame('b',$ms['field']['subSpecs'][0][0]['rightSubTerm']['subfields'][0]['tag']);
+        
+        // subspec 01
+        $this->assertSame('300',$ms['field']['subSpecs'][0][1]['leftSubTerm']['field']['tag']);
+        $this->assertSame('a',$ms['field']['subSpecs'][0][1]['leftSubTerm']['subfields'][0]['tag']);
+        $this->assertSame('0',$ms['field']['subSpecs'][0][1]['leftSubTerm']['field']['indicator1']);
+        $this->assertSame('1',$ms['field']['subSpecs'][0][1]['leftSubTerm']['field']['indicator2']);
+        
+        $this->assertSame('!~',$ms['field']['subSpecs'][0][1]['operator']);
+        
+        $this->assertSame('abc',$ms['field']['subSpecs'][0][1]['rightSubTerm']['comparable']);
+        
+        // subspec 1
+        $this->assertSame('!=',$ms['field']['subSpecs'][1]['leftSubTerm']['comparable']);
+        
+        $this->assertSame('!=',$ms['field']['subSpecs'][1]['operator']);
+        
+        $this->assertSame('!',$ms['field']['subSpecs'][1]['rightSubTerm']['comparable']);
+
+        // subfields
+        $this->assertSame('a',$ms['subfields'][0]['tag']);
+        
+        // subfield subspec 00
+        $this->assertSame('245',$ms['a'][0]['subSpecs'][0][0]['leftSubTerm']['field']['tag']);
+        $this->assertSame(0,$ms['a'][0]['subSpecs'][0][0]['leftSubTerm']['field']['indexStart']);
+        $this->assertSame('a',$ms['a'][0]['subSpecs'][0][0]['leftSubTerm']['subfields'][0]['tag']);
+        
+        $this->assertSame('?',$ms['a'][0]['subSpecs'][0][0]['operator']);
+        
+        $this->assertSame('245',$ms['a'][0]['subSpecs'][0][0]['rightSubTerm']['field']['tag']);
+        $this->assertSame(0,$ms['a'][0]['subSpecs'][0][0]['rightSubTerm']['field']['indexStart']);
+        $this->assertSame('c',$ms['a'][0]['subSpecs'][0][0]['rightSubTerm']['subfields'][0]['tag']);
+        
+                
+        // subfield subspec 01
+        $this->assertSame('245',$ms['a'][0]['subSpecs'][0][1]['leftSubTerm']['field']['tag']);
+        $this->assertSame(0,$ms['a'][0]['subSpecs'][0][1]['leftSubTerm']['field']['indexStart']);
+        $this->assertSame('a',$ms['a'][0]['subSpecs'][0][1]['leftSubTerm']['subfields'][0]['tag']);
+        
+        $this->assertSame('!',$ms['a'][0]['subSpecs'][0][1]['operator']);
+        
+        $this->assertSame('245',$ms['a'][0]['subSpecs'][0][1]['rightSubTerm']['field']['tag']);
+        $this->assertSame(0,$ms['a'][0]['subSpecs'][0][1]['rightSubTerm']['field']['indexStart']);
+        $this->assertSame('d',$ms['a'][0]['subSpecs'][0][1]['rightSubTerm']['subfields'][0]['tag']);
+
     }
     
 

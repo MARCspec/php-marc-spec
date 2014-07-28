@@ -22,12 +22,12 @@ class SubSpec implements SubSpecInterface, \JsonSerializable, \ArrayAccess {
     private $operator;
     
     /**
-     * @var MARCspecInterface|ComparisonString The left hand subterm
+     * @var MARCspecInterface|ComparisonStringInterface The left hand subterm
      */ 
     private $leftSubTerm;
     
     /**
-     * @var MARCspecInterface|ComparisonString The right hand subterm
+     * @var MARCspecInterface|ComparisonStringInterface The right hand subterm
      */ 
     private $rightSubTerm;
     

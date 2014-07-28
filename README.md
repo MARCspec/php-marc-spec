@@ -7,15 +7,20 @@ PHP based *MARCspec* parser and validator. For currently supported version of **
 ```php
 <?php
 
-require_once "MARCspec.php";
+require_once "vendor/autoload.php";
 
 use CK\MARCspec\MARCspec;
 
-// parse Marc spec
-$marcSpec = new MARCspec("245$a-c_10");
+// parse MARCspec
+$marcSpec = new MARCspec('020$a{$q[0]~\pbk}{$c/0=\€|$c/0=\$}');
 
-// get parsed elements
-$fieldTag = $marcSpec->getFieldTag(); // '245'
+// accessing properties
+echo $marcSpec['field']['tag']; // '020'
+echo $marcSpec['subfields'][0]['tag']; // 'a'
+echo $firstSubSpec = $marcSpec['subfields'][0]['subSpecs'][0]; // '020$q[0]~\pbk'
+echo $firstSubSpec['rightSubTerm']['comparable'] // 'pbk'
+echo $secondSubSpec = $marcSpec['a']['']['comparable'] // 'pbk'
+print 
 $subfields = $marcSpec->getSubfields(); // ['a'=>['tag'=>'a','start'=>0],'b'=>['tag'=>'b','start'=>0],'c'=>['tag'=>'c','start'=>0]]
 $indicator1 = $marcSpec->getIndicator1(); // '1'
 $indicator2 = $marcSpec->getIndicator2(); // '0'
