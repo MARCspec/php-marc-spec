@@ -547,7 +547,7 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
             break;
             case 'subSpecs': return $this->getSubSpecs();
             break;
-            default: return null;
+            default: throw new \UnexpectedValueException("Offset $offset does not exist.");
         }
     }
 
@@ -588,9 +588,9 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
             break;
             case 'charLength': throw new \UnexpectedValueException("CharLength is always calculated.");
             break;
-            case 'indicator1': $this->setIndicator1();
+            case 'indicator1': $this->setIndicator1($value);
             break;
-            case 'indicator2': $this->setIndicator2();
+            case 'indicator2': $this->setIndicator2($value);
             break;
             case 'subSpecs': $this->addSubSpec($value);
             break;

@@ -1,165 +1,144 @@
 # PHP MARCspec parser
 
-PHP based *MARCspec* parser and validator. For currently supported version of **MARCspec - A common MARC record path language** see http://cklee.github.io/marc-spec/marc-spec-4482fbb.html .
+PHP based *MARCspec* parser and validator.
 
+For currently supported version of **MARCspec - A common MARC record path language** see http://cklee.github.io/marc-spec/marc-spec-e66931e.html .
+
+# Installation
+
+Installation can be done by using composer or download the [ZIP file](https://github.com/cKlee/php-marc-spec/archive/master.zip).
 # Usage
 
 ```php
 <?php
 
-require_once "vendor/autoload.php";
+namespace CK\MARCspec;
+require("vendor/autoload.php");
 
-use CK\MARCspec\MARCspec;
+// parse and access MARCspec like an array
+$fixed = new MARCspec('007[0]/1-8{/0=\a}');
+echo $fixed['field']['tag']."\n";                                                  // '007'
+echo $fixed['field']['charStart']."\n";                                            // 1
+echo $fixed['field']['charEnd']."\n";                                              // 8
+echo $fixed['field']['charLength']."\n";                                           // 8
+echo $fixed['field']['subSpecs'][0]['leftSubTerm']."\n";                           // '007[0]/0'
+echo $fixed['field']['subSpecs'][0]['operator']."\n";                              // '='
+echo $fixed['field']['subSpecs'][0]['rightSubTerm']."\n";                          // '\a'
+echo $fixed['field']['subSpecs'][0]['rightSubTerm']['comparable']."\n";            // 'a'
 
-// parse MARCspec
-$marcSpec = new MARCspec('020$a{$q[0]~\pbk}{$c/0=\€|$c/0=\$}');
+echo $fixed."\n";                                                                  // '007[0]/1-8{007[0]/0=\a}'
 
-// accessing properties
-echo $marcSpec['field']['tag']; // '020'
-echo $marcSpec['subfields'][0]['tag']; // 'a'
-echo $firstSubSpec = $marcSpec['subfields'][0]['subSpecs'][0]; // '020$q[0]~\pbk'
-echo $firstSubSpec['rightSubTerm']['comparable'] // 'pbk'
-echo $secondSubSpec = $marcSpec['a']['']['comparable'] // 'pbk'
-print 
-$subfields = $marcSpec->getSubfields(); // ['a'=>['tag'=>'a','start'=>0],'b'=>['tag'=>'b','start'=>0],'c'=>['tag'=>'c','start'=>0]]
-$indicator1 = $marcSpec->getIndicator1(); // '1'
-$indicator2 = $marcSpec->getIndicator2(); // '0'
+$variable = new MARCspec('245_10$a');
+echo $variable['field']['tag']."\n";                                               // '245'
+echo $variable['field']['indicator1']."\n";                                        // '1'
+echo $variable['field']['indicator2']."\n";                                        // '0'
+echo $variable['subfields'][0]['tag']."\n";                                        // 'a'
+echo $variable['a'][0]['tag']."\n";                                                // 'a'
 
-// parse Marc spec
-$marcSpec = new MARCspec("LDR/0-4");
+echo $variable."\n";                                                               // '245_10$a'
 
-// get parsed elements
-$fieldTag = $marcSpec->getFieldTag(); // 'LDR'
-$charStart = $marcSpec->getCharStart(); // 0
-$charEnd = $marcSpec->getCharEnd(); // 4
-$charLength = $marcSpec->getCharLength(); // 5
+$complex = new MARCspec('020$a{$q[0]~\pbk}{$c/0=\€|$c/0=\$}');
+echo $complex['field']['tag']."\n";                                                // '020'
+echo $complex['subfields'][0]['tag']."\n";                                         // 'a'
 
-// initialize empty instance
-$marcSpec = new MARCspec;
+echo $complex['a'][0]['subSpecs'][0]['leftSubTerm']."\n";                          // '020$q[0]'
+echo $complex['a'][0]['subSpecs'][0]['operator']."\n";                             // '~'
+echo $complex['a'][0]['subSpecs'][0]['rightSubTerm']['comparable']."\n";           // 'pbk'
 
-$marcSpec->setFieldTag('245');
-$marcSpec->addSubfields('$a$b$e');
-$marcSpec->setIndicator1('1');
-$marcSpec->setIndicator2('0');
+echo $complex['a'][0]['subSpecs'][1][0]['leftSubTerm']."\n";                       // '020$c/0'
+echo $complex['a'][0]['subSpecs'][1][0]['leftSubTerm']['c'][0]['charStart']."\n";  // 0
+echo $complex['a'][0]['subSpecs'][1][0]['leftSubTerm']['c'][0]['charEnd']."\n";    // null
+echo $complex['a'][0]['subSpecs'][1][0]['leftSubTerm']['c'][0]['charLength']."\n"; // 1
+echo $complex['a'][0]['subSpecs'][1][0]['operator']."\n";                          // '='
+echo $complex['a'][0]['subSpecs'][1][0]['rightSubTerm']['comparable']."\n";        // '€'
 
-$enc = $marcSpec->encode(); // '245$a$b$e_10'
+echo $complex['a'][0]['subSpecs'][1][1]['leftSubTerm']."\n";                       // '020$c/0'
+echo $complex['a'][0]['subSpecs'][1][1]['leftSubTerm']['c'][0]['charStart']."\n";  // 0
+echo $complex['a'][0]['subSpecs'][1][1]['leftSubTerm']['c'][0]['charEnd']."\n";    // null
+echo $complex['a'][0]['subSpecs'][1][1]['leftSubTerm']['c'][0]['charLength']."\n"; // 1
+echo $complex['a'][0]['subSpecs'][1][1]['operator']."\n";                          // '='
+echo $complex['a'][0]['subSpecs'][1][1]['rightSubTerm']['comparable']."\n";        // '$'
 
-// initialize empty instance
-$marcSpec = new MARCspec;
+// creating MARCspec
 
-$marcSpec->setFieldTag('007');
-$marcSpec->setCharStart(0);
-$marcSpec->setLength(5);
+// creating a new Field
+$Field = new Field('...');
+$Field['indicator2'] = '1'; // or $Field->setIndicator2('1');
+$Field['indexStart'] = 0; // or $Field->setIndex(0);
 
-$enc = $marcSpec->encode(); // '007/0-4'
-$enc = $marcSpec->encode('json'); // { "marcspec": { "fieldTag": "007", "charStart": 0, "charEnd": 4, "charLength": 5 } }
+// creating a new MARCspec by setting the Field
+$MARCspec = MARCspec::setField($Field);
 
-// initialize empty instance
-$marcSpec = new MARCspec;
+// creating a new Subfield
+$Subfield = new Subfield('a');
 
-marcSpec->validate('245$a_1'); // true
-marcSpec->validate('004$a/1'); // InvalidArgumentException
+// adding the Subfield to the MARCspec
+$MARCspec->addSubfields($Subfield);
+
+// creating instances of MARCspec and ComparisonString
+$LeftSubTerm = new MARCspec('...$a/#');
+$RightSubTerm = new ComparisonString(',');
+
+// creating a new SubSpec with instances above and an operator '='
+$SubSpec = new SubSpec($LeftSubTerm,'=',$RightSubTerm);
+
+// adding the SubSpec to the Subfield
+$Subfield['subSpecs'] = $SubSpec;
+
+// echo whole MARCspec
+echo $MARCspec; // '...[0]__1$a{...$a/#=\,}' 
 ```
 
-## Public methods
+# ArrayAccess vs. Methods
 
-### CK\MARCspec\MARCspec::__construct()
+MARCspec can be accessed like an immutable array with the following offsets or with its correponding methods (see source code for documentation of all methods).
 
-Params:
+## Instances of MARCspec
 
-* string $spec: The MARC spec as string
+| offset    | method get    | method set        |
+|:---------:|:-------------:|:-----------------:|
+| field     | getField      | setField|
+| subfields | getSubfields  | addSubfields|
 
-### CK\MARCspec\MARCspec::decode()
+## Instances of Field
 
-Params:
+| offset    | method get    | method set        |
+|:---------:|:-------------:|:-----------------:|
+| tag       | getTag        | setTag|
+| indicator1| getIndicator1 | setIndicator1|
+| indicator2| getIndicator2 | setIndicator2|
+| charStart | getCharStart  | setCharStart|
+| charEnd   | getCharEnd    | setCharEnd|
+| charLength| getCharLength | |
+| indexStart| getIndexStart | setIndexStart|
+| indexEnd  | getIndexEnd   | setIndexEnd|
+| indexLength| getIndexLength | |
+| subSpecs  | getSubSpecs   | addSubSpecs|
 
-* string $spec: The MARC spec as string
+## Instances of Subfield
 
-### CK\MARCspec\MARCspec::encode()
+| offset    | method get    | method set        |
+|:---------:|:-------------:|:-----------------:|
+| tag       | getTag        | setTag|
+| charStart | getCharStart  | setCharStart|
+| charEnd   | getCharEnd    | setCharEnd|
+| charLength| getCharLength | |
+| indexStart| getIndexStart | setIndexStart|
+| indexEnd  | getIndexEnd   | setIndexEnd|
+| indexLength| getIndexLength | |
+| subSpecs  | getSubSpecs   | addSubSpecs|
 
-Params:
+## Instances of ComparisonString
 
-* string $encoding: The MARCspec encoding ("string" (default) and "json" currently supported)
+| offset    | method get    | method set        |
+|:---------:|:-------------:|:-----------------:|
+| raw       | getRaw        | |
+| comparable| getComprable  | |
 
-Return: string or JSON
+## Instances of SubSpec
 
-### CK\MARCspec\MARCspec::validate()
-
-Return: true | InvalidArgumentException
-
-### CK\MARCspec\MARCspec::setFieldTag()
-
-Params:
-
-* string $fieldTag: The field tag
-
-### CK\MARCspec\MARCspec::addSubfields()
-
-Params:
-
-* string $subfields: The string of subfield tags
-
-### CK\MARCspec\MARCspec::setIndicators()
-
-Params:
-
-* string $indicators: The string of indicators 1 and 2
-
-### CK\MARCspec\MARCspec::setIndicator1()
-
-Params:
-
-* string $indicator1: Indicator 1
-
-### CK\MARCspec\MARCspec::setIndicator2()
-
-Params:
-
-* string $indicator1: Indicator 2
-
-### CK\MARCspec\MARCspec::setCharStart()
-
-Params:
-
-* int : charcter start position
-
-### CK\MARCspec\MARCspec::setCharEnd()
-
-Params:
-
-* int : charcter end position
-
-### CK\MARCspec\MARCspec::setCharLength()
-
-Params:
-
-* int : charcter range length
-
-### CK\MARCspec\MARCspec::getFieldTag()
-
-Return: string
-
-### CK\MARCspec\MARCspec::getSubfields()
-
-Return: array
-
-### CK\MARCspec\MARCspec::getIndicator1()
-
-Return: string
-
-### CK\MARCspec\MARCspec::getIndicator2()
-
-Return: string
-
-### CK\MARCspec\MARCspec::getCharStart()
-
-Return: int
-
-### CK\MARCspec\MARCspec::getCharEnd()
-
-Return: int
-
-### CK\MARCspec\MARCspec::getCharLength()
-
-Return: int
-
+| offset    | method get    | method set        |
+|:---------:|:-------------:|:-----------------:|
+| leftSubTerm| getLeftSubTerm| |
+| operator  | getOperator  | |
+| rightSubTerm| getRightSubTerm| |

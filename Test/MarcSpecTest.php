@@ -48,11 +48,11 @@ class MARCspecTest extends \PHPUnit_Framework_TestCase
              $this->marcspec(array('245$a'));
      }
      /**
-      * @expectedException InvalidArgumentException
+      * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
      public function testInvalidArgument3Decode()
      {
-             $this->marcspec(array('245/#$a'));
+             $this->marcspec('245/#$a');
      }
     
 

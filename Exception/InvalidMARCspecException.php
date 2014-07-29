@@ -60,6 +60,7 @@ class InvalidMARCspecException extends \UnexpectedValueException {
     const OPERATOR     = 'Operator must be one of "=" / "!=" / "~" / "!~" / "!" / "?".';
     const HINTESCAPED  = 'Hint: Check for unescaped characters.';
     const CHARORIND    = 'Either characterSpec or indicators are allowed.';
+    const CHARANDSF    = 'Either characterSpec for field or subfields are allowed.';
     
     public function __construct($message, $context = null)
     {

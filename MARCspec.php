@@ -397,6 +397,13 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess{
             $_subfields = [];
             if(array_key_exists('subfield',$_dataRef))
             {
+                if(!is_null($this->field->getCharStart()))
+                {
+                    throw new InvalidMARCspecException(
+                        InvalidMARCspecException::MS.
+                        InvalidMARCspecException::CHARANDSF
+                    );
+                }
                 if(2 == strpos($_dataRef['subfield'],'-')) // assuming subfield range
                 {
                     $_subfields = $this->handleSubfieldRanges(substr($_dataRef['subfield'],1));
