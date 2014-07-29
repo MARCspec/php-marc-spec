@@ -17,5 +17,5 @@
     "autoload": {
         "psr-0": { "CK\\MARCspec": "" }
     },
-    "target-dir": "CK/MARCSpec"
+    "target-dir": "CK/MARCspec"
 }
