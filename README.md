@@ -17,47 +17,47 @@ require("vendor/autoload.php");
 
 // parse and access MARCspec like an array
 $fixed = new MARCspec('007[0]/1-8{/0=\a}');
-echo $fixed['field']['tag']."\n";                                                  // '007'
-echo $fixed['field']['charStart']."\n";                                            // 1
-echo $fixed['field']['charEnd']."\n";                                              // 8
-echo $fixed['field']['charLength']."\n";                                           // 8
-echo $fixed['field']['subSpecs'][0]['leftSubTerm']."\n";                           // '007[0]/0'
-echo $fixed['field']['subSpecs'][0]['operator']."\n";                              // '='
-echo $fixed['field']['subSpecs'][0]['rightSubTerm']."\n";                          // '\a'
-echo $fixed['field']['subSpecs'][0]['rightSubTerm']['comparable']."\n";            // 'a'
+echo $fixed['field']['tag'];                                                  // '007'
+echo $fixed['field']['charStart'];                                            // 1
+echo $fixed['field']['charEnd'];                                              // 8
+echo $fixed['field']['charLength'];                                           // 8
+echo $fixed['field']['subSpecs'][0]['leftSubTerm'];                           // '007[0]/0'
+echo $fixed['field']['subSpecs'][0]['operator'];                              // '='
+echo $fixed['field']['subSpecs'][0]['rightSubTerm'];                          // '\a'
+echo $fixed['field']['subSpecs'][0]['rightSubTerm']['comparable'];            // 'a'
 
-echo $fixed."\n";                                                                  // '007[0]/1-8{007[0]/0=\a}'
+echo $fixed;                                                                  // '007[0]/1-8{007[0]/0=\a}'
 
 $variable = new MARCspec('245_10$a');
-echo $variable['field']['tag']."\n";                                               // '245'
-echo $variable['field']['indicator1']."\n";                                        // '1'
-echo $variable['field']['indicator2']."\n";                                        // '0'
-echo $variable['subfields'][0]['tag']."\n";                                        // 'a'
-echo $variable['a'][0]['tag']."\n";                                                // 'a'
+echo $variable['field']['tag'];                                               // '245'
+echo $variable['field']['indicator1'];                                        // '1'
+echo $variable['field']['indicator2'];                                        // '0'
+echo $variable['subfields'][0]['tag'];                                        // 'a'
+echo $variable['a'][0]['tag'];                                                // 'a'
 
-echo $variable."\n";                                                               // '245_10$a'
+echo $variable;                                                               // '245_10$a'
 
 $complex = new MARCspec('020$a{$q[0]~\pbk}{$c/0=\€|$c/0=\$}');
-echo $complex['field']['tag']."\n";                                                // '020'
-echo $complex['subfields'][0]['tag']."\n";                                         // 'a'
+echo $complex['field']['tag'];                                                // '020'
+echo $complex['subfields'][0]['tag'];                                         // 'a'
 
-echo $complex['a'][0]['subSpecs'][0]['leftSubTerm']."\n";                          // '020$q[0]'
-echo $complex['a'][0]['subSpecs'][0]['operator']."\n";                             // '~'
-echo $complex['a'][0]['subSpecs'][0]['rightSubTerm']['comparable']."\n";           // 'pbk'
+echo $complex['a'][0]['subSpecs'][0]['leftSubTerm'];                          // '020$q[0]'
+echo $complex['a'][0]['subSpecs'][0]['operator'];                             // '~'
+echo $complex['a'][0]['subSpecs'][0]['rightSubTerm']['comparable'];           // 'pbk'
 
-echo $complex['a'][0]['subSpecs'][1][0]['leftSubTerm']."\n";                       // '020$c/0'
-echo $complex['a'][0]['subSpecs'][1][0]['leftSubTerm']['c'][0]['charStart']."\n";  // 0
-echo $complex['a'][0]['subSpecs'][1][0]['leftSubTerm']['c'][0]['charEnd']."\n";    // null
-echo $complex['a'][0]['subSpecs'][1][0]['leftSubTerm']['c'][0]['charLength']."\n"; // 1
-echo $complex['a'][0]['subSpecs'][1][0]['operator']."\n";                          // '='
-echo $complex['a'][0]['subSpecs'][1][0]['rightSubTerm']['comparable']."\n";        // '€'
+echo $complex['a'][0]['subSpecs'][1][0]['leftSubTerm'];                       // '020$c/0'
+echo $complex['a'][0]['subSpecs'][1][0]['leftSubTerm']['c'][0]['charStart'];  // 0
+echo $complex['a'][0]['subSpecs'][1][0]['leftSubTerm']['c'][0]['charEnd'];    // null
+echo $complex['a'][0]['subSpecs'][1][0]['leftSubTerm']['c'][0]['charLength']; // 1
+echo $complex['a'][0]['subSpecs'][1][0]['operator'];                          // '='
+echo $complex['a'][0]['subSpecs'][1][0]['rightSubTerm']['comparable'];        // '€'
 
-echo $complex['a'][0]['subSpecs'][1][1]['leftSubTerm']."\n";                       // '020$c/0'
-echo $complex['a'][0]['subSpecs'][1][1]['leftSubTerm']['c'][0]['charStart']."\n";  // 0
-echo $complex['a'][0]['subSpecs'][1][1]['leftSubTerm']['c'][0]['charEnd']."\n";    // null
-echo $complex['a'][0]['subSpecs'][1][1]['leftSubTerm']['c'][0]['charLength']."\n"; // 1
-echo $complex['a'][0]['subSpecs'][1][1]['operator']."\n";                          // '='
-echo $complex['a'][0]['subSpecs'][1][1]['rightSubTerm']['comparable']."\n";        // '$'
+echo $complex['a'][0]['subSpecs'][1][1]['leftSubTerm'];                       // '020$c/0'
+echo $complex['a'][0]['subSpecs'][1][1]['leftSubTerm']['c'][0]['charStart'];  // 0
+echo $complex['a'][0]['subSpecs'][1][1]['leftSubTerm']['c'][0]['charEnd'];    // null
+echo $complex['a'][0]['subSpecs'][1][1]['leftSubTerm']['c'][0]['charLength']; // 1
+echo $complex['a'][0]['subSpecs'][1][1]['operator'];                          // '='
+echo $complex['a'][0]['subSpecs'][1][1]['rightSubTerm']['comparable'];        // '$'
 
 // creating MARCspec
 
@@ -95,50 +95,51 @@ MARCspec can be accessed like an immutable array with the following offsets or w
 
 ## Instances of MARCspec
 
-| offset    | method get    | method set        |
-|:---------:|:-------------:|:-----------------:|
-| field     | getField      | setField|
-| subfields | getSubfields  | addSubfields|
+| offset    | method get    | method set   | type  |
+|:---------:|:-------------:|:------------:|:-----:|
+| field     | getField      | setField     | Field |
+| subfields | getSubfields  | addSubfields | array\[Subfield] |
+| \[subfield tag] | getSubfield |          | array\[Subfield] |
 
 ## Instances of Field
 
-| offset    | method get    | method set        |
-|:---------:|:-------------:|:-----------------:|
-| tag       | getTag        | setTag|
-| indicator1| getIndicator1 | setIndicator1|
-| indicator2| getIndicator2 | setIndicator2|
-| charStart | getCharStart  | setCharStart|
-| charEnd   | getCharEnd    | setCharEnd|
-| charLength| getCharLength | |
-| indexStart| getIndexStart | setIndexStart|
-| indexEnd  | getIndexEnd   | setIndexEnd|
-| indexLength| getIndexLength | |
-| subSpecs  | getSubSpecs   | addSubSpecs|
+| offset    | method get    | method set    | type  |
+|:---------:|:-------------:|:-------------:|:-----:|
+| tag       | getTag        | setTag        | string |
+| indicator1| getIndicator1 | setIndicator1 | string |
+| indicator2| getIndicator2 | setIndicator2 | string |
+| charStart | getCharStart  | setCharStart  | int |
+| charEnd   | getCharEnd    | setCharEnd    | int |
+| charLength| getCharLength |               | int |
+| indexStart| getIndexStart | setIndexStart | int |
+| indexEnd  | getIndexEnd   | setIndexEnd   | int |
+| indexLength| getIndexLength |             | int |
+| subSpecs  | getSubSpecs   | addSubSpecs   | array\[SubSpec]&#124;array\[array\[SubSpec]] |
 
 ## Instances of Subfield
 
-| offset    | method get    | method set        |
-|:---------:|:-------------:|:-----------------:|
-| tag       | getTag        | setTag|
-| charStart | getCharStart  | setCharStart|
-| charEnd   | getCharEnd    | setCharEnd|
-| charLength| getCharLength | |
-| indexStart| getIndexStart | setIndexStart|
-| indexEnd  | getIndexEnd   | setIndexEnd|
-| indexLength| getIndexLength | |
-| subSpecs  | getSubSpecs   | addSubSpecs|
+| offset    | method get    | method set    | type  |
+|:---------:|:-------------:|:-------------:|:-----:|
+| tag       | getTag        | setTag        | string |
+| charStart | getCharStart  | setCharStart  | int |
+| charEnd   | getCharEnd    | setCharEnd    | int |
+| charLength| getCharLength |               | int |
+| indexStart| getIndexStart | setIndexStart | int |
+| indexEnd  | getIndexEnd   | setIndexEnd   | int |
+| indexLength| getIndexLength |             | int |
+| subSpecs  | getSubSpecs   | addSubSpecs   | array\[SubSpec]&#124;array\[array\[SubSpec]] |
 
 ## Instances of ComparisonString
 
-| offset    | method get    | method set        |
-|:---------:|:-------------:|:-----------------:|
-| raw       | getRaw        | |
-| comparable| getComprable  | |
+| offset    | method get    | type  |
+|:---------:|:-------------:|:-----:|
+| raw       | getRaw        | string |
+| comparable| getComprable  | string |
 
 ## Instances of SubSpec
 
-| offset    | method get    | method set        |
-|:---------:|:-------------:|:-----------------:|
-| leftSubTerm| getLeftSubTerm| |
-| operator  | getOperator  | |
-| rightSubTerm| getRightSubTerm| |
+| offset       | method get      | type  |
+|:------------:|:---------------:|:-----:|
+| leftSubTerm  | getLeftSubTerm  | MARCspec&#124;ComparisonString |
+| operator     | getOperator     | string |
+| rightSubTerm | getRightSubTerm | MARCspec&#124;ComparisonString |
