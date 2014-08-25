@@ -46,13 +46,6 @@ class SubfieldTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
-    public function testInvalidSubfieldSpec01()
-    {
-        $this->subfieldspec('a');
-    }    
-    /**
-     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
-     */
     public function testInvalidSubfieldSpec1()
     {
         $this->subfieldspec(' $a ');
@@ -161,6 +154,16 @@ class SubfieldTest extends \PHPUnit_Framework_TestCase
         $this->subfieldspec('$a{$b}');
     }
 
+    
+    /**
+     * assert same properties
+     */
+    public function testValidSubfieldSpec001()
+    {
+        $Subfield = $this->subfieldspec('$a');
+        $this->assertSame('a', $Subfield->getTag());
+    }
+    
     /**
      * assert same properties
      */
