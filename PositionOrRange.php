@@ -154,7 +154,7 @@ class PositionOrRange implements PositionOrRangeInterface {
         
         for($x = 0; $x < $posLength; $x++)
         {
-            if(!preg_match('/[0-9-#]/', $pos[$x]))
+            if(!preg_match('/[0-9-#]/', $pos[$x])) // alphabetic characters etc. are not valid
             {
                 throw new InvalidMARCspecException(
                     InvalidMARCspecException::PR.
@@ -173,7 +173,7 @@ class PositionOrRange implements PositionOrRangeInterface {
             );
         }
         
-        if(0 === strpos($pos,'-'))
+        if(0 === strpos($pos,'-')) // something like -123 ist not valid
         {
             throw new InvalidMARCspecException(
                 InvalidMARCspecException::PR.
@@ -182,7 +182,7 @@ class PositionOrRange implements PositionOrRangeInterface {
             );
         }
         
-        if(strpos($pos,'-') !== strrpos($pos,'-'))
+        if(strpos($pos,'-') !== strrpos($pos,'-')) // only one - is allowed
         {
             throw new InvalidMARCspecException(
                 InvalidMARCspecException::PR.
@@ -245,7 +245,7 @@ class PositionOrRange implements PositionOrRangeInterface {
             );
         }
         
-        if(!empty($end))
+        if(isset($end))
         {
             if('#' === $end)
             {
