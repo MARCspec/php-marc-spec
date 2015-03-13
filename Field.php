@@ -134,7 +134,7 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
                         $indexEnd = null;
                         if(array_key_exists('1',$_index))
                         {
-                            if(!empty($_index[1]))
+                            if(null !== ($_index[1]))
                             {
                                 $indexEnd = $_index[1];
                             }

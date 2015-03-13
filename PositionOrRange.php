@@ -204,7 +204,7 @@ class PositionOrRange implements PositionOrRangeInterface {
         
         if(1 == count($_pos))
         {
-            $_pos[1] = '';
+            $_pos[1] = null;
         }
         return $_pos;
     }
@@ -245,7 +245,7 @@ class PositionOrRange implements PositionOrRangeInterface {
             );
         }
         
-        if(isset($end))
+        if(preg_match('/[0-9#]/', $end))
         {
             if('#' === $end)
             {
