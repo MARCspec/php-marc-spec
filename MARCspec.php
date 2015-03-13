@@ -210,44 +210,46 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess{
     */
     private function handleSubfieldRanges($arg)
     {
-        $argLength = strlen($arg);
+        $_arg = explode("/",$arg); // character spec might be present
+        
+        $argLength = strlen($_arg[0]);
         if($argLength !== 3) 
         {
             throw new InvalidMARCspecException(
-                InvalidMARCspecException::SF.
-                InvalidMARCspecException::LENGTH3,
-                $arg
+            InvalidMARCspecException::SF.
+            InvalidMARCspecException::LENGTH3,
+            $_arg[0]
             );
         }
-        elseif(preg_match('/[a-z]/', $arg[0]) && !preg_match('/[a-z]/', $arg[2]))
+        elseif(preg_match('/[a-z]/', $_arg[0][0]) && !preg_match('/[a-z]/', $_arg[0][2]))
         {
             throw new InvalidMARCspecException(
-                InvalidMARCspecException::SF.
-                InvalidMARCspecException::RANGE,
-                $arg
+            InvalidMARCspecException::SF.
+            InvalidMARCspecException::RANGE,
+            $_arg[0]
             );
         }
-        elseif(preg_match('/[A-Z]/', $arg[0]) && !preg_match('/[A-Z]/', $arg[2]))
+        elseif(preg_match('/[A-Z]/', $_arg[0][0]) && !preg_match('/[A-Z]/', $_arg[0][2]))
         {
             throw new InvalidMARCspecException(
-                InvalidMARCspecException::SF.
-                InvalidMARCspecException::RANGE,
-                $arg
+            InvalidMARCspecException::SF.
+            InvalidMARCspecException::RANGE,
+            $_arg[0]
             );
         }
-        elseif(preg_match('/[0-9]/', $arg[0]) && !preg_match('/[0-9]/', $arg[2]))
+        elseif(preg_match('/[0-9]/', $_arg[0][0]) && !preg_match('/[0-9]/', $_arg[0][2]))
         {
             throw new InvalidMARCspecException(
-                InvalidMARCspecException::SF.
-                InvalidMARCspecException::RANGE,
-                $arg
+            InvalidMARCspecException::SF.
+            InvalidMARCspecException::RANGE,
+            $_arg[0]
             );
         }
         else
         {
-            foreach(range($arg[0],$arg[2]) as $sfStep)
+            foreach(range($_arg[0][0],$_arg[0][2]) as $sfStep)
             {
-                $_range[] = '$'.$sfStep;
+                $_range[] = (isset($_arg[1])) ? '$'.$sfStep.'/'.$_arg[1] : '$'.$sfStep;
             }
             return $_range;
         }
