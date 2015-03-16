@@ -1,6 +1,7 @@
 <?php
 /**
- * MARCspec is the specification of a reference, encoded as string, to a set of data from within a MARC record.
+ * MARCspec is the specification of a reference, encoded as string, to a set of data 
+ * from within a MARC record.
  * 
  * @author Carsten Klee <mailme.klee@yahoo.de>
  * @package CK\MARCspec
@@ -14,7 +15,8 @@ use CK\MARCspec\Exception\InvalidMARCspecException;
 /**
 * A MARCspec fieldspec class
 */
-class Field extends PositionOrRange implements FieldInterface, \JsonSerializable, \ArrayAccess {
+class Field extends PositionOrRange implements FieldInterface, \JsonSerializable, \ArrayAccess
+{
 
     /**
      * @var string field tag
@@ -101,8 +103,10 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
          * $specMatches[4] => indicatorSpec
          * $specMatches[5] => useless
          */
-        #if(0 === preg_match('/^(.{3,3})(\[.*\])?(\/[^_]*)?(_[^{]*)?(.*)?/',$fieldspec,$specMatches))
-        if(0 === preg_match('/^([a-z0-9]{3,3}|[A-Z0-9]{3,3}|[0-9\.]{3,3})(\[(?:(?:(?:[0-9]+|#)\-(?:[0-9]+|#))|(?:[0-9]+|#))\])?(?:(\/(?:(?:(?:[0-9]+|#)\-(?:[0-9]+|#))|(?:[0-9]+|#)))|(_[_a-z0-9][_a-z0-9]{0,1}))?(.*)?/',$fieldspec,$specMatches))
+        if(0 === preg_match(
+            '/^([a-z0-9]{3,3}|[A-Z0-9]{3,3}|[0-9\.]{3,3})(\[(?:(?:(?:[0-9]+|#)\-(?:[0-9]+|#))|(?:[0-9]+|#))\])?(?:(\/(?:(?:(?:[0-9]+|#)\-(?:[0-9]+|#))|(?:[0-9]+|#)))|(_[_a-z0-9][_a-z0-9]{0,1}))?(.*)?/',
+            $fieldspec,$specMatches)
+        )
         {
             throw new InvalidMARCspecException(
                 InvalidMARCspecException::FS.
@@ -379,14 +383,19 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
             {
                 if( !($sub instanceOf SubSpecInterface) )
                 {
-                    throw new \InvalidArgumentException('Values of array of subSpecs must be instances of SubSpecInterface.');
+                    throw new \InvalidArgumentException('Values of array of subSpecs 
+                        must be instances of SubSpecInterface.'
+                    );
                 }
             }
             $this->subSpecs[] = $SubSpec;
         }
         else
         {
-            throw new \InvalidArgumentException('Param 1 must be instance of SubSpecInterface or array with instances of SubSpecInterface. Got "'.gettype($subSpec).'".');
+            throw new \InvalidArgumentException('Param 1 must be instance of 
+                SubSpecInterface or array with instances of SubSpecInterface. Got "'
+                .gettype($subSpec).'".'
+            );
         }
     }
     
@@ -405,13 +414,42 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
     public function jsonSerialize()
     {
         $_fieldSpec['tag'] = $this->getTag();
-        if(($indexStart = $this->getIndexStart()) !== null) $_fieldSpec['indexStart'] = $indexStart;
-        if(($indexEnd = $this->getIndexEnd()) !== null) $_fieldSpec['indexEnd'] = $indexEnd;
-        if(($charStart = $this->getCharStart()) !== null) $_fieldSpec['charStart'] = $charStart;
-        if(($charEnd = $this->getCharEnd()) !== null) $_fieldSpec['charEnd'] = $charEnd;
-        if(($charLength = $this->getCharLength()) !== null) $_fieldSpec['charLength'] = $charLength;
-        if(($indicator1 = $this->getIndicator1()) !== null) $_fieldSpec['indicator1'] = $indicator1;
-        if(($indicator2 = $this->getIndicator2()) !== null) $_fieldSpec['indicator2'] = $indicator2;
+        
+        if(($indexStart = $this->getIndexStart()) !== null)
+        {
+            $_fieldSpec['indexStart'] = $indexStart;
+        }
+        
+        if(($indexEnd = $this->getIndexEnd()) !== null)
+        {
+            $_fieldSpec['indexEnd'] = $indexEnd;
+        }
+        
+        if(($charStart = $this->getCharStart()) !== null)
+        {
+            $_fieldSpec['charStart'] = $charStart;
+        }
+        
+        if(($charEnd = $this->getCharEnd()) !== null)
+        {
+            $_fieldSpec['charEnd'] = $charEnd;
+        }
+        
+        if(($charLength = $this->getCharLength()) !== null)
+        {
+            $_fieldSpec['charLength'] = $charLength;
+        }
+        
+        if(($indicator1 = $this->getIndicator1()) !== null)
+        {
+            $_fieldSpec['indicator1'] = $indicator1;
+        }
+        
+        if(($indicator2 = $this->getIndicator2()) !== null)
+        {
+            $_fieldSpec['indicator2'] = $indicator2;
+        }
+        
         if(($subSpecs = $this->getSubSpecs()) !== null)
         {
             $_fieldSpec['subSpecs'] = [];
@@ -443,13 +481,19 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
         if(($indexStart = $this->getIndexStart()) !== null)
         {
             $fieldSpec .= "[".$indexStart;
-            if(($indexEnd = $this->getIndexEnd()) !== null) $fieldSpec .= "-".$indexEnd;
+            if(($indexEnd = $this->getIndexEnd()) !== null)
+            {
+                $fieldSpec .= "-".$indexEnd;
+            }
             $fieldSpec .= "]";
         }
         if(($charStart = $this->getCharStart()) !== null)
         {
             $fieldSpec .= "/".$charStart;
-            if(($charEnd = $this->getCharEnd()) !== null) $fieldSpec .= "-".$charEnd;
+            if(($charEnd = $this->getCharEnd()) !== null)
+            {
+                $fieldSpec .= "-".$charEnd;
+            }
         }
         $indicator1 = ($this->getIndicator1() !== null) ? $this->indicator1 : "_";
         $indicator2 = ($this->getIndicator2() !== null) ? $this->indicator2 : "_";
@@ -492,7 +536,8 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
      * 
      * @api
      * 
-     * @param string $offset Key indexStart|indexEnd|charStart|charEnd|charLength|indicator1|indicator2|subSpecs
+     * @param string $offset Key indexStart|indexEnd|charStart|charEnd|charLength
+     * |indicator1|indicator2|subSpecs
      */ 
     public function offsetExists($offset)
     {
@@ -523,7 +568,8 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
      * 
      * @api
      * 
-     * @param string $offset Key indexStart|indexEnd|charStart|charEnd|charLength|indicator1|indicator2|subSpecs
+     * @param string $offset Key indexStart|indexEnd|charStart|charEnd|charLength
+     * |indicator1|indicator2|subSpecs
      */ 
     public function offsetGet($offset)
     {
@@ -556,7 +602,8 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
      * 
      * @api
      * 
-     * @param string $offset Key indexStart|indexEnd|charStart|charEnd|charLength|indicator1|indicator2|subSpecs
+     * @param string $offset Key indexStart|indexEnd|charStart|charEnd|charLength
+     * |indicator1|indicator2|subSpecs
      */ 
     public function offsetSet($offset,$value)
     {

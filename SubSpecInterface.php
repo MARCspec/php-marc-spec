@@ -1,6 +1,7 @@
 <?php
 /**
- * MARCspec is the specification of a reference, encoded as string, to a set of data from within a MARC record.
+ * MARCspec is the specification of a reference, encoded as string, to a set of data 
+ * from within a MARC record.
  * 
  * @author Carsten Klee <mailme.klee@yahoo.de>
  * @package CK\MARCspec
@@ -13,7 +14,8 @@ namespace CK\MARCspec;
 /**
  * MARCspec subspec interface
  */
-interface SubspecInterface {
+interface SubspecInterface
+{
 
     /**
     * Constructor for SubSpec

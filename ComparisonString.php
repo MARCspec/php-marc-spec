@@ -1,6 +1,7 @@
 <?php
 /**
- * MARCspec is the specification of a reference, encoded as string, to a set of data from within a MARC record.
+ * MARCspec is the specification of a reference, encoded as string, to a set of data 
+ * from within a MARC record.
  * 
  * @author Carsten Klee <mailme.klee@yahoo.de>
  * @package CK\MARCspec
@@ -13,7 +14,8 @@ use CK\MARCspec\Exception\InvalidMARCspecException;
 /**
 * A MARCspec comparison string class
 */
-class ComparisonString implements ComparisonStringInterface, \JsonSerializable, \ArrayAccess {
+class ComparisonString implements ComparisonStringInterface, \JsonSerializable, \ArrayAccess
+{
 
     /**
      * @var string The escaped comparison string
@@ -29,7 +31,12 @@ class ComparisonString implements ComparisonStringInterface, \JsonSerializable, 
     public function __construct($raw)
     {
         
-        if(!is_string($raw)) throw new \InvalidArgumentException('Argument must be of type string. Got '.gettype($raw).'.');
+        if(!is_string($raw))
+        {
+            throw new \InvalidArgumentException('Argument must be of type string. Got '
+                .gettype($raw).'.'
+            );
+        }
         
         $specialChars = ['{','}','!','=','~','?','$'];
         

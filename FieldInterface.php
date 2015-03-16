@@ -13,7 +13,8 @@ namespace CK\MARCspec;
 /**
 * MARCspec field interface
 */
-interface FieldInterface {
+interface FieldInterface
+{
 
     /**
      * Constructor for MARCspec field

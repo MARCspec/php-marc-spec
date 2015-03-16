@@ -1,6 +1,7 @@
 <?php
 /**
- * MARCspec is the specification of a reference, encoded as string, to a set of data from within a MARC record.
+ * MARCspec is the specification of a reference, encoded as string, to a set of data 
+ * from within a MARC record.
  * 
  * @author Carsten Klee <mailme.klee@yahoo.de>
  * @package CK\MARCspec
@@ -14,7 +15,8 @@ use CK\MARCspec\Exception\InvalidMARCspecException;
 /**
 * A MARCspec subfield class
 */
-class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerializable, \ArrayAccess {
+class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerializable, \ArrayAccess
+{
 
     /**
      * @var string subfield tag
@@ -234,14 +236,19 @@ class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerial
             {
                 if( !($sub instanceOf SubSpecInterface) )
                 {
-                    throw new \InvalidArgumentException('Values of array of subSpecs must be instances of SubSpecInterface.');
+                    throw new \InvalidArgumentException('Values of array of subSpecs 
+                        must be instances of SubSpecInterface.'
+                    );
                 }
             }
             $this->subSpecs[] = $SubSpec;
         }
         else
         {
-            throw new \InvalidArgumentException('Param 1 must be instance of SubSpecInterface or array with instances of SubSpecInterface. Got "'.gettype($subSpec).'".');
+            throw new \InvalidArgumentException('Param 1 must be instance of 
+                SubSpecInterface or array with instances of SubSpecInterface. Got "'
+                .gettype($subSpec).'".'
+            );
         }
     }
     
@@ -260,11 +267,32 @@ class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerial
     public function jsonSerialize()
     {
         $_subfieldSpec['tag'] = $this->getTag();
-        if(($indexStart = $this->getIndexStart()) !== null) $_subfieldSpec['indexStart'] = $indexStart;
-        if(($indexEnd = $this->getIndexEnd()) !== null) $_subfieldSpec['indexEnd'] = $indexEnd;
-        if(($charStart = $this->getCharStart()) !== null) $_subfieldSpec['charStart'] = $charStart;
-        if(($charEnd = $this->getCharEnd()) !== null) $_subfieldSpec['charEnd'] = $charEnd;
-        if(($charLength = $this->getCharLength()) !== null) $_subfieldSpec['charLength'] = $charLength;
+        
+        if(($indexStart = $this->getIndexStart()) !== null) 
+        {
+            $_subfieldSpec['indexStart'] = $indexStart;
+        }
+        
+        if(($indexEnd = $this->getIndexEnd()) !== null) 
+        {
+            $_subfieldSpec['indexEnd'] = $indexEnd;
+        }
+        
+        if(($charStart = $this->getCharStart()) !== null) 
+        {
+            $_subfieldSpec['charStart'] = $charStart;
+        }
+        
+        if(($charEnd = $this->getCharEnd()) !== null) 
+        {
+            $_subfieldSpec['charEnd'] = $charEnd;
+        }
+        
+        if(($charLength = $this->getCharLength()) !== null) 
+        {
+            $_subfieldSpec['charLength'] = $charLength;
+        }
+        
         if(($subSpecs = $this->getSubSpecs()) !== null)
         {
             $_subfieldSpec['subSpecs'] = [];
@@ -293,16 +321,24 @@ class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerial
     public function getBaseSpec()
     {
         $subfieldSpec = '$'.$this->getTag();
+        
         if(($indexStart = $this->getIndexStart()) !== null)
         {
             $subfieldSpec .= "[".$indexStart;
-            if(($indexEnd = $this->getIndexEnd()) !== null) $subfieldSpec .= "-".$indexEnd;
+            if(($indexEnd = $this->getIndexEnd()) !== null)
+            {
+                $subfieldSpec .= "-".$indexEnd;
+            }
             $subfieldSpec .= "]";
         }
+        
         if(($charStart = $this->getCharStart()) !== null)
         {
             $subfieldSpec .= "/".$charStart;
-            if(($charEnd = $this->getCharEnd()) !== null) $subfieldSpec .= "-".$charEnd;
+            if(($charEnd = $this->getCharEnd()) !== null)
+            {
+                $subfieldSpec .= "-".$charEnd;
+            }
         }
         return $subfieldSpec;
     }
@@ -346,18 +382,25 @@ class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerial
     {
         switch($offset)
         {
+            
             case 'tag': return isset($this->tag);
-            break;
+                break;
+            
             case 'indexStart': return isset($this->indexStart);
-            break;
+                break;
+            
             case 'indexEnd': return isset($this->indexEnd);
-            break;
+                break;
+            
             case 'charStart': return isset($this->charStart);
-            break;
+                break;
+            
             case 'charEnd': return isset($this->charEnd);
-            break;
+                break;
+            
             case 'subSpecs': return (0 < count($this->subSpecs)) ? true : false;
-            break;
+                break;
+            
             default: return false;
         }
     }
@@ -374,19 +417,26 @@ class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerial
         switch($offset)
         {
             case 'tag': return $this->getTag();
-            break;
+                break;
+            
             case 'indexStart': return $this->getIndexStart();
-            break;
+                break;
+            
             case 'indexEnd': return $this->getIndexEnd();
-            break;
+                break;
+            
             case 'charStart': return $this->getCharStart();
-            break;
+                break;
+            
             case 'charEnd': return $this->getCharEnd();
-            break;
+                break;
+            
             case 'charLength': return $this->getCharLength();
-            break;
+                break;
+            
             case 'subSpecs': return $this->getSubSpecs();
-            break;
+                break;
+            
             default: return null;
         }
     }
@@ -403,33 +453,39 @@ class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerial
         switch($offset)
         {
             case 'indexStart': $this->setIndexStartEnd($value);
-            break;
+                break;
+            
             case 'indexEnd':
-            if(!isset($this['indexStart']))
-            {
-                $this->setIndexStartEnd($value,$value);
-            }
-            else
-            {
-                $this->setIndexStartEnd($this['indexStart'],$value);
-            }
-            break;
+                if(!isset($this['indexStart']))
+                {
+                    $this->setIndexStartEnd($value,$value);
+                }
+                else
+                {
+                    $this->setIndexStartEnd($this['indexStart'],$value);
+                }
+                break;
+            
             case 'charStart': $this->setCharStartEnd($value);
-            break;
+                break;
+            
             case 'charEnd':
-            if(!isset($this['charStart']))
-            {
-                $this->setCharStartEnd($value,$value);
-            }
-            else
-            {
-                $this->setCharStartEnd($this['charStart'],$value);
-            }
-            break;
+                if(!isset($this['charStart']))
+                {
+                    $this->setCharStartEnd($value,$value);
+                }
+                else
+                {
+                    $this->setCharStartEnd($this['charStart'],$value);
+                }
+                break;
+            
             case 'charLength': throw new \UnexpectedValueException("CharLength is always calculated.");
-            break;
+                break;
+            
             case 'subSpecs': $this->addSubSpec($value);
-            break;
+                break;
+            
             default: throw new \UnexpectedValueException("Offset $offset cannot be set.");
         }
     }

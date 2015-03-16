@@ -1,6 +1,7 @@
 <?php
 /**
-* MARCspec is the specification of a reference, encoded as string, to a set of data from within a MARC record.
+* MARCspec is the specification of a reference, encoded as string, to a set of data 
+* from within a MARC record.
 * 
 * @author Carsten Klee <mailme.klee@yahoo.de>
 * @package CK\MARCspec
@@ -16,7 +17,8 @@ use CK\MARCspec\Exception\InvalidMARCspecException;
 * For Specification of MARC spec as string see
 * <http://cklee.github.io/marc-spec/marc-spec.html>
 */
-class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess{
+class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess
+{
 
     /**
     * @var Field The field object
@@ -145,7 +147,9 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess{
     {
         if(1 < strlen($arg))
         {
-            throw new \UnexpectedValueException('Method only allows argument to be 1 character long. Got '. strlen($arg));
+            throw new \UnexpectedValueException('Method only allows argument to be 1 
+                character long. Got '. strlen($arg)
+            );
         }
         $_subfields = null;
         if(0 < count($this->subfields))
@@ -213,6 +217,7 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess{
         $_arg = explode("/",$arg); // character spec might be present
         
         $argLength = strlen($_arg[0]);
+        
         if($argLength !== 3) 
         {
             throw new InvalidMARCspecException(
@@ -270,7 +275,12 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess{
      */
     private function checkIfString($arg)
     {
-        if(!is_string($arg)) throw new \InvalidArgumentException("Method only accepts string as argument. " .gettype($arg)." given.");
+        if(!is_string($arg))
+        {
+            throw new \InvalidArgumentException("Method only accepts string as argument. " .
+                gettype($arg)." given."
+            );
+        }
     }
     
 
@@ -478,7 +488,10 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess{
             $_subTermSet = [];
             $_subTerms = $this->subTermsToArray($subTermSet);
             
-            foreach(['leftSubTerm'=>$_subTerms['leftSubTerm'],'rightSubTerm'=>$_subTerms['rightSubTerm']] as $subTermKey => $subTerm)
+            foreach([
+                    'leftSubTerm'=>$_subTerms['leftSubTerm'],
+                    'rightSubTerm'=>$_subTerms['rightSubTerm']
+                ] as $subTermKey => $subTerm)
             {
                 if(!is_null($subTerm))
                 {
@@ -520,7 +533,9 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess{
                     $_subTermSet[$subTermKey] = new MARCspec($context);
                 }
             }
-            $_subSpec[$key] = new SubSpec($_subTermSet['leftSubTerm'],$_subTerms['operator'],$_subTermSet['rightSubTerm']);
+            $_subSpec[$key] = new SubSpec($_subTermSet['leftSubTerm'],
+                $_subTerms['operator'],
+                $_subTermSet['rightSubTerm']);
         }
         return (1 < count($_subSpec)) ? $_subSpec : $_subSpec[0];
     }
@@ -530,7 +545,9 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess{
         $_subTermSet = [];
         if(preg_match_all('/(?:'.self::LEFTSUBTERM.self::OPERATOR.')?(?<rightsubterm>.+)/',$subTermSet,$_subTermMatches,PREG_SET_ORDER))
         {
-            if(array_key_exists('leftsubterm',$_subTermMatches[0]) && !empty($_subTermMatches[0]['leftsubterm']))
+            if(array_key_exists('leftsubterm',$_subTermMatches[0]) 
+                && !empty($_subTermMatches[0]['leftsubterm'])
+            )
             {
                 $_subTermSet['leftSubTerm'] = $_subTermMatches[0]['leftsubterm'];
             }
@@ -538,7 +555,10 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess{
             {
                 $_subTermSet['leftSubTerm'] = null;
             }
-            if(array_key_exists('rightsubterm',$_subTermMatches[0]) && !empty($_subTermMatches[0]['rightsubterm']))
+            
+            if(array_key_exists('rightsubterm',$_subTermMatches[0]) 
+                && !empty($_subTermMatches[0]['rightsubterm'])
+            )
             {
                 $_subTermSet['rightSubTerm'] = $_subTermMatches[0]['rightsubterm'];
             }
@@ -550,7 +570,10 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess{
                 $subTermSet
                 );
             }
-            if(array_key_exists('operator',$_subTermMatches[0]) && !empty($_subTermMatches[0]['operator']))
+            
+            if(array_key_exists('operator',$_subTermMatches[0]) 
+                && !empty($_subTermMatches[0]['operator'])
+            )
             {
                 $_subTermSet['operator'] = $_subTermMatches[0]['operator'];
             }

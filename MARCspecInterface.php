@@ -1,6 +1,7 @@
 <?php
 /**
- * MARCspec is the specification of a reference, encoded as string, to a set of data from within a MARC record.
+ * MARCspec is the specification of a reference, encoded as string, to a set of data 
+ * from within a MARC record.
  * 
  * @author Carsten Klee <mailme.klee@yahoo.de>
  * @package CK\MARCspec
@@ -13,7 +14,8 @@ namespace CK\MARCspec;
 /**
  * MARCspec subfield interface
  */
-interface MARCspecInterface {
+interface MARCspecInterface
+{
     /**
      * Constructor for a MARCspec
      *
@@ -21,7 +23,8 @@ interface MARCspecInterface {
      * 
      * @api
      * 
-     * @param string|FieldInterface $spec The MARCspec as string or an instance of FieldInterface
+     * @param string|FieldInterface $spec The MARCspec as string or an instance of 
+     * FieldInterface
      */
      public function __construct($spec);
     
@@ -44,14 +47,16 @@ interface MARCspecInterface {
     /**
      * Add subfields
      * 
-     * @param string|SubfieldInterface $subfields The subfield spec or instance of SubfieldInterface
+     * @param string|SubfieldInterface $subfields The subfield spec or instance of 
+     * SubfieldInterface
      */
     public function addSubfields($subfields);
     
     /**
     * Get array of subfields
     *
-    * @return null|array[SubfieldInterface] $subfields The array of instances of SubfieldInterface
+    * @return null|array[SubfieldInterface] $subfields The array of instances of 
+    * SubfieldInterface
     */
      public function getSubfields();
      
@@ -60,7 +65,8 @@ interface MARCspecInterface {
     *
     * @param string $subfieldTag The subfield tag
     * 
-    * @return null|array $subfields [SubfieldInterface] $subfields The array of instances of SubfieldInterface with a specific tag
+    * @return null|array $subfields [SubfieldInterface] $subfields The array of 
+    * instances of SubfieldInterface with a specific tag
     */
      public function getSubfield($subfieldTag);
     

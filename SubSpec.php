@@ -1,6 +1,7 @@
 <?php
 /**
- * MARCspec is the specification of a reference, encoded as string, to a set of data from within a MARC record.
+ * MARCspec is the specification of a reference, encoded as string, to a set of data 
+ * from within a MARC record.
  * 
  * @author Carsten Klee <mailme.klee@yahoo.de>
  * @package CK\MARCspec
@@ -14,7 +15,8 @@ use CK\MARCspec\Exception\InvalidMARCspecException;
 /**
 * A MARCspec subspec class
 */
-class SubSpec implements SubSpecInterface, \JsonSerializable, \ArrayAccess {
+class SubSpec implements SubSpecInterface, \JsonSerializable, \ArrayAccess
+{
 
     /**
      * @var string Operator
@@ -40,22 +42,31 @@ class SubSpec implements SubSpecInterface, \JsonSerializable, \ArrayAccess {
     public function __construct($leftSubTerm, $operator, $rightSubTerm)
     {
 
-        if($leftSubTerm instanceOf MARCspecInterface || $leftSubTerm instanceOf ComparisonStringInterface)
+        if($leftSubTerm instanceOf MARCspecInterface 
+            || $leftSubTerm instanceOf ComparisonStringInterface)
         {
             $this->leftSubTerm = $leftSubTerm;
         }
         else
         {
-            throw new \InvalidArgumentException('Argument 1 must be instance of CK\MARCspec\MARCspecInterface or CK\MARCspec\ComparisonStringInterface');
+            throw new \InvalidArgumentException(
+                'Argument 1 must be instance of CK\MARCspec\MARCspecInterface or 
+                CK\MARCspec\ComparisonStringInterface'
+            );
         }
         
-        if($rightSubTerm instanceOf MARCspecInterface || $rightSubTerm instanceOf ComparisonStringInterface)
+        if($rightSubTerm instanceOf MARCspecInterface 
+            || $rightSubTerm instanceOf ComparisonStringInterface)
         {
             $this->rightSubTerm = $rightSubTerm;
         }
         else
         {
-            throw new \InvalidArgumentException('Argument 3 must be instance of CK\MARCspec\MARCspecInterface or CK\MARCspec\ComparisonStringInterface. Got '.gettype($rightSubTerm));
+            throw new \InvalidArgumentException(
+                'Argument 3 must be instance of CK\MARCspec\MARCspecInterface or 
+                CK\MARCspec\ComparisonStringInterface. Got '
+                .gettype($rightSubTerm)
+            );
         }
         
         $this->setOperator($operator);
@@ -117,7 +128,10 @@ class SubSpec implements SubSpecInterface, \JsonSerializable, \ArrayAccess {
      */
     public function jsonSerialize()
     {
-        if(!is_null($this->leftSubTerm)) $_subSpec['leftSubTerm'] = $this->leftSubTerm->jsonSerialize();
+        if(!is_null($this->leftSubTerm))
+        {
+            $_subSpec['leftSubTerm'] = $this->leftSubTerm->jsonSerialize();
+        }
         $_subSpec['operator'] = $this->operator;
         $_subSpec['rightSubTerm'] = $this->rightSubTerm->jsonSerialize();
         return $_subSpec;
@@ -137,7 +151,8 @@ class SubSpec implements SubSpecInterface, \JsonSerializable, \ArrayAccess {
             case 'operator': 
             case 'leftSubTerm':
             case 'rightSubTerm': return true;
-            break;
+                break;
+            
             default: return false;
         }
     }
@@ -154,11 +169,14 @@ class SubSpec implements SubSpecInterface, \JsonSerializable, \ArrayAccess {
         switch($offset)
         {
             case 'operator': return $this->getOperator();
-            break;
+                break;
+            
             case 'leftSubTerm': return $this->getLeftSubTerm();
-            break;
+                break;
+            
             case 'rightSubTerm': return $this->getRightSubTerm();
-            break;
+                break;
+            
             default: throw new \UnexpectedValueException("Offset $offset does not exist.");
         }
     }

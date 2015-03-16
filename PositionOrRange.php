@@ -1,6 +1,7 @@
 <?php
 /**
-* MARCspec is the specification of a reference, encoded as string, to a set of data from within a MARC record.
+* MARCspec is the specification of a reference, encoded as string, to a set of data 
+* from within a MARC record.
 * 
 * @author Carsten Klee <mailme.klee@yahoo.de>
 * @package CK\MARCspec
@@ -14,7 +15,8 @@ use CK\MARCspec\Exception\InvalidMARCspecException;
 /**
 * class for index or character position or range spec
 */
-class PositionOrRange implements PositionOrRangeInterface {
+class PositionOrRange implements PositionOrRangeInterface
+{
 
     /**
      * {@inheritdoc}
@@ -137,7 +139,8 @@ class PositionOrRange implements PositionOrRangeInterface {
     * 
     * @throws InvalidMARCspecException
     * 
-    * @return array $_pos[string] An numeric array of character or index positions. $_pos[1] might be empty.
+    * @return array $_pos[string] An numeric array of character or index positions. 
+    * $_pos[1] might be empty.
     */
     protected function validatePos($pos)
     {
@@ -350,6 +353,11 @@ class PositionOrRange implements PositionOrRangeInterface {
      */
     protected function checkIfString($arg)
     {
-        if(!is_string($arg)) throw new \InvalidArgumentException("Method only accepts string as argument. " .gettype($arg)." given.");
+        if(!is_string($arg))
+        {
+            throw new \InvalidArgumentException("Method only accepts string as argument. " 
+                .gettype($arg)." given."
+            );
+        }
     }
 } // EOC
