@@ -231,7 +231,7 @@ class PositionOrRange implements PositionOrRangeInterface
     {
         $_startEnd = array();
         
-        if(preg_match('/[0-9]/', (string)$start))
+        if(preg_match('/[0-9]/', $start))
         {
             $_startEnd[0] = (int)$start;
         }
@@ -247,14 +247,14 @@ class PositionOrRange implements PositionOrRangeInterface
                 $start
             );
         }
-        
+
         if(preg_match('/[0-9#]/', $end))
         {
             if('#' === $end)
             {
                 $_startEnd[1] = '#';
             }
-            elseif(preg_match('/[0-9]/', (string)$end))
+            elseif(preg_match('/[0-9]/', $end))
             {
                 $_startEnd[1] = (int)$end;
                 
@@ -302,7 +302,7 @@ class PositionOrRange implements PositionOrRangeInterface
     {
 
         $_startEnd = array();
-        if(preg_match('/[0-9]/', (string)$start))
+        if(preg_match('/[0-9]/', $start))
         {
             $_startEnd[0] = (int)$start;
         }
@@ -319,7 +319,7 @@ class PositionOrRange implements PositionOrRangeInterface
         }
         
         
-        if(preg_match('/^[1-9]\d*/', (string)$length)) // only positive int without 0
+        if(preg_match('/^[1-9]\d*/', $length)) // only positive int without 0
         {
             if('#' !== $_startEnd[0])
             {

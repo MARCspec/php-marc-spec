@@ -292,6 +292,12 @@ class FieldTest extends \PHPUnit_Framework_TestCase
             $this->assertSame(4, $fieldSpec->getCharEnd());
             $this->assertSame(5, $fieldSpec->getCharLength());
             
+            $fieldSpec = $this->fieldspec('LDR/#-0');
+            $this->assertSame('LDR', $fieldSpec->getTag());
+            $this->assertSame('#', $fieldSpec->getCharStart());
+            $this->assertSame(0, $fieldSpec->getCharEnd());
+            $this->assertSame(1, $fieldSpec->getCharLength());
+            
     }
 
         

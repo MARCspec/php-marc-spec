@@ -176,7 +176,7 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
                         $charEnd = null;
                         if(array_key_exists(1,$_charPosOrRange))
                         {
-                            if(!empty($_charPosOrRange[1]))
+                            if(isset($_charPosOrRange[1]))
                             {
                                 $charEnd = $_charPosOrRange[1];
                             }
