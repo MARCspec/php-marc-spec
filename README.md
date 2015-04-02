@@ -6,7 +6,20 @@ For currently supported version of **MARCspec - A common MARC record path langua
 
 # Installation
 
-Installation can be done by using composer or download the [ZIP file](https://github.com/cKlee/php-marc-spec/archive/master.zip).
+Installation can be done by using [composer](https://getcomposer.org/doc/00-intro.md) 
+
+```
+{
+    "require": {
+        "ck/php-marcspec": "1.*"
+    }
+}
+```
+
+or download the [ZIP file](https://github.com/MARCspec/php-marc-spec/archive/master.zip).
+
+PHP-MARCspec requires PHP 5.4 or later.
+
 # Usage
 
 ```php
