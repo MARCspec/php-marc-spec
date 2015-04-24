@@ -15,7 +15,7 @@ use CK\MARCspec\Exception\InvalidMARCspecException;
 /**
 * A MARCspec subfield class
 */
-class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerializable, \ArrayAccess
+class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerializable, \ArrayAccess, \IteratorAggregate
 {
 
     /**
@@ -496,5 +496,14 @@ class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerial
     public function offsetUnset($offset)
     {
         throw new \BadMethodCallException("Offset $offset can not be unset.");
+    }
+    
+    public function getIterator()
+    {
+        foreach($this as $key => $value)
+        {
+            $_[$key] = $value;
+        }
+        return new SpecIterator($_);
     }
 } // EOC

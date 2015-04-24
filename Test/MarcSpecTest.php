@@ -171,6 +171,49 @@ class MARCspecTest extends \PHPUnit_Framework_TestCase
 
     }
     
+    public function testIteration()
+    {
+        $ms = $this->marcspec('245$a-c{$b|$c}{$e}');
+        $count = 0;
+
+        foreach($ms as $key => $value)
+        {
+            $count++;
+        }
+        $this->assertSame(2, $count);
+        
+        $count = 0;
+        foreach($ms['subfields'] as $key => $value)
+        {
+            $count++;
+        }
+        $this->assertSame(3, $count);
+        
+       
+        foreach($ms['subfields'] as $subfield)
+        {
+            $count = 0;
+            foreach($subfield['subSpecs'] as $subSpec)
+            {
+                if(is_array($subSpec))
+                {
+                    $this->assertSame(2, count($subSpec));
+                }
+                else
+                {
+                    foreach($subSpec as $key => $prop)
+                    {
+                        $this->assertTrue(in_array($key,["leftSubTerm","operator","rightSubTerm"]));
+                    }
+                }
+                
+                $count++;
+            }
+            $this->assertSame(2, $count);
+        }
+        
+        
+    }
 
 
 }
