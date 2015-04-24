@@ -17,7 +17,7 @@ use CK\MARCspec\Exception\InvalidMARCspecException;
 * For Specification of MARC spec as string see
 * <http://cklee.github.io/marc-spec/marc-spec.html>
 */
-class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess
+class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess, \IteratorAggregate
 {
 
     /**
@@ -673,5 +673,10 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess
     public function offsetUnset($offset)
     {
         throw new \BadMethodCallException("Offset $offset can not be unset.");
+    }
+    
+    public function getIterator()
+    {
+        return new SpecIterator(["field" => $this->field, "subfields" => $this->subfields]);
     }
 } // EOC
