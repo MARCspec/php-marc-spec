@@ -553,6 +553,8 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
             break;
             case 'charEnd': return isset($this->charEnd);
             break;
+            case 'charLength': return !is_null($this->getCharLength());
+            break;
             case 'indicator1': return isset($this->indicator1);
             break;
             case 'indicator2': return isset($this->indicator2);
