@@ -196,28 +196,6 @@ class FieldTest extends \PHPUnit_Framework_TestCase
     public function testInvalidFieldSpec35()
     {
             $this->fieldspec('245___');
-    }    
-    
-    /**
-     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
-     */
-    public function testInvalidFieldSpec37()
-    {
-            $this->fieldspec('245_1+');
-    }    
-    /**
-     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
-     */
-    public function testInvalidFieldSpec38()
-    {
-            $this->fieldspec('245_123');
-    }    
-    /**
-     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
-     */
-    public function testInvalidFieldSpec39()
-    {
-            $this->fieldspec('245_$');
     }
     
     /**

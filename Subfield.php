@@ -397,6 +397,9 @@ class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerial
             
             case 'charEnd': return isset($this->charEnd);
                 break;
+                
+            case 'charLength': return !is_null($this->getCharLength());
+                break;
             
             case 'subSpecs': return (0 < count($this->subSpecs)) ? true : false;
                 break;

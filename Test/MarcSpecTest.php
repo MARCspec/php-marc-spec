@@ -214,6 +214,24 @@ class MARCspecTest extends \PHPUnit_Framework_TestCase
         
         
     }
+    
+    public function testOffsets()
+    {
+        $ms = $this->marcspec('LDR/0-3');
+        $this->assertTrue($ms['field']->offsetExists('charLength'));
+        
+        $ms = $this->marcspec('LDR/0-#');
+        $this->assertFalse($ms['field']->offsetExists('charLength'));
+        
+        $ms = $this->marcspec('245$a/0-3');
+        $this->assertTrue($ms['a'][0]->offsetExists('charLength'));
+        
+        $ms = $this->marcspec('245$a/#-3');
+        $this->assertTrue($ms['a'][0]->offsetExists('charLength'));
+        
+        $ms = $this->marcspec('245$a/0-#');
+        $this->assertFalse($ms['a'][0]->offsetExists('charLength'));
+    }
 
 
 }
