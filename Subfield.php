@@ -278,6 +278,11 @@ class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerial
             $_subfieldSpec['indexEnd'] = $indexEnd;
         }
         
+        if(($indexLength = $this->getIndexLength()) !== null)
+        {
+            $_subfieldSpec['indexLength'] = $indexLength;
+        }
+        
         if(($charStart = $this->getCharStart()) !== null) 
         {
             $_subfieldSpec['charStart'] = $charStart;
@@ -384,26 +389,21 @@ class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerial
         {
             
             case 'tag': return isset($this->tag);
-                break;
-            
+            break;
             case 'indexStart': return isset($this->indexStart);
-                break;
-            
+            break;
             case 'indexEnd': return isset($this->indexEnd);
-                break;
-            
+            break;
+            case 'indexLength': return !is_null($this->getIndexLength());
+            break;
             case 'charStart': return isset($this->charStart);
-                break;
-            
+            break;
             case 'charEnd': return isset($this->charEnd);
-                break;
-                
+            break;
             case 'charLength': return !is_null($this->getCharLength());
-                break;
-            
+            break;
             case 'subSpecs': return (0 < count($this->subSpecs)) ? true : false;
-                break;
-            
+            break;
             default: return false;
         }
     }
@@ -420,26 +420,21 @@ class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerial
         switch($offset)
         {
             case 'tag': return $this->getTag();
-                break;
-            
+            break;
             case 'indexStart': return $this->getIndexStart();
-                break;
-            
+            break;
             case 'indexEnd': return $this->getIndexEnd();
-                break;
-            
+            break;
+            case 'indexLength': return $this->getIndexLength();
+            break;
             case 'charStart': return $this->getCharStart();
-                break;
-            
+            break;
             case 'charEnd': return $this->getCharEnd();
-                break;
-            
+            break;
             case 'charLength': return $this->getCharLength();
-                break;
-            
+            break;
             case 'subSpecs': return $this->getSubSpecs();
-                break;
-            
+            break;
             default: return null;
         }
     }
@@ -456,39 +451,42 @@ class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerial
         switch($offset)
         {
             case 'indexStart': $this->setIndexStartEnd($value);
-                break;
+            break;
             
             case 'indexEnd':
-                if(!isset($this['indexStart']))
-                {
-                    $this->setIndexStartEnd($value,$value);
-                }
-                else
-                {
-                    $this->setIndexStartEnd($this['indexStart'],$value);
-                }
-                break;
+            if(!isset($this['indexStart']))
+            {
+                $this->setIndexStartEnd($value,$value);
+            }
+            else
+            {
+                $this->setIndexStartEnd($this['indexStart'],$value);
+            }
+            break;
+            
+            case 'indexLength': throw new \UnexpectedValueException("indexLength is always calculated.");
+            break;
             
             case 'charStart': $this->setCharStartEnd($value);
-                break;
-            
+            break;
+
             case 'charEnd':
-                if(!isset($this['charStart']))
-                {
-                    $this->setCharStartEnd($value,$value);
-                }
-                else
-                {
-                    $this->setCharStartEnd($this['charStart'],$value);
-                }
-                break;
-            
+            if(!isset($this['charStart']))
+            {
+                $this->setCharStartEnd($value,$value);
+            }
+            else
+            {
+                $this->setCharStartEnd($this['charStart'],$value);
+            }
+            break;
+
             case 'charLength': throw new \UnexpectedValueException("CharLength is always calculated.");
-                break;
-            
+            break;
+
             case 'subSpecs': $this->addSubSpec($value);
-                break;
-            
+            break;
+
             default: throw new \UnexpectedValueException("Offset $offset cannot be set.");
         }
     }

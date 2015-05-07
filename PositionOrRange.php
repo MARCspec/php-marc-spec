@@ -125,6 +125,46 @@ class PositionOrRange implements PositionOrRangeInterface
     /**
      * {@inheritdoc}
      */
+    public function getIndexLength()
+    {
+        if( is_null($this->getIndexStart()) && is_null($this->getIndexEnd()) )
+        {
+            return null;
+        }
+        if( !is_null($this->getIndexStart()) && is_null($this->getIndexEnd()) )
+        {
+            return 1;
+        }
+        // both defined
+        if($this->indexStart === $this->indexEnd) 
+        {
+            return 1;
+        }
+        if('#' === $this->indexStart && '#' !== $this->indexEnd)
+        {
+            return $this->indexEnd + 1;
+        }
+        if('#' !== $this->indexStart && '#' === $this->indexEnd)
+        {
+            return null;
+        }
+        else
+        {
+            $length = $this->indexEnd - $this->indexStart + 1;
+            if(1 > $length)
+            {
+                throw new InvalidMARCspecException(
+                    InvalidMARCspecException::PR.
+                    InvalidMARCspecException::NEGATIVE
+                );
+            }
+            return $length;
+        }
+    }
+    
+    /**
+     * {@inheritdoc}
+     */
     protected function getStartEnd($arg)
     {
         return (isset($arg)) ? $arg : null;
@@ -157,7 +197,7 @@ class PositionOrRange implements PositionOrRangeInterface
         
         for($x = 0; $x < $posLength; $x++)
         {
-            if(!preg_match('/[0-9-#]/', $pos[$x])) // alphabetic characters etc. are not valid
+            if(!preg_match('/[0-9\-#]/', $pos[$x])) // alphabetic characters etc. are not valid
             {
                 throw new InvalidMARCspecException(
                     InvalidMARCspecException::PR.

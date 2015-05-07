@@ -255,7 +255,7 @@ class SubfieldTest extends \PHPUnit_Framework_TestCase
     /**
      * test character position and range
      */
-    public function testSetAndGet()
+    public function testSetAndGetChar()
     {
             $Subfield = $this->subfieldspec('$a');
             $Subfield->setCharStartEnd('0','3');
@@ -284,10 +284,41 @@ class SubfieldTest extends \PHPUnit_Framework_TestCase
             $this->assertSame("#", $Subfield->getCharStart());
             $this->assertSame(3, $Subfield->getCharEnd());
             $this->assertSame(4, $Subfield->getCharLength());
-            
-
     }
-    
+
+    /**
+     * test index position and range
+     */
+    public function testSetAndGetIndex()
+    {
+        $Subfield = $this->subfieldspec('$a');
+        $Subfield->setIndexStartEnd('0','3');
+        $this->assertSame('a', $Subfield->getTag());
+        $this->assertSame(0, $Subfield->getIndexStart());
+        $this->assertSame(3, $Subfield->getIndexEnd());
+        $this->assertSame(4, $Subfield->getIndexLength());
+        
+        $Subfield = $this->subfieldspec('$a');
+        $Subfield->setIndexStartEnd("#",3);
+        $this->assertSame('a', $Subfield->getTag());
+        $this->assertSame("#", $Subfield->getIndexStart());
+        $this->assertSame(3, $Subfield->getIndexEnd());
+        $this->assertSame(4, $Subfield->getIndexLength());
+        
+        $Subfield = $this->subfieldspec('$a');
+        $Subfield->setIndexStartEnd(0,4);
+        $this->assertSame('a', $Subfield->getTag());
+        $this->assertSame(0, $Subfield->getIndexStart());
+        $this->assertSame(4, $Subfield->getIndexEnd());
+        $this->assertSame(5, $Subfield->getIndexLength());
+        
+        $Subfield = $this->subfieldspec('$a');
+        $Subfield->setIndexStartLength("#",4);
+        $this->assertSame('a', $Subfield->getTag());
+        $this->assertSame("#", $Subfield->getIndexStart());
+        $this->assertSame(3, $Subfield->getIndexEnd());
+        $this->assertSame(4, $Subfield->getIndexLength());
+    }
     /**
      * test encoding
      */

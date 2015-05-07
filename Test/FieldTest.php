@@ -234,11 +234,11 @@ class FieldTest extends \PHPUnit_Framework_TestCase
             
             $fieldSpec = $this->fieldspec('245[1-3]');
             $this->assertSame(1, $fieldSpec->getIndexStart());
-            $this->assertSame(3, $fieldSpec->getIndexEnd());            
+            $this->assertSame(3, $fieldSpec->getIndexEnd());
             
             $fieldSpec = $this->fieldspec('245[1-#]');
             $this->assertSame(1, $fieldSpec->getIndexStart());
-            $this->assertSame('#', $fieldSpec->getIndexEnd());            
+            $this->assertSame('#', $fieldSpec->getIndexEnd());
             
             $fieldSpec = $this->fieldspec('245[#-3]');
             $this->assertSame('#', $fieldSpec->getIndexStart());
@@ -320,7 +320,7 @@ class FieldTest extends \PHPUnit_Framework_TestCase
     /**
      * test character position and range
      */
-    public function testSetAndGet()
+    public function testSetAndGetChar()
     {
             $fieldSpec = $this->fieldspec('LDR');
             $fieldSpec->setCharStartEnd(0,3);
@@ -349,8 +349,40 @@ class FieldTest extends \PHPUnit_Framework_TestCase
             $this->assertSame("#", $fieldSpec->getCharStart());
             $this->assertSame(3, $fieldSpec->getCharEnd());
             $this->assertSame(4, $fieldSpec->getCharLength());
+    }
+    
+    /**
+     * test index position and range
+     */
+    public function testSetAndGetIndex()
+    {
+            $fieldSpec = $this->fieldspec('300');
+            $fieldSpec->setIndexStartEnd(0,3);
+            $this->assertSame('300', $fieldSpec->getTag());
+            $this->assertSame(0, $fieldSpec->getIndexStart());
+            $this->assertSame(3, $fieldSpec->getIndexEnd());
+            $this->assertSame(4, $fieldSpec->getIndexLength());
             
-
+            $fieldSpec = $this->fieldspec('300');
+            $fieldSpec->setIndexStartEnd("#",3);
+            $this->assertSame('300', $fieldSpec->getTag());
+            $this->assertSame("#", $fieldSpec->getIndexStart());
+            $this->assertSame(3, $fieldSpec->getIndexEnd());
+            $this->assertSame(4, $fieldSpec->getIndexLength());
+            
+            $fieldSpec = $this->fieldspec('300');
+            $fieldSpec->setIndexStartEnd(0,4);
+            $this->assertSame('300', $fieldSpec->getTag());
+            $this->assertSame(0, $fieldSpec->getIndexStart());
+            $this->assertSame(4, $fieldSpec->getIndexEnd());
+            $this->assertSame(5, $fieldSpec->getIndexLength());
+                        
+            $fieldSpec = $this->fieldspec('300');
+            $fieldSpec->setIndexStartLength("#",4);
+            $this->assertSame('300', $fieldSpec->getTag());
+            $this->assertSame("#", $fieldSpec->getIndexStart());
+            $this->assertSame(3, $fieldSpec->getIndexEnd());
+            $this->assertSame(4, $fieldSpec->getIndexLength());
     }
     
     /**

@@ -425,6 +425,11 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
             $_fieldSpec['indexEnd'] = $indexEnd;
         }
         
+        if(($indexLength = $this->getIndexLength()) !== null)
+        {
+            $_fieldSpec['indexLength'] = $indexLength;
+        }
+        
         if(($charStart = $this->getCharStart()) !== null)
         {
             $_fieldSpec['charStart'] = $charStart;
@@ -549,6 +554,8 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
             break;
             case 'indexEnd': return isset($this->indexEnd);
             break;
+            case 'indexLength': return !is_null($this->getIndexLength());
+            break;
             case 'charStart': return isset($this->charStart);
             break;
             case 'charEnd': return isset($this->charEnd);
@@ -583,6 +590,8 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
             break;
             case 'indexEnd': return $this->getIndexEnd();
             break;
+            case 'indexLength': return $this->getIndexLength();
+            break;
             case 'charStart': return $this->getCharStart();
             break;
             case 'charEnd': return $this->getCharEnd();
@@ -613,6 +622,7 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
         {
             case 'indexStart': $this->setIndexStartEnd($value);
             break;
+            
             case 'indexEnd':
                 if(!isset($this['indexStart']))
                 {
@@ -623,8 +633,13 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
                     $this->setIndexStartEnd($this['indexStart'],$value);
                 }
             break;
+            
+            case 'indexLength': throw new \UnexpectedValueException("indexLength is always calculated.");
+            break;
+            
             case 'charStart': $this->setCharStartEnd($value);
             break;
+            
             case 'charEnd':
                 if(!isset($this['charStart']))
                 {
@@ -635,14 +650,19 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
                     $this->setCharStartEnd($this['charStart'],$value);
                 }
             break;
+            
             case 'charLength': throw new \UnexpectedValueException("CharLength is always calculated.");
             break;
+            
             case 'indicator1': $this->setIndicator1($value);
             break;
+            
             case 'indicator2': $this->setIndicator2($value);
             break;
+            
             case 'subSpecs': $this->addSubSpec($value);
             break;
+            
             default: throw new \UnexpectedValueException("Offset $offset cannot be set.");
         }
     }
