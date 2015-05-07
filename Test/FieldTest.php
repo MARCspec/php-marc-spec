@@ -383,6 +383,13 @@ class FieldTest extends \PHPUnit_Framework_TestCase
             $this->assertSame("#", $fieldSpec->getIndexStart());
             $this->assertSame(3, $fieldSpec->getIndexEnd());
             $this->assertSame(4, $fieldSpec->getIndexLength());
+            
+            $fieldSpec = $this->fieldspec('300');
+            $fieldSpec->setIndexStartLength(0,6);
+            $this->assertSame('300', $fieldSpec->getTag());
+            $this->assertSame(0, $fieldSpec->getIndexStart());
+            $this->assertSame(5, $fieldSpec->getIndexEnd());
+            $this->assertSame(6, $fieldSpec->getIndexLength());
     }
     
     /**

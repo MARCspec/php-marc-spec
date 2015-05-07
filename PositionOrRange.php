@@ -361,14 +361,7 @@ class PositionOrRange implements PositionOrRangeInterface
         
         if(preg_match('/^[1-9]\d*/', $length)) // only positive int without 0
         {
-            if('#' !== $_startEnd[0])
-            {
-                $_startEnd[1] = (int)$length;
-            }
-            else
-            {
-                $_startEnd[1] = $_startEnd[0] + (int)$length -1;
-            }
+            $_startEnd[1] = (int)$length - 1;
         }
         else
         {
