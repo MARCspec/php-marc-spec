@@ -44,7 +44,7 @@ class InvalidMARCspecException extends \UnexpectedValueException {
     const LENGTHIND    = 'For indicators only two characters at are allowed.';
     const INDCHAR1     = 'At minimum one indicator must be a digit or a lowercase alphabetic character.';
     const INDCHAR2     = 'For indicators only digits, lowercase alphabetic characters and "_" are allowed.';
-    const NEGATIVE     = 'Ending character position or index must be equal or higher than starting character potion or index.';
+    const NEGATIVE     = 'Ending character or index position must be equal or higher than starting character or index position.';
     const PR1          = 'Assuming index or character position or range. Minimum one character is required. None given.';
     const PR2          = 'Assuming index or character position or range. Only digits, the character # and one "-" is allowed.';
     const PR3          = 'Assuming index or character range. At least two digits or the character # must be present.';

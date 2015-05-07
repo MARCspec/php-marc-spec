@@ -6,9 +6,9 @@ For currently supported version of **MARCspec - A common MARC record path langua
 
 # Installation
 
-Installation can be done by using [composer](https://getcomposer.org/doc/00-intro.md) 
+Installation can be done by using [composer](https://getcomposer.org/doc/00-intro.md).
 
-```php
+```json
 {
     "require": {
         "ck/php-marcspec": "1.*"

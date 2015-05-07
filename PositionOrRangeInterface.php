@@ -133,4 +133,18 @@ interface PositionOrRangeInterface
     * @throws \InvalidArgumentException if length is less than 1
     */
     public function getCharLength();
+    
+    /**
+    *
+    * Get length of index range
+    *
+    * @api
+    * 
+    * @access public
+    * 
+    * @return null|int $length The index range length
+    * 
+    * @throws \InvalidArgumentException if length is less than 1
+    */
+    public function getIndexLength();
 } // EOI
