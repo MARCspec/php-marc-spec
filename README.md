@@ -1,4 +1,4 @@
-# PHP-MARCspec [![Build Status](https://travis-ci.org/cKlee/php-marc-spec.svg?branch=master)] (https://travis-ci.org/cKlee/php-marc-spec)
+# PHP-MARCspec [![Build Status](https://travis-ci.org/MARCspec/php-marc-spec.svg?branch=master)] (https://travis-ci.org/MARCspec/php-marc-spec)
 
 PHP *MARCspec* parser and validator.
 
