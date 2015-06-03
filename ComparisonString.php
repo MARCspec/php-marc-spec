@@ -48,8 +48,7 @@ class ComparisonString implements ComparisonStringInterface, \JsonSerializable, 
             );
         }
         
-        #$specialChars = ['{','}','!','=','~','?','$'];
-        
+        /** char of list ${}!=~?|\s must be escaped if not at index 0*/
         if(!preg_match('/^(.(?:[^${}!=~?| ]|(?<=\\\\)[${}!=~?|])*)$/',$raw))
         {
             throw new InvalidMARCspecException(
@@ -58,17 +57,6 @@ class ComparisonString implements ComparisonStringInterface, \JsonSerializable, 
                 $raw
             );
         }
-        /*foreach($specialChars as $specialChar)
-        {
-            if( preg_match('/(?<!\\\)'.preg_quote($specialChar).'/','\\'.$raw) )
-            {
-                throw new InvalidMARCspecException(
-                    InvalidMARCspecException::CS.
-                    InvalidMARCspecException::ESCAPE,
-                    $raw
-                );
-            }
-        }*/
         
         $this->raw = $raw;
     }
