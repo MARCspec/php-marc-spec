@@ -26,7 +26,8 @@ class ComparisonString implements ComparisonStringInterface, \JsonSerializable, 
     *
     * {@inheritdoc}
     * 
-    * @throws \InvalidArgumentException if argument is not a string or comparison string is not properly escaped
+    * @throws \InvalidArgumentException if argument is not a string or 
+    * comparison string is not properly escaped
     */
     public function __construct($raw)
     {
@@ -38,11 +39,28 @@ class ComparisonString implements ComparisonStringInterface, \JsonSerializable, 
             );
         }
         
-        $specialChars = ['{','}','!','=','~','?','$'];
-        
-        for($i = 0; $i < count($specialChars);$i++)
+        if(false !== strpos($raw,' '))
         {
-            if( preg_match('/(?<!\\\)'.preg_quote($specialChars[$i]).'/','\\'.$raw) )
+            throw new InvalidMARCspecException(
+                InvalidMARCspecException::CS.
+                InvalidMARCspecException::SPACE,
+                $raw
+            );
+        }
+        
+        #$specialChars = ['{','}','!','=','~','?','$'];
+        
+        if(!preg_match('/^(.(?:[^${}!=~?| ]|(?<=\\\\)[${}!=~?|])*)$/',$raw))
+        {
+            throw new InvalidMARCspecException(
+                InvalidMARCspecException::CS.
+                InvalidMARCspecException::ESCAPE,
+                $raw
+            );
+        }
+        /*foreach($specialChars as $specialChar)
+        {
+            if( preg_match('/(?<!\\\)'.preg_quote($specialChar).'/','\\'.$raw) )
             {
                 throw new InvalidMARCspecException(
                     InvalidMARCspecException::CS.
@@ -50,7 +68,7 @@ class ComparisonString implements ComparisonStringInterface, \JsonSerializable, 
                     $raw
                 );
             }
-        }
+        }*/
         
         $this->raw = $raw;
     }
