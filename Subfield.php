@@ -95,7 +95,7 @@ class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerial
      */
     private function validateSubfield($arg)
     {
-        if(empty($arg))
+        if(!strlen($arg))
         {
             throw new InvalidMARCspecException(
                 InvalidMARCspecException::SF.
@@ -108,7 +108,7 @@ class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerial
         
         for($i = 0;$i<$argLength;$i++)
         {
-            if(!preg_match('/[!\"#$%&\'()*+,-.\/0-9:;<=>?[\]^_`a-z{}~]/', $arg[$i]))
+            if(!preg_match('/[\\!-\\?\\[-\\{\\}-~]/', $arg[$i]))
             {
                 throw new InvalidMARCspecException(
                     InvalidMARCspecException::SF.
