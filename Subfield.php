@@ -46,7 +46,7 @@ class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerial
     /**
      * @var array subSpec
      */
-    private $subSpecs = array();
+    private $subSpecs = [];
 
     /**
     *
@@ -130,7 +130,7 @@ class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerial
             }
         }
         
-        if(preg_match('/(?<!\$)\{/', $arg))
+        if(preg_match('/\{.*\}$/', $arg))
         {
             throw new InvalidMARCspecException(
                 InvalidMARCspecException::SF.
