@@ -90,7 +90,6 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess, \I
                 );
             }
             
-            
             // creates a fieldspec
             if(empty($specMatches[1]))
             {
@@ -450,6 +449,7 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess, \I
                 {
                     $_subfields[] = $_dataRef['subfield'];
                 }
+                
                 foreach($_subfields as $subfield)
                 {
                     $Subfield = new Subfield($subfield);
@@ -491,17 +491,20 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess, \I
      */
     private function createSubSpec($assumedSubspecs,$Subfield=null)
     {
-        $context = $this->field->getBaseSpec();
+        $fieldContext = $this->field->getBaseSpec();
+        $subfieldContext = "";
         if(!is_null($Subfield))
         {
-            $context .= $Subfield->getBaseSpec();
+            $subfieldContext = $Subfield->getBaseSpec();
         }
+        $context = $fieldContext.$subfieldContext;
+        
         $_nocount = ['$','\\'];
         $_operators = ['?','!','~','='];
         $specLength = strlen($assumedSubspecs);
 
         $_subTermSets = preg_split('/(?<!\\\\)\|/', substr($assumedSubspecs,1,$specLength-2));
-        
+
         foreach($_subTermSets as $key => $subTermSet)
         {
             if(preg_match('/(?<![\\\\\$])[\{\}]/',$subTermSet,$_error, PREG_OFFSET_CAPTURE))
@@ -513,8 +516,7 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess, \I
                 );
             }
             $_subTermSet = [];
-            $_subTerms = $this->subTermsToArray($subTermSet);
-            
+            $_subTerms = $this->subTermsToArray($subTermSet);´
             foreach([
                     'leftSubTerm'=>$_subTerms['leftSubTerm'],
                     'rightSubTerm'=>$_subTerms['rightSubTerm']
@@ -528,45 +530,53 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess, \I
                     }
                     else
                     {
+                        if(strpos("[/_$",$subTerm[0]) && is_null($context))
+                        {
+                            throw new InvalidMARCspecException(
+                            InvalidMARCspecException::SS.
+                            InvalidMARCspecException::MISSINGFIELD,
+                            $assumedSubspecs
+                            );
+                        }
+                        
                         switch($subTerm[0]) 
                         {
+                            case '_':
+                                if($refPos = strpos($context,$subTerm[0]))
+                                {
+                                    $newSpec = substr($context,0,$refPos).$subTerm;
+                                }
+                                else
+                                {
+                                    $newSpec = $fieldContext.$subTerm;
+                                }
+                                break;
+                                
                             case '[':
                             case '/':
-                            case '_':
                             case '$':
-                                if(is_null($context))
-                                {
-                                    throw new InvalidMARCspecException(
-                                        InvalidMARCspecException::SS.
-                                        InvalidMARCspecException::MISSINGFIELD,
-                                        $assumedSubspecs
-                                    );
-                                }
-                                if('_' == $subTerm[0])
-                                {
-                                    $refPos = strpos($context,$subTerm[0]);
-                                }
-                                else
-                                {
-                                    $refPos = strrpos($context,$subTerm[0]);
-                                }
+                                $refPos = strrpos($context,$subTerm[0]);
+                                
                                 if($refPos)
                                 {
-                                    $_subTermSet[$subTermKey] = new MARCspec(substr($context,0,$refPos).$subTerm);
+                                    $newSpec = substr($context,0,$refPos).$subTerm;
                                 }
                                 else
                                 {
-                                    $_subTermSet[$subTermKey] = new MARCspec($context.$subTerm);
+                                    $newSpec = $context.$subTerm;
                                 }
-                            break;
-                            default: $_subTermSet[$subTermKey] = new MARCspec($subTerm);
+                                break;
+                            
+                            default: $newSpec = $subTerm;
                         }
                     }
                 }
                 else
                 {
-                    $_subTermSet[$subTermKey] = new MARCspec($context);
+                    $newSpec = $context;
                 }
+                
+                $_subTermSet[$subTermKey] = new MARCspec($newSpec);
             }
             $_subSpec[$key] = new SubSpec($_subTermSet['leftSubTerm'],
                 $_subTerms['operator'],
