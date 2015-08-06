@@ -12,6 +12,16 @@ use CK\MARCspec\Exception\InvalidMARCspecException;
 
 class ComparisonStringTest extends \PHPUnit_Framework_TestCase
 {
+    protected $validTests;
+    protected $invalidTests;
+    
+    protected function setUp()
+    {
+        $validTestsJson = file_get_contents(__DIR__. '/../' ."vendor/ck/marcspec-test-suite/valid/validComparisonString.json");
+        $invalidTestsJson = file_get_contents(__DIR__. '/../' ."vendor/ck/marcspec-test-suite/invalid/invalidComparisonString.json");
+        $this->validTests = json_decode($validTestsJson);
+        $this->invalidTests = json_decode($invalidTestsJson);
+    }
     
     public function compare($arg)
     {
@@ -27,7 +37,7 @@ class ComparisonStringTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidArgument1Decode()
     {
-        $comapare = $this->compare(array('a'));
+        $this->compare(array('a'));
     }    
     
     /**
@@ -35,7 +45,7 @@ class ComparisonStringTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidArgument2Decode()
     {
-        $compare = $this->compare('.{.');
+        $this->compare('.{.');
     }
 
     /**
@@ -68,5 +78,30 @@ class ComparisonStringTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('this\sis\sa\sTest\s\\\{\}\!\=\~\?', $compare->getRaw());
         $this->assertSame('this is a Test \{}!=~?', $compare->getComparable());
         
+    }
+    
+    public function testInvalidFromTestSuite()
+    {
+        foreach($this->invalidTests->{'tests'} as $test)
+        {
+            try
+            {
+                new ComparisonString($test->{'data'});
+            }
+            catch(\Exception $e)
+            {
+              continue;
+            }
+            $this->fail('An expected exception has not been raised for '.$test->{'data'});
+        }
+    }
+    
+    public function testValidFromTestSuite()
+    {
+        foreach($this->validTests->{'tests'} as $test)
+        {
+            new ComparisonString($test->{'data'});
+            $this->assertSame(1,preg_match('/'.$this->validTests->{'schema'}->{'pattern'}.'/',$test->{'data'}));
+        }
     }
 }

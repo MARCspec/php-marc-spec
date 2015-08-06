@@ -15,54 +15,26 @@ use CK\MARCspec\Exception\InvalidMARCspecException;
 class FieldTest extends \PHPUnit_Framework_TestCase
 {
     
+    protected $validTests = [];
+    protected $invalidTests = [];
+    
+    protected function setUp()
+    {
+        $this->validTests[] = json_decode(file_get_contents(__DIR__. '/../' ."vendor/ck/marcspec-test-suite/valid/validFieldTag.json"));
+        $this->invalidTests[] = json_decode(file_get_contents(__DIR__. '/../' ."vendor/ck/marcspec-test-suite/invalid/invalidFieldTag.json"));
+    }
+    
     public function fieldspec($arg)
     {
         return new Field($arg);
     }
     
-    /****
-    * invalid data types
-    ***/
-    
-    /**
-     * @expectedException InvalidArgumentException
-     */
-    public function testInvalidArgument1Decode()
-    {
-            $this->fieldspec((int)'245');
-    }
     /**
      * @expectedException InvalidArgumentException
      */
     public function testInvalidArgument2Decode()
     {
             $this->fieldspec(array('245'));
-    }
-    
-    /****
-    * invalid field tags
-    ***/
-    
-    /**
-     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
-     */
-    public function testInvalidFieldSpec1()
-    {
-            $this->fieldspec(' 24 ');
-    }
-    /**
-     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
-     */
-    public function testInvalidFieldSpec11()
-    {
-            $this->fieldspec('24/');
-    }
-    /**
-     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
-     */
-    public function testInvalidFieldSpec12()
-    {
-            $this->fieldspec('2Xx');
     }
     
     /**
@@ -192,11 +164,11 @@ class FieldTest extends \PHPUnit_Framework_TestCase
     }    
     /**
      * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
-     */
+    
     public function testInvalidFieldSpec35()
     {
             $this->fieldspec('245___');
-    }
+    }*/
     
     /**
      * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
@@ -423,5 +395,34 @@ class FieldTest extends \PHPUnit_Framework_TestCase
         
         $fieldSpec = $this->fieldspec('300[1-3]');
         $this->assertSame('300[1-3]',"$fieldSpec");
+    }
+    public function testInvalidFromTestSuite()
+    {
+        foreach($this->invalidTests as $invalid)
+        {
+            foreach($invalid->{'tests'} as $test)
+            {
+                try
+                {
+                    new Field($test->{'data'});
+                }
+                catch(\Exception $e)
+                {
+                    continue;
+                }
+                $this->fail('An expected exception has not been raised for '.$test->{'data'});
+            }
+        }
+    }
+    
+    public function testValidFromTestSuite()
+    {
+        foreach($this->validTests as $valid)
+        {
+            foreach($valid->{'tests'} as $test)
+            {
+                new Field($test->{'data'});
+            }
+        }
     }
 }

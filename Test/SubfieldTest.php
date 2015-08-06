@@ -14,6 +14,16 @@ use CK\MARCspec\Exception\InvalidMARCspecException;
 
 class SubfieldTest extends \PHPUnit_Framework_TestCase
 {
+    protected $validTests = [];
+    protected $invalidTests = [];
+    
+    protected function setUp()
+    {
+        $this->validTests[] = json_decode(file_get_contents(__DIR__. '/../' ."vendor/ck/marcspec-test-suite/valid/validSubfieldTag.json"));
+        $this->validTests[] = json_decode(file_get_contents(__DIR__. '/../' ."vendor/ck/marcspec-test-suite/valid/validSubfieldRange.json"));
+        $this->invalidTests[] = json_decode(file_get_contents(__DIR__. '/../' ."vendor/ck/marcspec-test-suite/invalid/invalidSubfieldTag.json"));
+        $this->invalidTests[] = json_decode(file_get_contents(__DIR__. '/../' ."vendor/ck/marcspec-test-suite/invalid/invalidSubfieldRange.json"));
+    }
     
     public function subfieldspec($arg)
     {
@@ -341,5 +351,42 @@ class SubfieldTest extends \PHPUnit_Framework_TestCase
         
         $Subfield = $this->subfieldspec('$a[1-3]');
         $this->assertSame('$a[1-3]',"$Subfield");
+    }
+    
+    public function testInvalidFromTestSuite()
+    {
+        foreach($this->invalidTests as $invalid)
+        {
+            foreach($invalid->{'tests'} as $test)
+            {
+                try
+                {
+                    new Subfield($test->{'data'});
+                }
+                catch(\Exception $e)
+                {
+                    continue;
+                }
+                $this->fail('An expected exception has not been raised for '.$test->{'data'});
+            }
+        }
+    }
+    
+    public function testValidFromTestSuite()
+    {
+        foreach($this->validTests as $valid)
+        {
+            foreach($valid->{'tests'} as $test)
+            {
+                try
+                {
+                    new Subfield($test->{'data'});
+                }
+                catch(\Exception $e)
+                {
+                    $this->fail('An unexpected exception has been raised for '.$test->{'data'}.': '.$e->getMessage());
+                }
+            }
+        }
     }
 }
