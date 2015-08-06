@@ -183,6 +183,8 @@ class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerial
         else // simple subfield
         {
             $this->tag = $arg;
+            // as of MARCspec 3.2.2 spec without index is always an abbreviation
+            $this->setIndexStartEnd(0,'#');
         }
     }
     /**
@@ -326,23 +328,39 @@ class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerial
     public function getBaseSpec()
     {
         $subfieldSpec = '$'.$this->getTag();
-        
+
         if(($indexStart = $this->getIndexStart()) !== null)
         {
-            $subfieldSpec .= "[".$indexStart;
-            if(($indexEnd = $this->getIndexEnd()) !== null)
+            $indexEnd = $this->getIndexEnd();
+            if(0 === $indexStart && "#" === $indexEnd)
             {
-                $subfieldSpec .= "-".$indexEnd;
+                // use abbreviation
             }
-            $subfieldSpec .= "]";
+            else
+            {
+                $subfieldSpec .= "[".$indexStart;
+                if($indexEnd !== null)
+                {
+                    $subfieldSpec .= "-".$indexEnd;
+                }
+                $subfieldSpec .= "]";
+            }
+            
         }
-        
         if(($charStart = $this->getCharStart()) !== null)
         {
-            $subfieldSpec .= "/".$charStart;
-            if(($charEnd = $this->getCharEnd()) !== null)
+            $charEnd = $this->getCharEnd();
+            if($charStart === 0 && $charEnd === "#")
             {
-                $subfieldSpec .= "-".$charEnd;
+                // use abbreviation
+            }
+            else
+            {
+                $subfieldSpec .= "/".$charStart;
+                if(($charEnd = $this->getCharEnd()) !== null)
+                {
+                    $subfieldSpec .= "-".$charEnd;
+                }
             }
         }
         return $subfieldSpec;

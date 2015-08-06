@@ -208,6 +208,11 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
                 );
             }
         }
+        else
+        {
+            // as of MARCspec 3.2.2 spec without index is always an abbreviation
+            $this->setIndexStartEnd(0,"#");
+        }
     }
 
     /**
@@ -487,19 +492,36 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
         $fieldSpec = $this->getTag();
         if(($indexStart = $this->getIndexStart()) !== null)
         {
-            $fieldSpec .= "[".$indexStart;
-            if(($indexEnd = $this->getIndexEnd()) !== null)
+            $indexEnd = $this->getIndexEnd();
+            if(0 === $indexStart && "#" === $indexEnd)
             {
-                $fieldSpec .= "-".$indexEnd;
+                // use abbreviation
             }
-            $fieldSpec .= "]";
+            else
+            {
+                $fieldSpec .= "[".$indexStart;
+                if($indexEnd !== null)
+                {
+                    $fieldSpec .= "-".$indexEnd;
+                }
+                $fieldSpec .= "]";
+            }
+
         }
         if(($charStart = $this->getCharStart()) !== null)
         {
-            $fieldSpec .= "/".$charStart;
-            if(($charEnd = $this->getCharEnd()) !== null)
+            $charEnd = $this->getCharEnd();
+            if($charStart === 0 && $charEnd === "#")
             {
-                $fieldSpec .= "-".$charEnd;
+                 // use abbreviation
+            }
+            else
+            {
+                $fieldSpec .= "/".$charStart;
+                if(($charEnd = $this->getCharEnd()) !== null)
+                {
+                    $fieldSpec .= "-".$charEnd;
+                }
             }
         }
         $indicator1 = ($this->getIndicator1() !== null) ? $this->indicator1 : "_";
