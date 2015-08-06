@@ -309,29 +309,47 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess, \I
         $_detected = [];
         $subfieldCount = 0;
         $subSpecCount = 0;
+        $checkPrevious = function($x) use ($arg,$_nocount)
+        {
+            $start = $x;
+            $count = true;
+            for($x ; $x > 0; $x--)
+            {
+                if(!in_array($arg[$x-1],$_nocount)) 
+                {
+                    $check = $start - $x;
+                    if ($check % 2 != 0) {
+                        return false;
+                    }
+                    else
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    $count = false;
+                }
+            }
+            return $count;
+        };
         for($i = 0;$i < strlen($arg);$i++)
         {
             if(0 < $i) // not first char
             {
-                $previous = $arg[$i-1];
-                
-                if('$' == $arg[$i] && !in_array($previous,$_nocount) && ($open === $close))
+                if('$' == $arg[$i] && $checkPrevious($i) && ($open === $close))
                 {
                     $subfieldCount++;
                 }
             }
-            else
-            {
-                $previous = null;
-            }
         
             if($open === $close)
             {
-                if('{' == $arg[$i] && !in_array($previous,$_nocount))
+                if('{' == $arg[$i] && $checkPrevious($i))
                 {
                     $open++;
                 }
-                if('}' == $arg[$i] && !in_array($previous,$_nocount))
+                if('}' == $arg[$i] && $checkPrevious($i))
                 {
                     throw new InvalidMARCspecException(
                         InvalidMARCspecException::MS.
@@ -376,11 +394,11 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess, \I
             else // open != close
             {
                 
-                if('{' == $arg[$i] && !in_array($previous,$_nocount))
+                if('{' == $arg[$i] && $checkPrevious($i))
                 {
                     $open++;
                 }
-                if('}' == $arg[$i] && !in_array($previous,$_nocount))
+                if('}' == $arg[$i] && $checkPrevious($i))
                 {
                     $close++;
                 }
