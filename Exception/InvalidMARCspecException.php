@@ -33,7 +33,7 @@ class InvalidMARCspecException extends \UnexpectedValueException {
     const MINIMUM3     = 'Spec must be at least three characters long.';
     const MINIMUM4     = 'Spec must be at least four characters long.';
     const LENGTH       = 'Invalid spec length.';
-    const LENGTH3      = 'Invalid spec length. Spec must be three characters long.';
+    const LENGTH3      = 'Invalid spec length. At minimum spec must be three characters long.';
     const PREFIX       = 'Missing prefixed character "$".';
     const ESCAPE       = 'Unescaped character detected';
     const DETECTEDSS   = 'Detected Subspec. Use method addSubSpec to add subspecs.';
