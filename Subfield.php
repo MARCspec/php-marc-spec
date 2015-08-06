@@ -60,13 +60,13 @@ class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerial
     {
         $this->checkIfString($subfieldspec);
 
-        if('$' !== $subfieldspec[0])
+        if('$' === $subfieldspec[0] && 1 < strlen($subfieldspec))
         {
-            $this->validateSubfield($subfieldspec);
+            $this->validateSubfield(substr($subfieldspec,1));
         }
         else
         {
-            $this->validateSubfield(substr($subfieldspec,1));
+            $this->validateSubfield($subfieldspec);
         }
     }
     
@@ -95,12 +95,12 @@ class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerial
      */
     private function validateSubfield($arg)
     {
-        if(!strlen($arg))
+        if(0 === strlen($arg))
         {
             throw new InvalidMARCspecException(
                 InvalidMARCspecException::SF.
                 InvalidMARCspecException::MISSINGTAG,
-                $arg
+                $arg. ' '. gettype($arg)
             );
         }
         
