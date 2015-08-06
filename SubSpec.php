@@ -120,7 +120,20 @@ class SubSpec implements SubSpecInterface, \JsonSerializable, \ArrayAccess, \Ite
      */
     public function __toString()
     {
-        return "$this->leftSubTerm".$this->operator."$this->rightSubTerm";
+        switch($this->operator)
+        {
+            case "!":
+                $subSpecString = $this->operator."$this->rightSubTerm";
+                break;
+                
+            case "?":
+                $subSpecString = "$this->rightSubTerm";
+                break;
+            
+            default:
+                $subSpecString = "$this->leftSubTerm".$this->operator."$this->rightSubTerm";
+        }
+        return $subSpecString;
     }
     
     /**
