@@ -175,7 +175,10 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess, \I
         
         return null;
     }
-    
+    /**
+    * Creates and adds a single subfield from the MARCspecParser result
+    * @param array $_subfield The MARCspecParser result array
+    */ 
     private function addSubfield($_subfield)
     {
         if(array_key_exists('subfieldtagrange',$_subfield))
