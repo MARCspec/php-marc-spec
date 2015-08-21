@@ -64,11 +64,16 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
     *
     * @throws InvalidMARCspecException
     */
-    public function __construct($fieldspec)
+    public function __construct($fieldspec = null)
     {
+        if(is_null($fieldspec)) return;
+        
         $this->checkIfString($fieldspec);
+        
         $spec = trim($fieldspec);
+        
         $specLength = strlen($fieldspec);
+        
         // check string length
         if(3 > $specLength)
         {
@@ -94,138 +99,51 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
                 $fieldspec
             );
         }
-
-        /**
-         * $specMatches[0] => whole spec
-         * $specMatches[1] => tag
-         * $specMatches[2] => indexSpec
-         * $specMatches[3] => charSpec
-         * $specMatches[4] => indicatorSpec
-         * $specMatches[5] => useless
-         */
-        if(0 === preg_match(
-            '/^([a-z0-9\.]{3,3}|[A-Z0-9\.]{3,3}|[0-9\.]{3,3})(\[(?:(?:(?:[0-9]+|#)\-(?:[0-9]+|#))|(?:[0-9]+|#))\])?(?:(\/(?:(?:(?:[0-9]+|#)\-(?:[0-9]+|#))|(?:[0-9]+|#)))|(_[_a-z0-9][_a-z0-9]{0,1}))?(.*)?/',
-            $fieldspec,$specMatches)
-        )
+        
+        $parser = new MARCspecParser();
+        
+        $parser->fieldToArray($fieldspec);
+        
+        if(array_key_exists('subfields',$parser->parsed))
         {
             throw new InvalidMARCspecException(
                 InvalidMARCspecException::FS.
-                InvalidMARCspecException::UNKNOWN,
+                InvalidMARCspecException::DETECTEDSF,
                 $fieldspec
             );
         }
-
-        $this->setTag($specMatches[1]);
-
-        if($specLength > 3)
+       
+        $this->setTag($parser->field['tag']);
+        
+        if(array_key_exists('index',$parser->field))
         {
-            // check an set indexSpec
-            if(!array_key_exists(2,$specMatches))
-            {
-                throw new InvalidMARCspecException(
-                    InvalidMARCspecException::FS.
-                    InvalidMARCspecException::INDEX,
-                    $fieldspec
-                );
-            }
-
-            if(!empty($specMatches[2]))
-            {
-                if( preg_match('/^\[(.*)\]/', $specMatches[2], $_assumedIndex) )
-                {
-                    if( $_index = $this->validatePos($_assumedIndex[1]) )
-                    {
-                        $indexEnd = null;
-                        if(array_key_exists('1',$_index))
-                        {
-                            if(null !== ($_index[1]))
-                            {
-                                $indexEnd = $_index[1];
-                            }
-                        }
-                        $this->setIndexStartEnd($_index[0],$indexEnd);
-                    }
-                }
-                else
-                {
-                    throw new InvalidMARCspecException(
-                        InvalidMARCspecException::FS.
-                        InvalidMARCspecException::INDEX,
-                        $fieldspec
-                    );
-                }
-            }
-
-            if(!empty($specMatches[3]) && !empty($specMatches[4]))
-            {
-                throw new InvalidMARCspecException(
-                    InvalidMARCspecException::FS.
-                    InvalidMARCspecException::CHARORIND,
-                    $fieldspec
-                );
-            }
-
-            if(!empty($specMatches[3]))
-            {
-                // check character position or range
-                $charPosOrRange = substr($specMatches[3], 1);
-                if('' != $charPosOrRange)
-                {
-                    if($_charPosOrRange = $this->validatePos($charPosOrRange))
-                    {
-                        $charEnd = null;
-                        if(array_key_exists(1,$_charPosOrRange))
-                        {
-                            if(isset($_charPosOrRange[1]))
-                            {
-                                $charEnd = $_charPosOrRange[1];
-                            }
-                        }
-                        $this->setCharStartEnd($_charPosOrRange[0],$charEnd);
-                    }
-                }
-                else
-                {
-                    throw new InvalidMARCspecException(
-                        InvalidMARCspecException::PR.
-                        InvalidMARCspecException::PRCHAR,
-                        $fieldspec
-                    );
-                }
-            }
-
-            if(!empty($specMatches[4]))
-            {
-                $this->setIndicators(substr($specMatches[4],1));
-            }
-
-            if(!empty($specMatches[5]))
-            {
-                throw new InvalidMARCspecException(
-                    InvalidMARCspecException::FS.
-                    InvalidMARCspecException::USELESS,
-                    $fieldspec
-                );
-            }
+            $_pos = MARCspec::validatePos($parser->field['index']);
+            
+            $this->setIndexStartEnd($_pos[0],$_pos[1]);
         }
         else
         {
             // as of MARCspec 3.2.2 spec without index is always an abbreviation
             $this->setIndexStartEnd(0,"#");
         }
+        
+        if(array_key_exists('indicators',$parser->field))
+        {
+            $this->setIndicators($parser->field['indicators']);
+        }
+        elseif(array_key_exists('charpos',$parser->field))
+        {
+            $_chars = MARCspec::validatePos($parser->field['charpos']);
+            
+            $this->setCharStartEnd($_chars[0],$_chars[1]);
+        }
     }
 
     /**
     *
-    * Set the field tag
-    *
-    * Provided param gets validated
-    *
-    * @access private
-    *
-    * @param string $arg The field tag
+    * {@inheritdoc}
     */
-    private function setTag($arg)
+    public function setTag($arg)
     {
         if($this->validateTag($arg)) $this->tag = $arg;
     }
@@ -422,15 +340,9 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
     {
         $_fieldSpec['tag'] = $this->getTag();
 
-        if(($indexStart = $this->getIndexStart()) !== null)
-        {
-            $_fieldSpec['indexStart'] = $indexStart;
-        }
+        $_fieldSpec['indexStart'] = $this->getIndexStart();
 
-        if(($indexEnd = $this->getIndexEnd()) !== null)
-        {
-            $_fieldSpec['indexEnd'] = $indexEnd;
-        }
+        $_fieldSpec['indexEnd'] = $this->getIndexEnd();
 
         if(($indexLength = $this->getIndexLength()) !== null)
         {
@@ -490,24 +402,23 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
     public function getBaseSpec()
     {
         $fieldSpec = $this->getTag();
-        if(($indexStart = $this->getIndexStart()) !== null)
+        $indexStart = $this->getIndexStart();
+        $indexEnd = $this->getIndexEnd();
+        if(0 === $indexStart && "#" === $indexEnd)
         {
-            $indexEnd = $this->getIndexEnd();
-            if(0 === $indexStart && "#" === $indexEnd)
-            {
-                // use abbreviation
-            }
-            else
-            {
-                $fieldSpec .= "[".$indexStart;
-                if($indexEnd !== null)
-                {
-                    $fieldSpec .= "-".$indexEnd;
-                }
-                $fieldSpec .= "]";
-            }
-
+            // use abbreviation
         }
+        else
+        {
+            $fieldSpec .= "[".$indexStart;
+            
+            if($indexEnd !== null && $indexStart !== $indexEnd)
+            {
+                $fieldSpec .= "-".$indexEnd;
+            }
+            $fieldSpec .= "]";
+        }
+
         if(($charStart = $this->getCharStart()) !== null)
         {
             $charEnd = $this->getCharEnd();

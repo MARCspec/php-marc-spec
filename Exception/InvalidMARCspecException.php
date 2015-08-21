@@ -17,7 +17,7 @@ class InvalidMARCspecException extends \UnexpectedValueException {
 
     const METHOD       = 'In method ';
     const ARGUMENT     = 'Tried to parse ';
-    const UNKNOWN      = 'Unknown Error.';
+    const UNKNOWN      = 'Assuming invalid spec.';
     const MS           = 'MARCspec. ';
     const FS           = 'Fieldspec. ';
     const SF           = 'Subfieldspec. ';
@@ -36,7 +36,9 @@ class InvalidMARCspecException extends \UnexpectedValueException {
     const LENGTH3      = 'Invalid spec length. At minimum spec must be three characters long.';
     const PREFIX       = 'Missing prefixed character "$".';
     const ESCAPE       = 'Unescaped character detected';
+    const DETECTEDSF   = 'Detected Subfield. Use method MARCspec::addSubfields to add subfields.';
     const DETECTEDSS   = 'Detected Subspec. Use method addSubSpec to add subspecs.';
+    const MULTISF      = 'Detected more than one subfieldspecs. Use method addSubfields to add more than one subfield.';
     const INDEX        = 'Invalid index detected.';
     const PRCHAR       = 'For character position or range minimum one digit or character # is required.';
     const USELESS      = 'Detected useless data fragment.';

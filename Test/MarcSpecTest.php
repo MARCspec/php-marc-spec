@@ -40,39 +40,6 @@ class MARCspecTest extends \PHPUnit_Framework_TestCase
         );
          $this->validTests = $valid;
          $this->invalidTests = $invalid;
-        /*$valid[] = file_get_contents(__DIR__. '/../' ."vendor/ck/marcspec-test-suite/valid/validFieldTag.json");
-        $valid[] = file_get_contents(__DIR__. '/../' ."vendor/ck/marcspec-test-suite/valid/wildCombination_validChar.json");
-        $valid[] = file_get_contents(__DIR__. '/../' ."vendor/ck/marcspec-test-suite/valid/wildCombination_validIndexIndicator.json");
-        $valid[] = file_get_contents(__DIR__. '/../' ."vendor/ck/marcspec-test-suite/valid/wildCombination_validIndicators.json");
-        $valid[] = file_get_contents(__DIR__. '/../' ."vendor/ck/marcspec-test-suite/valid/wildCombination_validIndexChar.json");
-        #$valid[] = file_get_contents(__DIR__. '/../' ."vendor/ck/marcspec-test-suite/valid/wildCombination_validIndexCharSubSpec.json");
-        #$valid[] = file_get_contents(__DIR__. '/../' ."vendor/ck/marcspec-test-suite/valid/wildCombination_validSubSpec.json");
-        #$valid[] = file_get_contents(__DIR__. '/../' ."vendor/ck/marcspec-test-suite/valid/wildCombination_validSubSpecSubSpec.json");
-        $valid[] = file_get_contents(__DIR__. '/../' ."vendor/ck/marcspec-test-suite/valid/wildCombination_validIndexCharSubSpec.json");
-        $valid[] = file_get_contents(__DIR__. '/../' ."vendor/ck/marcspec-test-suite/valid/wildCombination_validIndexIndicatorSubSpec.json");
-        $valid[] = file_get_contents(__DIR__. '/../' ."vendor/ck/marcspec-test-suite/valid/wildCombination_validSubfieldRange.json");
-        $valid[] = file_get_contents(__DIR__. '/../' ."vendor/ck/marcspec-test-suite/valid/wildCombination_validSubfieldRangeRange.json");
-        $valid[] = file_get_contents(__DIR__. '/../' ."vendor/ck/marcspec-test-suite/valid/wildCombination_validSubfieldRangeSubSpec.json");
-        $valid[] = file_get_contents(__DIR__. '/../' ."vendor/ck/marcspec-test-suite/valid/wildCombination_validSubfieldSubSpecTag.json");
-        $valid[] = file_get_contents(__DIR__. '/../' ."vendor/ck/marcspec-test-suite/valid/wildCombination_validSubfieldTag.json");
-        $valid[] = file_get_contents(__DIR__. '/../' ."vendor/ck/marcspec-test-suite/valid/wildCombination_validSubfieldTagRange.json");
-        $valid[] = file_get_contents(__DIR__. '/../' ."vendor/ck/marcspec-test-suite/valid/wildCombination_validSubfieldTagSubSpec.json");
-        $valid[] = file_get_contents(__DIR__. '/../' ."vendor/ck/marcspec-test-suite/valid/wildCombination_validSubfieldTagTag.json");
-        $valid[] = file_get_contents(__DIR__. '/../' ."vendor/ck/marcspec-test-suite/valid/wildCombination_validSubSpec.json");
-        $valid[] = file_get_contents(__DIR__. '/../' ."vendor/ck/marcspec-test-suite/valid/wildCombination_validSubSpecSubSpec.json");
-        
-        
-        $invalid[] = file_get_contents(__DIR__. '/../' ."vendor/ck/marcspec-test-suite/invalid/wildCombination_invalidSubfieldRange.json");
-        $invalid[] = file_get_contents(__DIR__. '/../' ."vendor/ck/marcspec-test-suite/invalid/wildCombination_invalidSubfieldTag.json");
-        
-        foreach($valid as $validTests)
-        {
-            $this->validTests[] = json_decode($validTests);
-        }
-        foreach($invalid as $invalidTests)
-        {
-            $this->invalidTests[] = json_decode($invalidTests);
-        }*/
     }
     
     public function marcspec($arg)

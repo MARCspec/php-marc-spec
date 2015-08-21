@@ -381,11 +381,11 @@ class FieldTest extends \PHPUnit_Framework_TestCase
         
         $fieldSpec = $this->fieldspec('245_1_');
         $this->assertSame('245_1_',"$fieldSpec");
-        
+
         $fieldSpec = $this->fieldspec('007/1');
         $this->assertSame('007/1', "$fieldSpec");
         $this->assertSame(1, $fieldSpec->getCharLength());
-        
+
         $fieldSpec = $this->fieldspec('007/1-3');
         $this->assertSame('007/1-3', "$fieldSpec");
         $this->assertSame(3, $fieldSpec->getCharLength());

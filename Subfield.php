@@ -56,170 +56,103 @@ class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerial
     * @throws InvalidMARCspecException
     * 
     */
-    public function __construct($subfieldspec)
+    public function __construct($subfieldspec = null)
     {
-        $this->checkIfString($subfieldspec);
-
-        if('$' === $subfieldspec[0] && 1 < strlen($subfieldspec))
+        if(is_null($subfieldspec)) return;
+        
+        if(!is_string($subfieldspec))
         {
-            $this->validateSubfield(substr($subfieldspec,1));
+            throw new \InvalidArgumentException("Method only accepts string as argument. " .
+            gettype($subfieldspec)." given."
+            );
         }
-        else
-        {
-            $this->validateSubfield($subfieldspec);
-        }
-    }
-    
-
-
-    /**
-    *
-    * {@inheritdoc}
-    * 
-    */
-    public function getTag()
-    {
-        return $this->tag;
-    }
-
-    /**
-     * validates and sets subfields
-     *
-     * @internal
-     * 
-     * @access private
-     * 
-     * @param string $arg The subfield tag
-     * 
-     * @throws InvalidMARCspecException
-     */
-    private function validateSubfield($arg)
-    {
-        if(0 === strlen($arg))
+        
+        $argLength = strlen($subfieldspec);
+        
+        if(0 === $argLength)
         {
             throw new InvalidMARCspecException(
                 InvalidMARCspecException::SF.
                 InvalidMARCspecException::MISSINGTAG,
-                $arg. ' '. gettype($arg)
+                $subfieldspec
             );
         }
         
-        $argLength = strlen($arg);
-        
-        for($i = 0;$i<$argLength;$i++)
+        if(1 == $argLength)
         {
-            if(!preg_match('/[\\!-\\?\\[-\\{\\}-~]/', $arg[$i]))
-            {
-                throw new InvalidMARCspecException(
-                    InvalidMARCspecException::SF.
-                    InvalidMARCspecException::SFCHAR,
-                    $arg
-                );
-            }
+            $subfieldspec = "$".$subfieldspec;
         }
-        
+
         if(1<$argLength) 
         {
-            if('-' == $arg[1]) // assuming subfield range
+            if('-' == $subfieldspec[1]) // assuming subfield range
             {
                 throw new InvalidMARCspecException(
                     InvalidMARCspecException::SF.
                     InvalidMARCspecException::SFRANGE,
-                    $arg
+                    $subfieldspec
                 );
             }
         }
         
-        if(preg_match('/\{.*\}$/', $arg))
+        if(preg_match('/\{.*\}$/', $subfieldspec))
         {
             throw new InvalidMARCspecException(
                 InvalidMARCspecException::SF.
                 InvalidMARCspecException::DETECTEDSS,
+                $subfieldspec
+            );
+        }
+        
+        $parser = new MARCspecParser();
+        
+        $subfield = $parser->subfieldToArray($subfieldspec);
+        
+        $this->setTag($subfield['subfieldtag']);
+        
+        if(array_key_exists('index',$subfield))
+        {
+            $_pos = MARCspec::validatePos($subfield['index']);
+            
+            $this->setIndexStartEnd($_pos[0],$_pos[1]);
+        }
+        else
+        {
+            // as of MARCspec 3.2.2 spec without index is always an abbreviation
+            $this->setIndexStartEnd(0,"#");
+        }
+        
+        if(array_key_exists('charpos',$subfield))
+        {
+            $_chars = MARCspec::validatePos($subfield['charpos']);
+            
+            $this->setCharStartEnd($_chars[0],$_chars[1]);
+        }
+    }
+    
+
+    /**
+    * {@inheritdoc}
+    */
+    public function setTag($arg)
+    {
+        if(!preg_match('/^[\!-\?\[-\{\}-~]$/',$arg))
+        {
+            throw new InvalidMARCspecException(
+                InvalidMARCspecException::SF.
+                InvalidMARCspecException::SFCHAR,
                 $arg
             );
         }
-
-        if($argLength > 1) // assuming index, subfield range or character position or range
-        {
-            $_split = preg_split('/\[(.*)\]/',$arg,-1,PREG_SPLIT_DELIM_CAPTURE);
-            if(3 == count($_split)) // assuming index and character position or range
-            {
-                if($argLength < 4)
-                {
-                    throw new InvalidMARCspecException(
-                        InvalidMARCspecException::SF.
-                        InvalidMARCspecException::MINIMUM4,
-                        $arg
-                    );
-                }
-                
-                $this->tag  = $arg[0];
-                
-                $_index = $this->validatePos($_split[1]);
-                
-                $this->setIndexStartEnd($_index[0],$_index[1]);
-                
-                if(!empty($_split[2])) // assuming character position or range
-                {
-                    
-                    $this->setCharPos($_split[2]);
-                }
-                
-            }
-            elseif(1 == count($_split) && '/' == $arg[1]) // assuming character position or range
-            {
-                $this->tag  = $arg[0];
-                $this->setCharPos(substr($arg,1));
-            }
-            else
-            {
-                throw new InvalidMARCspecException(
-                    InvalidMARCspecException::SF.
-                    InvalidMARCspecException::UNKNOWN,
-                    $arg
-                );
-            }
-        }
-        else // simple subfield
-        {
-            $this->tag = $arg;
-            // as of MARCspec 3.2.2 spec without index is always an abbreviation
-            $this->setIndexStartEnd(0,'#');
-        }
+        $this->tag = $arg;
     }
-    /**
-     * set subfield character position or range
-     * 
-     * @internal
-     * 
-     * @access private
-     * 
-     * @param string $subfield A subfield tag
-     * 
-     * @param string $charposSpec A character position or range spec
-     */
-    private function setCharPos($charposSpec)
-    {
-        
-        if('/' != $charposSpec[0]) {
-            throw new InvalidMARCspecException(
-                InvalidMARCspecException::SF.
-                InvalidMARCspecException::MISSINGSLASH,
-                $charposSpec
-            );
-        }
-        if(strlen($charposSpec) < 2) 
-        {
-            throw new InvalidMARCspecException(
-                InvalidMARCspecException::SF.
-                InvalidMARCspecException::MINIMUM2,
-                $charposSpec
-            );
-        }
-        $charPos = substr($charposSpec,1);
-        $_charPos = $this->validatePos($charPos);
 
-        $this->setCharStartEnd($_charPos[0],$_charPos[1]);
+    /**
+    * {@inheritdoc}
+    */
+    public function getTag()
+    {
+        return (isset($this->tag)) ? $this->tag : null;
     }
     
     /**
@@ -270,15 +203,9 @@ class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerial
     {
         $_subfieldSpec['tag'] = $this->getTag();
         
-        if(($indexStart = $this->getIndexStart()) !== null) 
-        {
-            $_subfieldSpec['indexStart'] = $indexStart;
-        }
+        $_subfieldSpec['indexStart'] =  $this->getIndexStart();
         
-        if(($indexEnd = $this->getIndexEnd()) !== null) 
-        {
-            $_subfieldSpec['indexEnd'] = $indexEnd;
-        }
+        $_subfieldSpec['indexEnd'] = $this->getIndexEnd();
         
         if(($indexLength = $this->getIndexLength()) !== null)
         {
@@ -329,24 +256,23 @@ class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerial
     {
         $subfieldSpec = '$'.$this->getTag();
 
-        if(($indexStart = $this->getIndexStart()) !== null)
+        $indexStart = $this->getIndexStart();
+        $indexEnd = $this->getIndexEnd();
+        if(0 === $indexStart && "#" === $indexEnd)
         {
-            $indexEnd = $this->getIndexEnd();
-            if(0 === $indexStart && "#" === $indexEnd)
-            {
-                // use abbreviation
-            }
-            else
-            {
-                $subfieldSpec .= "[".$indexStart;
-                if($indexEnd !== null)
-                {
-                    $subfieldSpec .= "-".$indexEnd;
-                }
-                $subfieldSpec .= "]";
-            }
-            
+            // use abbreviation
         }
+        else
+        {
+            $subfieldSpec .= "[".$indexStart;
+            
+            if($indexEnd !== null && $indexStart !== $indexEnd)
+            {
+                $subfieldSpec .= "-".$indexEnd;
+            }
+            $subfieldSpec .= "]";
+        }
+
         if(($charStart = $this->getCharStart()) !== null)
         {
             $charEnd = $this->getCharEnd();
@@ -468,6 +394,9 @@ class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerial
     {
         switch($offset)
         {
+            case 'tag': $this->setTag($value);
+            break;
+            
             case 'indexStart': $this->setIndexStartEnd($value);
             break;
             

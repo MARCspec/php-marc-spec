@@ -25,6 +25,19 @@ interface FieldInterface
      */
      public function __construct($fieldspec);
     
+    
+    /**
+    *
+    * Set the field tag
+    *
+    * Provided param gets validated
+    *
+    * @api
+    *
+    * @param string $arg The field tag
+    */
+    public function setTag($arg);
+    
     /**
     *
     * Get the field tag

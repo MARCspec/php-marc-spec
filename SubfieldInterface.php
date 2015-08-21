@@ -30,13 +30,24 @@ interface SubfieldInterface
     
     /**
     *
-    * Get the field tag
+    * Sets the subfield tag
+    *
+    * @api
+    * 
+    * @access public
+    *
+    */
+    public function setTag($arg);
+
+    /**
+    *
+    * Get the subfield tag
     *
     * @api
     * 
     * @access public
     * 
-    * @return string $fieldTag The field tag
+    * @return string The subfield tag
     */
     public function getTag();
 

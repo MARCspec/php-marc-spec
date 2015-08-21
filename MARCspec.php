@@ -29,16 +29,6 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess, \I
     * @var array Array of subfields
     */
     private $subfields = [];
-
-    /**
-     * @constant string Regex for leftSubTerm
-     */
-    const LEFTSUBTERM = '^(?<leftsubterm>(?:\\\(?:(?<=\\\)[\!\=\~\?]|[^\!\=\~\?])+)|(?:(?<=\$)[\!\=\~\?]|[^\!\=\~\?])+)?';
-    
-    /**
-     * @constant string Regex for operator
-     */
-    const OPERATOR = '(?<operator>\!\~|\!\=|\=|\~|\!|\?)';
     
 
     /**
@@ -76,35 +66,62 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess, \I
                 );
             }
             
-            /**
-             * $specMatches[0] => whole spec 
-             * $specMatches[1] => fieldspec
-             * $specMatches[2] => rest
-             */ 
-            if(0 === preg_match('/^([^{$]*)(.*)/',$spec,$specMatches))
+            $parser = new MARCspecParser($spec);
+
+            $this->field = new Field();
+            
+            $this->field->setTag($parser->field['tag']);
+            
+            if(array_key_exists('index',$parser->field))
             {
-                throw new InvalidMARCspecException(
-                    InvalidMARCspecException::MS.
-                    InvalidMARCspecException::UNKNOWN,
-                    $spec
-                );
+                $_pos = $this->validatePos($parser->field['index']);
+                
+                $this->field->setIndexStartEnd($_pos[0],$_pos[1]);
+            }
+            else
+            {
+                // as of MARCspec 3.2.2 spec without index is always an abbreviation
+                $this->field->setIndexStartEnd(0,"#");
             }
             
-            // creates a fieldspec
-            if(empty($specMatches[1]))
+            if(array_key_exists('indicators',$parser->field))
             {
-                throw new InvalidMARCspecException(
-                    InvalidMARCspecException::MS.
-                    InvalidMARCspecException::MISSINGFIELD,
-                    $spec
-                );
+                $this->field->setIndicators($parser->field['indicators']);
             }
-            $this->field = new Field($specMatches[1]);
-
-            // process rest
-            if(!empty($specMatches[2]))
+            elseif(array_key_exists('charpos',$parser->field))
             {
-                $this->createInstances($this->parseDataRef($specMatches[2]));
+                $_chars = $this->validatePos($parser->field['charpos']);
+                
+                $this->field->setCharStartEnd($_chars[0],$_chars[1]);
+            }
+            
+            if(array_key_exists('subspecs',$parser->field))
+            {
+                foreach($parser->field['subspecs'] as $subspec)
+                {
+                    if(!array_key_exists('operator',$subspec))
+                    {
+                        foreach($subspec as $orSubSpec)
+                        {
+                            $_subSpecs[] = $this->createSubSpec($orSubSpec);
+                        }
+                         $this->field->addSubSpec($_subSpecs);
+                    }
+                    else
+                    {
+                        $Subspec = $this->createSubSpec($subspec);
+                        
+                        $this->field->addSubSpec($Subspec);
+                    }
+                }
+            }
+
+            if($parser->subfields)
+            {
+                foreach($parser->subfields as $_subfield)
+                {
+                    $this->addSubfield($_subfield);
+                }
             }
         }
     }
@@ -142,11 +159,11 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess, \I
     {
         if(1 < strlen($arg))
         {
-            throw new \UnexpectedValueException('Method only allows argument to be 1 
-                character long. Got '. strlen($arg)
+            throw new \UnexpectedValueException(
+                'Method only allows argument to be 1 character long. Got '. strlen($arg)
             );
         }
-        $_subfields = null;
+        
         if(0 < count($this->subfields))
         {
             foreach($this->subfields as $subfield)
@@ -157,6 +174,69 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess, \I
         }
         
         return null;
+    }
+    
+    private function addSubfield($_subfield)
+    {
+        if(array_key_exists('subfieldtagrange',$_subfield))
+        {
+            $_subfieldRange = $this->handleSubfieldRanges($_subfield['subfieldtagrange']);
+        }
+        else
+        {
+            $_subfieldRange[] = $_subfield['subfieldtag'];
+        }
+        
+        foreach($_subfieldRange as $subfieldTag)
+        {
+            $Subfield = new Subfield();
+            
+            $Subfield->setTag($subfieldTag);
+            
+            if(array_key_exists('index',$_subfield))
+            {
+                $_pos = $this->validatePos($_subfield['index']);
+                
+                $Subfield->setIndexStartEnd($_pos[0],$_pos[1]);
+            }
+            else
+            {
+                // as of MARCspec 3.2.2 spec without index is always an abbreviation
+                $Subfield->setIndexStartEnd(0,"#");
+            }
+            
+            if(array_key_exists('charpos',$_subfield))
+            {
+                $_chars = $this->validatePos($_subfield['charpos']);
+                
+                $Subfield->setCharStartEnd($_chars[0],$_chars[1]);
+            }
+            
+            if(array_key_exists('subspecs',$_subfield))
+            {
+                $_subSpecs = [];
+                
+                foreach($_subfield['subspecs'] as $subspec)
+                {
+                    if(!array_key_exists('operator',$subspec))
+                    {
+                        foreach($subspec as $orSubSpec)
+                        {
+                            $_subSpecs[] = $this->createSubSpec($orSubSpec,$Subfield);
+                        }
+                        $Subfield->addSubSpec($_subSpecs);
+                    }
+                    else
+                    {
+                        $Subspec = $this->createSubSpec($subspec,$Subfield);
+                        
+                        $Subfield->addSubSpec($Subspec);
+                    }
+                }
+            }
+            
+            $this->addSubfields($Subfield);
+        }
     }
     /**
      * {@inheritdoc}
@@ -190,7 +270,15 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess, \I
                     $subfields
                 );
             }
-            $this->createInstances($this->parseDataRef($subfields));
+            
+            $parser = new MARCspecParser();
+            
+            $_subfieldSpecs = $parser->matchSubfields($subfields);
+
+            foreach($_subfieldSpecs as $subfieldSpec)
+            {
+                $this->addSubfield($subfieldSpec);
+            }
         }
     }
     
@@ -203,7 +291,7 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess, \I
     *
     * @param string $arg The assumed subfield range
     * 
-    * @return array $_range[string] An array of subfield specs
+    * @return array $_range[string] An array of subfield tags
     * 
     * @throws InvalidMARCspecException
     */
@@ -217,15 +305,8 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess, \I
                 $arg
             );
         }
-        /**
-        * $_arg[0] = whole match
-        * $_arg[1] = subfield range
-        * $_arg[2] = subfield index
-        * $_arg[3] = subfield charspec
-        */
-        preg_match('/^([0-9a-zA-Z-]{3,3})(?:(\[[0-9#-]{1,3}\])?(\/[0-9#-]{1,3})?)$/', $arg, $_arg);
-        
-        if(preg_match('/[a-z]/', $_arg[1][0]) && !preg_match('/[a-z]/', $_arg[1][2]))
+
+        if(preg_match('/[a-z]/', $arg[0]) && !preg_match('/[a-z]/', $arg[2]))
         {
             throw new InvalidMARCspecException(
                 InvalidMARCspecException::SF.
@@ -233,7 +314,7 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess, \I
                 $arg
             );
         }
-        if(preg_match('/[A-Z]/', $_arg[1][0]) && !preg_match('/[A-Z]/', $_arg[1][2]))
+        if(preg_match('/[A-Z]/', $arg[0]) && !preg_match('/[A-Z]/', $arg[2]))
         {
             throw new InvalidMARCspecException(
                 InvalidMARCspecException::SF.
@@ -241,7 +322,7 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess, \I
                 $arg
             );
         }
-        if(preg_match('/[0-9]/', $_arg[1][0]) && !preg_match('/[0-9]/', $_arg[1][2]))
+        if(preg_match('/[0-9]/', $arg[0]) && !preg_match('/[0-9]/', $arg[2]))
         {
             throw new InvalidMARCspecException(
                 InvalidMARCspecException::SF.
@@ -249,7 +330,7 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess, \I
                 $arg
             );
         }
-        if($_arg[1][0] > $_arg[1][2])
+        if($arg[0] > $arg[2])
         {
             throw new InvalidMARCspecException(
                 InvalidMARCspecException::SF.
@@ -258,13 +339,7 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess, \I
             );
         }
 
-        foreach(range($_arg[1][0],$_arg[1][2]) as $sfStep)
-        {
-             $range = (array_key_exists('2', $_arg) && strlen($_arg[2])) ? $sfStep.$_arg[2] : $sfStep;
-             $range = (array_key_exists('3', $_arg) && strlen($_arg[3])) ? $range.$_arg[3] : $range;
-             $_range[] = '$'.$range;
-        }
-        return $_range;
+        return range($arg[0],$arg[2]);
     }
     
 
@@ -290,345 +365,176 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess, \I
         }
     }
     
-
     /**
-    * Detects and creates subfields and subspecs
-    *
-    * @param string $arg string of subfieldspecs and/or subspecs
-    * 
-    * @return array $_detected Associative array of instances of Subfield and SubSpec
-    * 
-    * @throws InvalidMARCspecException
-    */
-    public static function parseDataRef($arg)
+     * validate a position or range
+     * 
+     * @access protected
+     * 
+     * @param string $pos The position or range
+     * 
+     * @throws InvalidMARCspecException
+     * 
+     * @return array $_pos[string] An numeric array of character or index positions. 
+     * $_pos[1] might be empty.
+     */
+    public static function validatePos($pos)
     {
-        $open = 0;
-        $close = 0;
-        $_nocount = ['$','\\'];
-        $_detected = [];
-        $subfieldCount = 0;
-        $subSpecCount = 0;
-        $checkPrevious = function($x) use ($arg,$_nocount)
-        {
-            $start = $x;
-            $count = true;
-            for($x ; $x > 0; $x--)
-            {
-                if(!in_array($arg[$x-1],$_nocount)) 
-                {
-                    $check = $start - $x;
-                    if ($check % 2 != 0) {
-                        return false;
-                    }
-                    else
-                    {
-                        return true;
-                    }
-                }
-                else
-                {
-                    $count = false;
-                }
-            }
-            return $count;
-        };
-        for($i = 0;$i < strlen($arg);$i++)
-        {
-            if(0 < $i) // not first char
-            {
-                if('$' == $arg[$i] && $checkPrevious($i) && ($open === $close))
-                {
-                    $subfieldCount++;
-                }
-            }
+        $posLength = strlen($pos);
         
-            if($open === $close)
-            {
-                if('{' == $arg[$i] && $checkPrevious($i))
-                {
-                    $open++;
-                }
-                if('}' == $arg[$i] && $checkPrevious($i))
-                {
-                    throw new InvalidMARCspecException(
-                        InvalidMARCspecException::MS.
-                        InvalidMARCspecException::BRACKET,
-                        $arg
-                    );
-                }
-                
-                if($open !== $close)
-                {
-                    if(array_key_exists('subspec',$_detected))
-                    {
-                        if(array_key_exists($subSpecCount,$_detected[$subfieldCount]['subspec']))
-                        {
-                            $subspec = $_detected[$subfieldCount]['subspec'][$subSpecCount].$arg[$i];
-                            $_detected[$subfieldCount]['subspec'][$subSpecCount] = $subspec;
-                        }
-                        else
-                        {
-                            $_detected[$subfieldCount]['subspec'][] = $arg[$i];
-                        }
-                    }
-                    else
-                    {
-                        $_detected[$subfieldCount]['subspec'][] = $arg[$i];
-                    }
-                }
-                else
-                {
-                    $subSpecCount = 0;
-                    if(array_key_exists($subfieldCount,$_detected))
-                    {
-                        $spec = $_detected[$subfieldCount]['subfield'].$arg[$i];
-                        $_detected[$subfieldCount]['subfield'] = $spec;
-                    }
-                    else
-                    {
-                        $_detected[] = ['subfield'=>$arg[$i]];
-                    }
-                }
-            }
-            else // open != close
-            {
-                
-                if('{' == $arg[$i] && $checkPrevious($i))
-                {
-                    $open++;
-                }
-                if('}' == $arg[$i] && $checkPrevious($i))
-                {
-                    $close++;
-                }
-                
-                $subspec = $_detected[$subfieldCount]['subspec'][$subSpecCount].$arg[$i];
-                $_detected[$subfieldCount]['subspec'][$subSpecCount] = $subspec;
-                
-                if($open === $close) $subSpecCount++;
-                
-            }
-        }
-        if($open !== $close)
+        if(1 > $posLength)
         {
             throw new InvalidMARCspecException(
-                InvalidMARCspecException::MS.
-                InvalidMARCspecException::BRACKET." ".
-                InvalidMARCspecException::HINTESCAPED,
-                $arg
+                InvalidMARCspecException::PR.
+                InvalidMARCspecException::PR1,
+                $pos
             );
         }
-        return $_detected;
-    }
-    
-    /**
-     * Creates instances of Subfield and Subspec
-     * 
-     * @param array $_detected Associative array of subfields and subspecs
-     */ 
-    private function createInstances($_detected)
-    {
-        foreach($_detected as $key => $_dataRef)
+        
+        for($x = 0; $x < $posLength; $x++)
         {
-            $_subfields = [];
-            if(array_key_exists('subfield',$_dataRef))
+            if(!preg_match('/[0-9\-#]/', $pos[$x])) // alphabetic characters etc. are not valid
             {
-                if(!is_null($this->field->getCharStart()))
-                {
-                    throw new InvalidMARCspecException(
-                        InvalidMARCspecException::MS.
-                        InvalidMARCspecException::CHARANDSF,
-                        $this->field->__toString()
-                    );
-                }
-                if(2 == strpos($_dataRef['subfield'],'-')) // assuming subfield range
-                {
-                    $_subfields = $this->handleSubfieldRanges(substr($_dataRef['subfield'],1));
-                }
-                else
-                {
-                    $_subfields[] = $_dataRef['subfield'];
-                }
-                
-                foreach($_subfields as $subfield)
-                {
-                    $Subfield = new Subfield($subfield);
-                    
-                    $this->subfields[] = $Subfield;
-                    
-                    if(array_key_exists('subspec',$_dataRef)) 
-                    {
-                        foreach($_dataRef['subspec'] as $subspec)
-                        {
-                            $_Subspecs = $this->createSubSpec($subspec,$Subfield);
-                            $Subfield->addSubSpec($_Subspecs);
-                        }
-                    }
-                }
-            }
-            else
-            {
-                foreach($_dataRef['subspec'] as $subKey => $subspec)
-                {
-                    $Subspec = $this->createSubSpec($subspec);
-                    $this->field->addSubSpec($Subspec);
-                }
+                throw new InvalidMARCspecException(
+                    InvalidMARCspecException::PR.
+                    InvalidMARCspecException::PR2,
+                    $pos
+                );
             }
         }
+        
+        if(strpos($pos,'-') === $posLength-1) // something like 123- is not valid
+        {
+            throw new InvalidMARCspecException(
+                InvalidMARCspecException::PR.
+                InvalidMARCspecException::PR3,
+                $pos
+            );
+        }
+        
+        if(0 === strpos($pos,'-')) // something like -123 ist not valid
+        {
+            throw new InvalidMARCspecException(
+                InvalidMARCspecException::PR.
+                InvalidMARCspecException::PR4,
+                $pos
+            );
+        }
+        
+        if(strpos($pos,'-') !== strrpos($pos,'-')) // only one - is allowed
+        {
+            throw new InvalidMARCspecException(
+                InvalidMARCspecException::PR.
+                InvalidMARCspecException::PR5,
+                $pos
+            );
+        }
+        
+        $_pos = explode('-',$pos);
+        
+        if(2 < count($_pos))
+        {
+            throw new InvalidMARCspecException(
+                InvalidMARCspecException::PR.
+                InvalidMARCspecException::PR6,
+                $pos
+            );
+        }
+        
+        if(1 == count($_pos))
+        {
+            $_pos[1] = null;
+        }
+        return $_pos;
     }
-    
+
     /**
      * Creates SubSpecs
      * 
      * @internal
      *
-     * @param string $assumedSubspecs A string with assumed subSpecs
+     * @param array $_subTerms Array representation of a subspec
+     * @param SubfieldInterface|null The subfield is optional
      * 
-     * @return SubSpecInterface|$_subSpec[SubSpecInterface] Instance of SubSpecInterface
-     * or numeric array of instances of SubSpecInterface
+     * @return SubSpecInterface Instance of SubSpecInterface
      * 
      * @throws InvalidMARCspecException
      */
-    private function createSubSpec($assumedSubspecs,$Subfield=null)
+    private function createSubSpec($_subTerms,$Subfield=null)
     {
         $fieldContext = $this->field->getBaseSpec();
-        $subfieldContext = "";
+        $context = $fieldContext;
         if(!is_null($Subfield))
         {
+            $context = $fieldContext.$Subfield->getBaseSpec();
             $subfieldContext = $Subfield->getBaseSpec();
         }
-        $context = $fieldContext.$subfieldContext;
-        
-        $_nocount = ['$','\\'];
-        $_operators = ['?','!','~','='];
-        $specLength = strlen($assumedSubspecs);
 
-        $_subTermSets = preg_split('/(?<!\\\\)\|/', substr($assumedSubspecs,1,$specLength-2));
-
-        foreach($_subTermSets as $key => $subTermSet)
+        $handleSubTerm = function($subTerm) use ($fieldContext,$context)
         {
-            if(preg_match('/(?<![\\\\\$])[\{\}]/',$subTermSet,$_error, PREG_OFFSET_CAPTURE))
+            if('\\' == $subTerm[0]) // is a comparisonString
             {
-                throw new InvalidMARCspecException(
-                    InvalidMARCspecException::MS.
-                    InvalidMARCspecException::ESCAPE,
-                    $assumedSubspecs
-                );
+                return new ComparisonString(substr($subTerm,1));
             }
-            $_subTermSet = [];
-            $_subTerms = $this->subTermsToArray($subTermSet);´
-            foreach([
-                    'leftSubTerm'=>$_subTerms['leftSubTerm'],
-                    'rightSubTerm'=>$_subTerms['rightSubTerm']
-                ] as $subTermKey => $subTerm)
+            else
             {
-                if(!is_null($subTerm))
+                if(strpos("[/_$",$subTerm[0]) && is_null($context))
                 {
-                    if('\\' == $subTerm[0]) // is a comparisonString
-                    {
-                        $_subTermSet[$subTermKey] = new ComparisonString(substr($subTerm,1));
-                    }
-                    else
-                    {
-                        if(strpos("[/_$",$subTerm[0]) && is_null($context))
-                        {
-                            throw new InvalidMARCspecException(
-                            InvalidMARCspecException::SS.
-                            InvalidMARCspecException::MISSINGFIELD,
-                            $assumedSubspecs
-                            );
-                        }
-                        
-                        switch($subTerm[0]) 
-                        {
-                            case '_':
-                                if($refPos = strpos($context,$subTerm[0]))
-                                {
-                                    $newSpec = substr($context,0,$refPos).$subTerm;
-                                }
-                                else
-                                {
-                                    $newSpec = $fieldContext.$subTerm;
-                                }
-                                break;
-                                
-                            case '[':
-                            case '/':
-                            case '$':
-                                $refPos = strrpos($context,$subTerm[0]);
-                                
-                                if($refPos)
-                                {
-                                    $newSpec = substr($context,0,$refPos).$subTerm;
-                                }
-                                else
-                                {
-                                    $newSpec = $context.$subTerm;
-                                }
-                                break;
-                            
-                            default: $newSpec = $subTerm;
-                        }
-                    }
-                }
-                else
-                {
-                    $newSpec = $context;
+                    throw new InvalidMARCspecException(
+                        InvalidMARCspecException::SS.
+                        InvalidMARCspecException::MISSINGFIELD,
+                        $subTerm
+                    );
                 }
                 
-                $_subTermSet[$subTermKey] = new MARCspec($newSpec);
+                switch($subTerm[0]) 
+                {
+                    case '_':
+                        if($refPos = strpos($context,$subTerm[0]))
+                        {
+                            if('$' !== substr($context,$refPos - 1,1))
+                            {
+                               return new MARCspec(substr($context,0,$refPos).$subTerm);
+                            }
+                            
+                        }
+                        return new MARCspec($fieldContext.$subTerm);
+                        
+                    case '$':
+                       return new MARCspec($fieldContext.$subTerm);
+                        
+                    case '[':
+                    case '/':
+                        $refPos = strrpos($context,$subTerm[0]);
+                        
+                        if($refPos)
+                        {
+                            if('$' !== substr($context,$refPos - 1,1))
+                            {
+                                return new MARCspec(substr($context,0,$refPos).$subTerm);
+                            }
+                        }
+
+                        return new MARCspec($context.$subTerm);
+                    
+                    default: return new MARCspec($subTerm);
+                }
             }
-            $_subSpec[$key] = new SubSpec($_subTermSet['leftSubTerm'],
-                $_subTerms['operator'],
-                $_subTermSet['rightSubTerm']);
-        }
-        return (1 < count($_subSpec)) ? $_subSpec : $_subSpec[0];
-    }
-    
-    private function subTermsToArray($subTermSet)
-    {
+        };
+        
         $_subTermSet = [];
-        if(preg_match_all('/(?:'.self::LEFTSUBTERM.self::OPERATOR.')?(?<rightsubterm>.+)/',$subTermSet,$_subTermMatches,PREG_SET_ORDER))
+
+        if(array_key_exists('leftsubterm',$_subTerms))
         {
-            if(array_key_exists('leftsubterm',$_subTermMatches[0]) 
-                && !empty($_subTermMatches[0]['leftsubterm'])
-            )
-            {
-                $_subTermSet['leftSubTerm'] = $_subTermMatches[0]['leftsubterm'];
-            }
-            else
-            {
-                $_subTermSet['leftSubTerm'] = null;
-            }
-            
-            if(array_key_exists('rightsubterm',$_subTermMatches[0]) 
-                && !empty($_subTermMatches[0]['rightsubterm'])
-            )
-            {
-                $_subTermSet['rightSubTerm'] = $_subTermMatches[0]['rightsubterm'];
-            }
-            else
-            {
-                throw new InvalidMARCspecException(
-                InvalidMARCspecException::SS.
-                InvalidMARCspecException::MISSINGRIGHT,
-                $subTermSet
-                );
-            }
-            
-            if(array_key_exists('operator',$_subTermMatches[0]) 
-                && !empty($_subTermMatches[0]['operator'])
-            )
-            {
-                $_subTermSet['operator'] = $_subTermMatches[0]['operator'];
-            }
-            else
-            {
-                $_subTermSet['operator'] = '?';
-            }
-            return $_subTermSet;
+            $_subTermSet['leftsubterm'] = $handleSubTerm($_subTerms['leftsubterm']);
         }
-        return null;
+        else
+        {
+            $_subTermSet['leftsubterm'] = new MARCspec($context);
+        }
+        
+        $_subTermSet['rightsubterm'] = $handleSubTerm($_subTerms['rightsubterm']);
+
+       return new SubSpec($_subTermSet['leftsubterm'],$_subTerms['operator'],$_subTermSet['rightsubterm']);
     }
 
     /**

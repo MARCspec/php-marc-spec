@@ -45,25 +45,25 @@ interface PositionOrRangeInterface
 
     /**
     *
-    * Get the character starting position
+    * Get the character starting position as integer or '#'
     *
     * @api
     * 
     * @access public
     * 
-    * @return null|int|string $indexStart The field index starting position
+    * @return int|string $indexStart The field index starting position
     */
     public function getIndexStart();
 
     /**
     *
-    * Get the field index ending position
+    * Get the field index ending position as integer or '#'
     *
     * @api
     * 
     * @access public
     * 
-    * @return null|int $indexEnd The field index ending position
+    * @return int|string $indexEnd The field index ending position
     */
     public function getIndexEnd();
 
@@ -97,26 +97,26 @@ interface PositionOrRangeInterface
 
     /**
     *
-    * Get the character starting position
+    * Get the character starting position as integer or '#'
     *
     * @api
     * 
     * @access public
     * 
-    * @return null|int $charStart The character starting position 
+    * @return int|string $charStart The character starting position 
     */
     public function getCharStart();
 
 
     /**
     *
-    * Get the character ending position
+    * Get the character ending position as integer or '#'
     *
     * @api
     * 
     * @access public
     * 
-    * @return null|int $charEnd The character ending position 
+    * @return int|string $charEnd The character ending position 
     */
     public function getCharEnd();
 

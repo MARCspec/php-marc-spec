@@ -39,7 +39,7 @@ class PositionOrRange implements PositionOrRangeInterface
      */
     public function getIndexStart()
     {
-        return $this->getStartEnd($this->indexStart);
+        return (isset($this->indexStart)) ? $this->indexStart : 0;
     }
     
     /**
@@ -47,7 +47,14 @@ class PositionOrRange implements PositionOrRangeInterface
      */
     public function getIndexEnd()
     {
-        return $this->getStartEnd($this->indexEnd);
+        if(!isset($this->indexStart))
+        {
+            return '#';
+        }
+        else
+        {
+            return (isset($this->indexEnd)) ? $this->indexEnd : $this->indexStart;
+        }
     }
     
     /**
@@ -71,7 +78,7 @@ class PositionOrRange implements PositionOrRangeInterface
      */
     public function getCharStart()
     {
-        return $this->getStartEnd($this->charStart);
+        return (isset($this->charStart)) ? $this->charStart : null;
     }
     
     /**
@@ -79,7 +86,7 @@ class PositionOrRange implements PositionOrRangeInterface
      */
     public function getCharEnd()
     {
-        return $this->getStartEnd($this->charEnd);
+        return (isset($this->charEnd)) ? $this->charEnd : null;
     }
     
     /**
@@ -87,39 +94,7 @@ class PositionOrRange implements PositionOrRangeInterface
      */
     public function getCharLength()
     {
-        if( is_null($this->getCharStart()) && is_null($this->getCharEnd()) )
-        {
-            return null;
-        }
-        if( !is_null($this->getCharStart()) && is_null($this->getCharEnd()) )
-        {
-            return 1;
-        }
-        // both defined
-        if($this->charStart === $this->charEnd) 
-        {
-            return 1;
-        }
-        if('#' === $this->charStart && '#' !== $this->charEnd)
-        {
-            return $this->charEnd + 1;
-        }
-        if('#' !== $this->charStart && '#' === $this->charEnd)
-        {
-            return null;
-        }
-        else
-        {
-            $length = $this->charEnd - $this->charStart + 1;
-            if(1 > $length)
-            {
-                throw new InvalidMARCspecException(
-                    InvalidMARCspecException::PR.
-                    InvalidMARCspecException::NEGATIVE
-                );
-            }
-            return $length;
-        }
+        return $this->getLength(true);
     }
     
     /**
@@ -127,129 +102,64 @@ class PositionOrRange implements PositionOrRangeInterface
      */
     public function getIndexLength()
     {
-        if( is_null($this->getIndexStart()) && is_null($this->getIndexEnd()) )
+        return $this->getLength(false);
+    }
+    
+    /**
+    * Calculate the length of charrange or index range
+    *
+    * @param bool $type True for charrange and false for indexrange
+    * 
+    * @return int $length
+    */
+    private function getLength($type = true)
+    {
+        if($type)
         {
-            return null;
-        }
-        if( !is_null($this->getIndexStart()) && is_null($this->getIndexEnd()) )
-        {
-            return 1;
-        }
-        // both defined
-        if($this->indexStart === $this->indexEnd) 
-        {
-            return 1;
-        }
-        if('#' === $this->indexStart && '#' !== $this->indexEnd)
-        {
-            return $this->indexEnd + 1;
-        }
-        if('#' !== $this->indexStart && '#' === $this->indexEnd)
-        {
-            return null;
+            $start = $this->getCharStart();
+            $end   = $this->getCharEnd();
         }
         else
         {
-            $length = $this->indexEnd - $this->indexStart + 1;
-            if(1 > $length)
-            {
-                throw new InvalidMARCspecException(
-                    InvalidMARCspecException::PR.
-                    InvalidMARCspecException::NEGATIVE
-                );
-            }
-            return $length;
+            $start = $this->getIndexStart();
+            $end   = $this->getIndexEnd();
         }
-    }
-    
-    /**
-     * {@inheritdoc}
-     */
-    protected function getStartEnd($arg)
-    {
-        return (isset($arg)) ? $arg : null;
-    }
-    
-    /**
-    * validate a position or range
-    * 
-    * @access protected
-    * 
-    * @param string $pos The position or range
-    * 
-    * @throws InvalidMARCspecException
-    * 
-    * @return array $_pos[string] An numeric array of character or index positions. 
-    * $_pos[1] might be empty.
-    */
-    protected function validatePos($pos)
-    {
-        $posLength = strlen($pos);
         
-        if(1 > $posLength)
+        if( is_null($start) && is_null($end) )
+        {
+            return null;
+        }
+        
+        if(!is_null($start) && is_null($end) )
+        {
+            return 1;
+        }
+        
+        if($start === $end) 
+        {
+            return 1;
+        }
+        
+        if('#' === $start && '#' !== $end)
+        {
+            return $end + 1;
+        }
+        
+        if('#' !== $start && '#' === $end)
+        {
+            return null;
+        }
+
+        $length = $end - $start + 1;
+        
+        if(1 > $length)
         {
             throw new InvalidMARCspecException(
-                InvalidMARCspecException::PR.
-                InvalidMARCspecException::PR1,
-                $pos
+            InvalidMARCspecException::PR.
+            InvalidMARCspecException::NEGATIVE
             );
         }
-        
-        for($x = 0; $x < $posLength; $x++)
-        {
-            if(!preg_match('/[0-9\-#]/', $pos[$x])) // alphabetic characters etc. are not valid
-            {
-                throw new InvalidMARCspecException(
-                    InvalidMARCspecException::PR.
-                    InvalidMARCspecException::PR2,
-                    $pos
-                );
-            }
-        }
-        
-        if(strpos($pos,'-') === $posLength-1) // something like 123- is not valid
-        {
-            throw new InvalidMARCspecException(
-                InvalidMARCspecException::PR.
-                InvalidMARCspecException::PR3,
-                $pos
-            );
-        }
-        
-        if(0 === strpos($pos,'-')) // something like -123 ist not valid
-        {
-            throw new InvalidMARCspecException(
-                InvalidMARCspecException::PR.
-                InvalidMARCspecException::PR4,
-                $pos
-            );
-        }
-        
-        if(strpos($pos,'-') !== strrpos($pos,'-')) // only one - is allowed
-        {
-            throw new InvalidMARCspecException(
-                InvalidMARCspecException::PR.
-                InvalidMARCspecException::PR5,
-                $pos
-            );
-        }
-        
-        $_pos = explode('-',$pos);
-        
-        if(2 < count($_pos))
-        {
-            throw new InvalidMARCspecException(
-                InvalidMARCspecException::PR.
-                InvalidMARCspecException::PR6,
-                $pos
-            );
-        }
-        
-        if(1 == count($_pos))
-        {
-            $_pos[1] = null;
-        }
-        return $_pos;
+        return $length;
     }
 
     /**
