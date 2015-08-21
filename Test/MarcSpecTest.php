@@ -22,7 +22,8 @@ class MARCspecTest extends \PHPUnit_Framework_TestCase
     {
         $valid = [];
         $invalid = [];
-        array_walk($a = ['valid','invalid'], 
+        $a = ['valid','invalid'];
+        array_walk($a, 
             function($v,$k) use (&$valid,&$invalid)
             {
                 foreach (glob(__DIR__. '/../' .'vendor/ck/marcspec-test-suite/'.$v.'/wildCombination_*.json') as $filename)
