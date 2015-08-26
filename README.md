@@ -34,12 +34,12 @@ echo $fixed['field']['tag'];                                                  //
 echo $fixed['field']['charStart'];                                            // 1
 echo $fixed['field']['charEnd'];                                              // 8
 echo $fixed['field']['charLength'];                                           // 8
-echo $fixed['field']['subSpecs'][0]['leftSubTerm'];                           // '007[0]/0'
+echo $fixed['field']['subSpecs'][0]['leftSubTerm'];                           // '007[0-0]/0-0'
 echo $fixed['field']['subSpecs'][0]['operator'];                              // '='
 echo $fixed['field']['subSpecs'][0]['rightSubTerm'];                          // '\a'
 echo $fixed['field']['subSpecs'][0]['rightSubTerm']['comparable'];            // 'a'
 
-echo $fixed;                                                                  // '007[0]/1-8{007[0]/0=\a}'
+echo $fixed;                                                                  // '007[0-0]/1-8{007[0-0]/0=\a}'
 
 $variable = new MARCspec('245_10$a');
 echo $variable['field']['tag'];                                               // '245'
@@ -48,26 +48,26 @@ echo $variable['field']['indicator2'];                                        //
 echo $variable['subfields'][0]['tag'];                                        // 'a'
 echo $variable['a'][0]['tag'];                                                // 'a'
 
-echo $variable;                                                               // '245_10$a'
+echo $variable;                                                               // '245[0-#]_10$a'
 
 $complex = new MARCspec('020$a{$q[0]~\pbk}{$c/0=\€|$c/0=\$}');
 echo $complex['field']['tag'];                                                // '020'
 echo $complex['subfields'][0]['tag'];                                         // 'a'
 
-echo $complex['a'][0]['subSpecs'][0]['leftSubTerm'];                          // '020$q[0]'
+echo $complex['a'][0]['subSpecs'][0]['leftSubTerm'];                          // '020[0-#]$q[0-0]'
 echo $complex['a'][0]['subSpecs'][0]['operator'];                             // '~'
 echo $complex['a'][0]['subSpecs'][0]['rightSubTerm']['comparable'];           // 'pbk'
 
-echo $complex['a'][0]['subSpecs'][1][0]['leftSubTerm'];                       // '020$c/0'
+echo $complex['a'][0]['subSpecs'][1][0]['leftSubTerm'];                       // '020[0-#]$c[0-#]/0-0'
 echo $complex['a'][0]['subSpecs'][1][0]['leftSubTerm']['c'][0]['charStart'];  // 0
-echo $complex['a'][0]['subSpecs'][1][0]['leftSubTerm']['c'][0]['charEnd'];    // null
+echo $complex['a'][0]['subSpecs'][1][0]['leftSubTerm']['c'][0]['charEnd'];    // 0
 echo $complex['a'][0]['subSpecs'][1][0]['leftSubTerm']['c'][0]['charLength']; // 1
 echo $complex['a'][0]['subSpecs'][1][0]['operator'];                          // '='
 echo $complex['a'][0]['subSpecs'][1][0]['rightSubTerm']['comparable'];        // '€'
 
-echo $complex['a'][0]['subSpecs'][1][1]['leftSubTerm'];                       // '020$c/0'
+echo $complex['a'][0]['subSpecs'][1][1]['leftSubTerm'];                       // '020[0-#]$c[0-#]/0-0'
 echo $complex['a'][0]['subSpecs'][1][1]['leftSubTerm']['c'][0]['charStart'];  // 0
-echo $complex['a'][0]['subSpecs'][1][1]['leftSubTerm']['c'][0]['charEnd'];    // null
+echo $complex['a'][0]['subSpecs'][1][1]['leftSubTerm']['c'][0]['charEnd'];    // 0
 echo $complex['a'][0]['subSpecs'][1][1]['leftSubTerm']['c'][0]['charLength']; // 1
 echo $complex['a'][0]['subSpecs'][1][1]['operator'];                          // '='
 echo $complex['a'][0]['subSpecs'][1][1]['rightSubTerm']['comparable'];        // '$'
@@ -99,7 +99,7 @@ $SubSpec = new SubSpec($LeftSubTerm,'=',$RightSubTerm);
 $Subfield['subSpecs'] = $SubSpec;
 
 // echo whole MARCspec
-echo $MARCspec; // '...[0]__1$a{...$a/#=\,}' 
+echo $MARCspec; // '...[0-0]__1$a[0-#]{...[0-#]$a[0-#]/#-#=\,}' 
 ```
 
 # ArrayAccess vs. Methods
