@@ -215,11 +215,7 @@ class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerial
         if(($charStart = $this->getCharStart()) !== null) 
         {
             $_subfieldSpec['charStart'] = $charStart;
-        }
-        
-        if(($charEnd = $this->getCharEnd()) !== null) 
-        {
-            $_subfieldSpec['charEnd'] = $charEnd;
+            $_subfieldSpec['charEnd'] = $this->getCharEnd();
         }
         
         if(($charLength = $this->getCharLength()) !== null) 
@@ -256,41 +252,15 @@ class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerial
     {
         $subfieldSpec = '$'.$this->getTag();
 
-        $indexStart = $this->getIndexStart();
-        $indexEnd = $this->getIndexEnd();
-        if(0 === $indexStart && "#" === $indexEnd)
-        {
-            // use abbreviation
-        }
-        else
-        {
-            $subfieldSpec .= "[".$indexStart;
-            
-            if($indexEnd !== null && $indexStart !== $indexEnd)
-            {
-                $subfieldSpec .= "-".$indexEnd;
-            }
-            $subfieldSpec .= "]";
-        }
+        $subfieldSpec .= "[".$this->getIndexStart()."-".$this->getIndexEnd()."]";
 
         if(($charStart = $this->getCharStart()) !== null)
         {
-            $charEnd = $this->getCharEnd();
-            if($charStart === 0 && $charEnd === "#")
-            {
-                // use abbreviation
-            }
-            else
-            {
-                $subfieldSpec .= "/".$charStart;
-                if(($charEnd = $this->getCharEnd()) !== null)
-                {
-                    $subfieldSpec .= "-".$charEnd;
-                }
-            }
+            $subfieldSpec .= "/".$charStart."-".$this->getCharEnd();
         }
         return $subfieldSpec;
     }
+
     /**
      * {@inheritdoc}
      */

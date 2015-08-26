@@ -177,14 +177,23 @@ class SubfieldTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidSubfieldSpec01()
     {
-        $Subfield = $this->subfieldspec('$a');
+        $Subfield = $this->subfieldspec(null);
+        $Subfield->setTag('a');
         $this->assertSame('a', $Subfield->getTag());
         $Subspec = new SubSpec(new MARCspec('245$b'),'!=',new MARCspec('245$c'));
         $Subfield->addSubSpec($Subspec);
         $this->assertSame(1, count($Subfield->getSubSpecs()));
     }
 
-
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testInvalidSubSpecAdd1()
+    {
+        $Subfield = $this->subfieldspec('a');
+        $Subspec = new SubSpec('245$b','!','245$b');
+        $Subfield->addSubSpec($Subspec);
+    }
 
     /**
      * assert same subfield tag
@@ -334,21 +343,30 @@ class SubfieldTest extends \PHPUnit_Framework_TestCase
     {
 
         $Subfield = $this->subfieldspec('$a');
-        $this->assertSame('$a', "$Subfield");
+        $this->assertSame('$a[0-#]', "$Subfield");
         
         $Subfield = $this->subfieldspec('$a/1');
-        $this->assertSame('$a/1',"$Subfield");
+        $this->assertSame('$a[0-#]/1-1',"$Subfield");
         $this->assertSame(1, $Subfield->getCharLength());
         
         $Subfield = $this->subfieldspec('$a/1-3');
-        $this->assertSame('$a/1-3',"$Subfield");
+        $this->assertSame('$a[0-#]/1-3',"$Subfield");
         $this->assertSame(3, $Subfield->getCharLength());
         
         $Subfield = $this->subfieldspec('$a[1]');
-        $this->assertSame('$a[1]',"$Subfield");
+        $this->assertSame('$a[1-1]',"$Subfield");
         
         $Subfield = $this->subfieldspec('$a[1-3]');
         $this->assertSame('$a[1-3]',"$Subfield");
+    }
+    
+    /**
+     * @expectedException BadMethodCallException
+     */
+    public function testOffsetUnset()
+    {
+        $Subfield = $this->subfieldspec('$a');
+        unset($Subfield['tag']);
     }
     
     public function testInvalidFromTestSuite()

@@ -56,7 +56,7 @@ class ComparisonStringTest extends \PHPUnit_Framework_TestCase
         $compare = $this->compare(".");
         $this->assertSame('.', $compare->getRaw());
         $this->assertSame('.', $compare->getComparable());
-        
+        $this->assertSame('\.', $compare->__toString());
     }
     
     /**
@@ -103,5 +103,15 @@ class ComparisonStringTest extends \PHPUnit_Framework_TestCase
             new ComparisonString($test->{'data'});
             $this->assertSame(1,preg_match('/'.$this->validTests->{'schema'}->{'pattern'}.'/',$test->{'data'}));
         }
+    }
+    
+    /**
+    * @expectedException BadMethodCallException
+    */
+    public function testOffsetUnset()
+    {
+        $escaped_string = '\\.';
+        $compare = $this->compare($escaped_string);
+        unset($compare['raw']);
     }
 }

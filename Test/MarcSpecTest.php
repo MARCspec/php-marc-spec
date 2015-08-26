@@ -108,7 +108,7 @@ class MARCspecTest extends \PHPUnit_Framework_TestCase
      public function testValidMarcSpec4()
      {
          $marcSpec = $this->marcspec('...[#]/1-3');
-         $this->assertSame('...[#]/1-3', "$marcSpec");
+         $this->assertSame('...[#-#]/1-3', "$marcSpec");
      }
     
 
@@ -198,6 +198,16 @@ class MARCspecTest extends \PHPUnit_Framework_TestCase
 
     }
     
+    /**
+     * @covers CK\MARCspec\Subfield::getIterator
+     * @covers CK\MARCspec\SubSpec::getIterator
+     * @covers CK\MARCspec\SpecIterator::__construct
+     * @covers CK\MARCspec\SpecIterator::rewind
+     * @covers CK\MARCspec\SpecIterator::valid
+     * @covers CK\MARCspec\SpecIterator::current
+     * @covers CK\MARCspec\SpecIterator::next
+     * @covers CK\MARCspec\SpecIterator::key
+     */
     public function testIteration()
     {
         $ms = $this->marcspec('245$a-c{$b|$c}{$e}');
@@ -242,6 +252,10 @@ class MARCspecTest extends \PHPUnit_Framework_TestCase
         
     }
     
+    /**
+     * @covers CK\MARCspec\Field::offsetExists
+     * @covers CK\MARCspec\Subfield::offsetExists
+     */
     public function testOffsets()
     {
         $ms = $this->marcspec('LDR/0-3');
@@ -259,7 +273,44 @@ class MARCspecTest extends \PHPUnit_Framework_TestCase
         $ms = $this->marcspec('245$a/0-#');
         $this->assertFalse($ms['a'][0]->offsetExists('charLength'));
     }
-
+    
+    /**
+    * @covers CK\MARCspec\Field::jsonSerialize
+    * @covers CK\MARCspec\Subfield::jsonSerialize
+    * @covers CK\MARCspec\SubSpec::jsonSerialize
+    * @covers CK\MARCspec\ComparisonString::jsonSerialize
+    */
+    public function testJsonSerialize()
+    {
+        $ms = $this->marcspec('...[0-3]_01{$a|$b!=$c}$a{300/1-3=\abc}{245$a!~\test}');
+        $encode = json_encode($ms);
+        $test = '{"field":{"tag":"...","indexStart":0,"indexEnd":3,"indexLength":4,"indicator1":"0","indicator2":"1","subSpecs":[[{"leftSubTerm":{"field":{"tag":"...","indexStart":0,"indexEnd":3,"indexLength":4,"indicator1":"0","indicator2":"1"}},"operator":"?","rightSubTerm":{"field":{"tag":"...","indexStart":0,"indexEnd":3,"indexLength":4,"indicator1":"0","indicator2":"1"},"subfields":[{"tag":"a","indexStart":0,"indexEnd":"#"}]}},{"leftSubTerm":{"field":{"tag":"...","indexStart":0,"indexEnd":3,"indexLength":4,"indicator1":"0","indicator2":"1"},"subfields":[{"tag":"b","indexStart":0,"indexEnd":"#"}]},"operator":"!=","rightSubTerm":{"field":{"tag":"...","indexStart":0,"indexEnd":3,"indexLength":4,"indicator1":"0","indicator2":"1"},"subfields":[{"tag":"c","indexStart":0,"indexEnd":"#"}]}}]]},"subfields":[{"tag":"a","indexStart":0,"indexEnd":"#","subSpecs":[{"leftSubTerm":{"field":{"tag":"300","indexStart":0,"indexEnd":"#","charStart":1,"charEnd":3,"charLength":3}},"operator":"=","rightSubTerm":{"comparisonString":"abc"}},{"leftSubTerm":{"field":{"tag":"245","indexStart":0,"indexEnd":"#"},"subfields":[{"tag":"a","indexStart":0,"indexEnd":"#"}]},"operator":"!~","rightSubTerm":{"comparisonString":"test"}}]}]}';
+        
+        $this->assertsame($encode,$test);
+    }
+    
+    /**
+     * @covers CK\MARCspec\Field::__toString
+     * @covers CK\MARCspec\Subfield::__toString
+     * @covers CK\MARCspec\SubSpec::__toString
+     * @covers CK\MARCspec\ComparisonString::__toString
+     */
+    public function testToString()
+    {
+        $ms = $this->marcspec('...[0-3]_01{$a|$b!=$c}$a{300/1-3=\abc}{245$a!~\test}');
+        $test = '...[0-3]_01{...[0-3]_01$a[0-#]|...[0-3]_01$b[0-#]!=...[0-3]_01$c[0-#]}$a[0-#]{300[0-#]/1-3=\abc}{245[0-#]$a[0-#]!~\test}';
+        $this->assertsame($ms->__toString(),$test);
+    }
+    
+    /**
+     * @expectedException BadMethodCallException
+     */
+    public function testOffsetUnset()
+    {
+        $ms =  $this->marcspec('245');
+        unset($ms['field']);
+    }
+    
     public function testInvalidFromTestSuite()
     {
         foreach($this->invalidTests as $invalid)

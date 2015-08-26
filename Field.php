@@ -269,16 +269,7 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
                 $indicators
             );
         }
-        /* this is valid */
-        /*
-        elseif(preg_match('/_{2,2}/', $indicators))
-        {
-            throw new InvalidMARCspecException(
-                InvalidMARCspecException::FS.
-                InvalidMARCspecException::INDCHAR1,
-                $indicators
-            );
-        }*/
+
         for($x = 0; $x < strlen($indicators); $x++)
         {
             if(!preg_match('/[a-z0-9_]/', $indicators[$x]))
@@ -352,11 +343,7 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
         if(($charStart = $this->getCharStart()) !== null)
         {
             $_fieldSpec['charStart'] = $charStart;
-        }
-
-        if(($charEnd = $this->getCharEnd()) !== null)
-        {
-            $_fieldSpec['charEnd'] = $charEnd;
+            $_fieldSpec['charEnd'] = $this->getCharEnd();
         }
 
         if(($charLength = $this->getCharLength()) !== null)
@@ -402,39 +389,14 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
     public function getBaseSpec()
     {
         $fieldSpec = $this->getTag();
-        $indexStart = $this->getIndexStart();
-        $indexEnd = $this->getIndexEnd();
-        if(0 === $indexStart && "#" === $indexEnd)
-        {
-            // use abbreviation
-        }
-        else
-        {
-            $fieldSpec .= "[".$indexStart;
-            
-            if($indexEnd !== null && $indexStart !== $indexEnd)
-            {
-                $fieldSpec .= "-".$indexEnd;
-            }
-            $fieldSpec .= "]";
-        }
+        
+        $fieldSpec .= "[".$this->getIndexStart()."-".$this->getIndexEnd()."]";
 
         if(($charStart = $this->getCharStart()) !== null)
         {
-            $charEnd = $this->getCharEnd();
-            if($charStart === 0 && $charEnd === "#")
-            {
-                 // use abbreviation
-            }
-            else
-            {
-                $fieldSpec .= "/".$charStart;
-                if(($charEnd = $this->getCharEnd()) !== null)
-                {
-                    $fieldSpec .= "-".$charEnd;
-                }
-            }
+            $fieldSpec .= "/".$charStart."-".$this->getCharEnd();
         }
+        
         $indicator1 = ($this->getIndicator1() !== null) ? $this->indicator1 : "_";
         $indicator2 = ($this->getIndicator2() !== null) ? $this->indicator2 : "_";
         $indicators = $indicator1.$indicator2;
@@ -555,6 +517,9 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
     {
         switch($offset)
         {
+            case 'tag': $this->setTag($value);
+            break;
+            
             case 'indexStart': $this->setIndexStartEnd($value);
             break;
 

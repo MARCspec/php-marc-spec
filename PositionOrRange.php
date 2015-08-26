@@ -86,7 +86,7 @@ class PositionOrRange implements PositionOrRangeInterface
      */
     public function getCharEnd()
     {
-        return (isset($this->charEnd)) ? $this->charEnd : null;
+        return (isset($this->charEnd)) ? $this->charEnd : $this->charStart;
     }
     
     /**
