@@ -132,7 +132,7 @@ class MARCspecParser
 
         $this->parsed = array_filter($_fieldMatches[0],'strlen');
 
-        if(!array_key_exists('field',$this->parsed))
+        if(!array_key_exists('field',$this->parsed)) // TODO: check if 'tag' is the required key
         {
             throw new InvalidMARCspecException(
                 InvalidMARCspecException::FS.
@@ -192,7 +192,7 @@ class MARCspecParser
                     {
                         $_or[] = $this->matchSubTerms($orSubSpec);
                     }
-                    $this->field['subspecs'][] = $_or;
+                    $this->field['subspecs'][] = $_or; // TODO: Check if array is required since $_or is an array
                 }
                 else
                 {

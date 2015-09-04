@@ -427,7 +427,7 @@ class FieldTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(3, $fieldSpec->getCharLength());
         
         $fieldSpec = $this->fieldspec('300[1]');
-        $this->assertSame('300[1-1]', "$fieldSpec");
+        $this->assertSame('300[1]', "$fieldSpec");
         
         $fieldSpec = $this->fieldspec('300[1-3]');
         $this->assertSame('300[1-3]',"$fieldSpec");

@@ -108,7 +108,7 @@ class MARCspecTest extends \PHPUnit_Framework_TestCase
      public function testValidMarcSpec4()
      {
          $marcSpec = $this->marcspec('...[#]/1-3');
-         $this->assertSame('...[#-#]/1-3', "$marcSpec");
+         $this->assertSame('...[#]/1-3', "$marcSpec");
      }
     
 

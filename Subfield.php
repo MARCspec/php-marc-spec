@@ -253,20 +253,14 @@ class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerial
         $subfieldSpec = '$'.$this->getTag();
         $indexStart = $this->getIndexStart();
         $indexEnd = $this->getIndexEnd();
-        if(0 === $indexStart && "#" === $indexEnd)
+
+        $subfieldSpec .= "[".$indexStart;
+        
+        if($indexStart !== $indexEnd)
         {
-            // use abbreviation
+            $subfieldSpec .= "-".$indexEnd;
         }
-        else
-        {
-            $subfieldSpec .= "[".$indexStart;
-            
-            if($indexStart !== $indexEnd)
-            {
-                $subfieldSpec .= "-".$indexEnd;
-            }
-            $subfieldSpec .= "]";
-        }
+        $subfieldSpec .= "]";
         
         if(($charStart = $this->getCharStart()) !== null)
         {

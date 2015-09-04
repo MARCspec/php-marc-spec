@@ -392,20 +392,14 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
         
         $indexStart = $this->getIndexStart();
         $indexEnd = $this->getIndexEnd();
-        if(0 === $indexStart && "#" === $indexEnd)
+
+        $fieldSpec .= "[".$indexStart;
+       
+        if($indexStart !== $indexEnd)
         {
-            // use abbreviation
+            $fieldSpec .= "-".$indexEnd;
         }
-        else
-        {
-           $fieldSpec .= "[".$indexStart;
-           
-           if($indexStart !== $indexEnd)
-           {
-                $fieldSpec .= "-".$indexEnd;
-    }
-            $fieldSpec .= "]";
-        }
+        $fieldSpec .= "]";
         
         if(($charStart = $this->getCharStart()) !== null)
         {
