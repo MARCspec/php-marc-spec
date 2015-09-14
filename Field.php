@@ -269,17 +269,14 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
                 $indicators
             );
         }
-
-        for($x = 0; $x < strlen($indicators); $x++)
+        
+        if(preg_match('/[^a-z0-9_]/', $indicators))
         {
-            if(!preg_match('/[a-z0-9_]/', $indicators[$x]))
-            {
-                throw new InvalidMARCspecException(
-                    InvalidMARCspecException::FS.
-                    InvalidMARCspecException::INDCHAR2,
-                    $indicators
-                );
-            }
+            throw new InvalidMARCspecException(
+                InvalidMARCspecException::FS.
+                InvalidMARCspecException::INDCHAR2,
+                $indicators
+            );
         }
         return true;
     }

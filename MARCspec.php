@@ -393,16 +393,14 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess, \I
             );
         }
         
-        for($x = 0; $x < $posLength; $x++)
+
+        if(preg_match('/[^0-9\-#]/', $pos)) // alphabetic characters etc. are not valid
         {
-            if(!preg_match('/[0-9\-#]/', $pos[$x])) // alphabetic characters etc. are not valid
-            {
-                throw new InvalidMARCspecException(
-                    InvalidMARCspecException::PR.
-                    InvalidMARCspecException::PR2,
-                    $pos
-                );
-            }
+            throw new InvalidMARCspecException(
+                InvalidMARCspecException::PR.
+                InvalidMARCspecException::PR2,
+                $pos
+            );
         }
         
         if(strpos($pos,'-') === $posLength-1) // something like 123- is not valid
