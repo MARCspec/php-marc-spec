@@ -503,10 +503,8 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess, \I
                     case '$':
                        return new MARCspec($fieldContext.$subTerm);
                         
-                    case '[':
                     case '/':
                         $refPos = strrpos($context,$subTerm[0]);
-                        
                         if($refPos)
                         {
                             if('$' !== substr($context,$refPos - 1,1))
@@ -514,8 +512,21 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess, \I
                                 return new MARCspec(substr($context,0,$refPos).$subTerm);
                             }
                         }
-
                         return new MARCspec($context.$subTerm);
+                        
+                    case '[':
+                        $refPos = strrpos($context,$subTerm[0]);
+                        if($refPos)
+                        {
+                            if('$' !== substr($context,$refPos - 1,1))
+                            {
+                                return new MARCspec(substr($context,0,$refPos).$subTerm);
+                            }
+                        }
+                        else
+                        {
+                            throw new \RuntimeException('Abbreviated spec cannot resolved since context spec must have an index, which can\'t be found.');
+                        }
                     
                     default: return new MARCspec($subTerm);
                 }
