@@ -14,7 +14,7 @@ namespace CK\MARCspec;
 /**
  * MARCspec subspec interface
  */
-interface SubspecInterface
+interface SubSpecInterface
 {
 
     /**
