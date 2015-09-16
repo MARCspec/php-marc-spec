@@ -11,7 +11,7 @@ Installation can be done by using [composer](https://getcomposer.org/doc/00-intr
 ```json
 {
     "require": {
-        "ck/php-marcspec": "1.*"
+        "ck/php-marcspec": "@dev"
     }
 }
 ```
