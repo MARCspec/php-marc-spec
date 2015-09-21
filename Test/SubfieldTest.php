@@ -346,7 +346,7 @@ class SubfieldTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('$a[0-#]', "$Subfield");
         
         $Subfield = $this->subfieldspec('$a/1');
-        $this->assertSame('$a[0-#]/1-1',"$Subfield");
+        $this->assertSame('$a[0-#]/1',"$Subfield");
         $this->assertSame(1, $Subfield->getCharLength());
         
         $Subfield = $this->subfieldspec('$a/1-3');

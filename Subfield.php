@@ -272,7 +272,7 @@ class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerial
             else
             {
                 $subfieldSpec .= "/".$charStart;
-                if(($charEnd = $this->getCharEnd()) !== null)
+                if($charEnd !== $charStart)
                 {
                     $subfieldSpec .= "-".$charEnd;
                 }

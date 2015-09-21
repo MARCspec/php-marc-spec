@@ -408,7 +408,7 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
             else
             {
                 $fieldSpec .= "/".$charStart;
-                if(($charEnd = $this->getCharEnd()) !== null)
+                if($charEnd !== $charStart)
                 {
                     $fieldSpec .= "-".$charEnd;
                 }
