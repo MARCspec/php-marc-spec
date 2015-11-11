@@ -19,6 +19,7 @@ class SubfieldTest extends \PHPUnit_Framework_TestCase
     
     protected function setUp()
     {
+        if(0 < count($this->validTests)) return;
         $this->validTests[] = json_decode(file_get_contents(__DIR__. '/../' ."vendor/ck/marcspec-test-suite/valid/validSubfieldTag.json"));
         $this->invalidTests[] = json_decode(file_get_contents(__DIR__. '/../' ."vendor/ck/marcspec-test-suite/invalid/invalidSubfieldTag.json"));
     }

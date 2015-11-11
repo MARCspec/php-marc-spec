@@ -17,6 +17,7 @@ class ComparisonStringTest extends \PHPUnit_Framework_TestCase
     
     protected function setUp()
     {
+        if(0 < count($this->validTests)) return;
         $validTestsJson = file_get_contents(__DIR__. '/../' ."vendor/ck/marcspec-test-suite/valid/validComparisonString.json");
         $invalidTestsJson = file_get_contents(__DIR__. '/../' ."vendor/ck/marcspec-test-suite/invalid/invalidComparisonString.json");
         $this->validTests = json_decode($validTestsJson);

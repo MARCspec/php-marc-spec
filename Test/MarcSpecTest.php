@@ -20,6 +20,7 @@ class MARCspecTest extends \PHPUnit_Framework_TestCase
     
     protected function setUp()
     {
+        if(0 < count($this->validTests)) return;
         $valid = [];
         $invalid = [];
         $a = ['valid','invalid'];
