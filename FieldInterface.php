@@ -1,10 +1,10 @@
 <?php
 /**
 * MARCspec is the specification of a reference, encoded as string, to a set of data from within a MARC record.
-* 
+*
 * @author Carsten Klee <mailme.klee@yahoo.de>
 * @package CK\MARCspec
-* @copyright For the full copyright and license information, please view the LICENSE 
+* @copyright For the full copyright and license information, please view the LICENSE
 * file that was distributed with this source code.
 */
 
@@ -20,10 +20,10 @@ interface FieldInterface
      * Constructor for MARCspec field
      *
      * @api
-     * 
+     *
      * @param string $fieldspec The field spec
      */
-     public function __construct($fieldspec);
+    public function __construct($fieldspec);
     
     
     /**
@@ -43,7 +43,7 @@ interface FieldInterface
     * Get the field tag
     *
     * @api
-    * 
+    *
     * @return string $fieldTag The field tag
     */
     public function getTag();
@@ -53,7 +53,7 @@ interface FieldInterface
     * Set indicators
     *
     * @api
-    * 
+    *
     * @access public
     *
     * @param string $arg
@@ -65,9 +65,9 @@ interface FieldInterface
     * Set indicator 1
     *
     * @api
-    * 
+    *
     * @access public
-    * 
+    *
     * @param string $arg
     */
     public function setIndicator1($arg);
@@ -77,9 +77,9 @@ interface FieldInterface
     * Get indicator 1
     *
     * @api
-    * 
+    *
     * @access public
-    * 
+    *
     * @return null|string $indicator1 The indicator 1
     */
     public function getIndicator1();
@@ -89,9 +89,9 @@ interface FieldInterface
     * Set indicator 2
     *
     * @api
-    * 
+    *
     * @access public
-    * 
+    *
     * @param string $arg
     */
     public function setIndicator2($arg);
@@ -101,9 +101,9 @@ interface FieldInterface
     * Get indicator 2
     *
     * @api
-    * 
+    *
     * @access public
-    * 
+    *
     * @return null|string $indicator2 The indicator 2
     */
     public function getIndicator2();
@@ -112,49 +112,46 @@ interface FieldInterface
      * get array of subspecs
      *
      * @api
-     * 
+     *
      * @return null|array
      */
-     public function getSubSpecs();
+    public function getSubSpecs();
      
      /**
      * add a subspec to the array of subspecs
      *
      * @api
-     * 
+     *
      * @param SubSpecInterface|array[SubSpecInterface]
-     * 
+     *
      * @return null|array
      */
-     public function addSubSpec($SubSpec);
+    public function addSubSpec($SubSpec);
      
      /**
       * Get the basic spec without subspecs
-      * 
+      *
       * @api
-      * 
+      *
       * @return string
       */
-     public function getBaseSpec();
+    public function getBaseSpec();
      
     /**
      * encodes Field as string
      *
      * @api
-     * 
+     *
      * @return string
      */
     public function __toString();
     
     /**
      * Serialize Field as JSON
-     * 
+     *
      * @api
-     * 
+     *
      * @return array
      */
     public function jsonSerialize();
-
 } // EOI
-
-

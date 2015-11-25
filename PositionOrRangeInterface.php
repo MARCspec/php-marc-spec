@@ -1,11 +1,11 @@
 <?php
 /**
- * MARCspec is the specification of a reference, encoded as string, to a set of data 
+ * MARCspec is the specification of a reference, encoded as string, to a set of data
  * from within a MARC record.
- * 
+ *
  * @author Carsten Klee <mailme.klee@yahoo.de>
  * @package CK\MARCspec
- * @copyright For the full copyright and license information, please view the LICENSE 
+ * @copyright For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
@@ -22,35 +22,35 @@ interface PositionOrRangeInterface
     * Set the field index starting and ending position
     *
     * @api
-    * 
+    *
     * @access public
-    * 
+    *
     * @param int|string $start The index starting position
     * @param int|string|null $end The index ending position
     */
-    public function setIndexStartEnd($start,$end = null);
+    public function setIndexStartEnd($start, $end = null);
 
     /**
     *
     * Set the field index starting and ending position via length
     *
     * @api
-    * 
+    *
     * @access public
     *
     * @param int|string $start The index starting position
     * @param int $length The length count
     */
-    public function setIndexStartLength($start,$length);
+    public function setIndexStartLength($start, $length);
 
     /**
     *
     * Get the character starting position as integer or '#'
     *
     * @api
-    * 
+    *
     * @access public
-    * 
+    *
     * @return int|string $indexStart The field index starting position
     */
     public function getIndexStart();
@@ -60,9 +60,9 @@ interface PositionOrRangeInterface
     * Get the field index ending position as integer or '#'
     *
     * @api
-    * 
+    *
     * @access public
-    * 
+    *
     * @return int|string $indexEnd The field index ending position
     */
     public function getIndexEnd();
@@ -72,38 +72,38 @@ interface PositionOrRangeInterface
     * Set character starting and ending position
     *
     * @api
-    * 
+    *
     * @access public
-    * 
+    *
     * @param int|string $start The character starting position
     * @param int|string|null $end The character ending position
     *
     */
-    public function setCharStartEnd($start,$end = null);
+    public function setCharStartEnd($start, $end = null);
 
     /**
     *
     * Set character starting and ending position via start and length
-    * 
+    *
     * @api
-    * 
+    *
     * @access public
-    * 
+    *
     * @param int|string $start The character starting position
     * @param int $length The character length count
     *
     */
-    public function setCharStartLength($start,$length);
+    public function setCharStartLength($start, $length);
 
     /**
     *
     * Get the character starting position as integer or '#'
     *
     * @api
-    * 
+    *
     * @access public
-    * 
-    * @return int|string $charStart The character starting position 
+    *
+    * @return int|string $charStart The character starting position
     */
     public function getCharStart();
 
@@ -113,10 +113,10 @@ interface PositionOrRangeInterface
     * Get the character ending position as integer or '#'
     *
     * @api
-    * 
+    *
     * @access public
-    * 
-    * @return int|string $charEnd The character ending position 
+    *
+    * @return int|string $charEnd The character ending position
     */
     public function getCharEnd();
 
@@ -125,11 +125,11 @@ interface PositionOrRangeInterface
     * Get length of character range
     *
     * @api
-    * 
+    *
     * @access public
-    * 
+    *
     * @return null|int $length The character length
-    * 
+    *
     * @throws \InvalidArgumentException if length is less than 1
     */
     public function getCharLength();
@@ -139,11 +139,11 @@ interface PositionOrRangeInterface
     * Get length of index range
     *
     * @api
-    * 
+    *
     * @access public
-    * 
+    *
     * @return null|int $length The index range length
-    * 
+    *
     * @throws \InvalidArgumentException if length is less than 1
     */
     public function getIndexLength();

@@ -1,11 +1,11 @@
 <?php
 /**
-* MARCspec is the specification of a reference, encoded as string, to a set of data 
+* MARCspec is the specification of a reference, encoded as string, to a set of data
 * from within a MARC record.
-* 
+*
 * @author Carsten Klee <mailme.klee@yahoo.de>
 * @package CK\MARCspec
-* @copyright For the full copyright and license information, please view the LICENSE 
+* @copyright For the full copyright and license information, please view the LICENSE
 * file that was distributed with this source code.
 */
 namespace CK\MARCspec;
@@ -21,17 +21,17 @@ class PositionOrRange implements PositionOrRangeInterface
     /**
      * {@inheritdoc}
      */
-    public function setIndexStartEnd($start,$end = null)
+    public function setIndexStartEnd($start, $end = null)
     {
-        list($this->indexStart,$this->indexEnd) = $this->validateStartEnd($start,$end);
+        list($this->indexStart,$this->indexEnd) = $this->validateStartEnd($start, $end);
     }
     
     /**
      * {@inheritdoc}
      */
-    public function setIndexStartLength($start,$length)
+    public function setIndexStartLength($start, $length)
     {
-        list($this->indexStart,$this->indexEnd) = $this->validateStartLength($start,$length);
+        list($this->indexStart,$this->indexEnd) = $this->validateStartLength($start, $length);
     }
     
     /**
@@ -47,12 +47,9 @@ class PositionOrRange implements PositionOrRangeInterface
      */
     public function getIndexEnd()
     {
-        if(!isset($this->indexStart))
-        {
+        if (!isset($this->indexStart)) {
             return '#';
-        }
-        else
-        {
+        } else {
             return (isset($this->indexEnd)) ? $this->indexEnd : $this->indexStart;
         }
     }
@@ -60,17 +57,17 @@ class PositionOrRange implements PositionOrRangeInterface
     /**
      * {@inheritdoc}
      */
-    public function setCharStartEnd($start,$end = null)
+    public function setCharStartEnd($start, $end = null)
     {
-        list($this->charStart,$this->charEnd) = $this->validateStartEnd($start,$end);
+        list($this->charStart,$this->charEnd) = $this->validateStartEnd($start, $end);
     }
     
     /**
      * {@inheritdoc}
      */
-    public function setCharStartLength($start,$length)
+    public function setCharStartLength($start, $length)
     {
-        list($this->charStart,$this->charEnd) = $this->validateStartLength($start,$length);
+        list($this->charStart,$this->charEnd) = $this->validateStartLength($start, $length);
     }
     
     /**
@@ -109,54 +106,45 @@ class PositionOrRange implements PositionOrRangeInterface
     * Calculate the length of charrange or index range
     *
     * @param bool $type True for charrange and false for indexrange
-    * 
+    *
     * @return int $length
     */
     private function getLength($type = true)
     {
-        if($type)
-        {
+        if ($type) {
             $start = $this->getCharStart();
             $end   = $this->getCharEnd();
-        }
-        else
-        {
+        } else {
             $start = $this->getIndexStart();
             $end   = $this->getIndexEnd();
         }
         
-        if( is_null($start) && is_null($end) )
-        {
+        if (is_null($start) && is_null($end)) {
             return null;
         }
         
-        if(!is_null($start) && is_null($end) )
-        {
+        if (!is_null($start) && is_null($end)) {
             return 1;
         }
         
-        if($start === $end) 
-        {
+        if ($start === $end) {
             return 1;
         }
         
-        if('#' === $start && '#' !== $end)
-        {
+        if ('#' === $start && '#' !== $end) {
             return $end + 1;
         }
         
-        if('#' !== $start && '#' === $end)
-        {
+        if ('#' !== $start && '#' === $end) {
             return null;
         }
 
         $length = $end - $start + 1;
         
-        if(1 > $length)
-        {
+        if (1 > $length) {
             throw new InvalidMARCspecException(
-            InvalidMARCspecException::PR.
-            InvalidMARCspecException::NEGATIVE
+                InvalidMARCspecException::PR.
+                InvalidMARCspecException::NEGATIVE
             );
         }
         return $length;
@@ -165,32 +153,27 @@ class PositionOrRange implements PositionOrRangeInterface
     /**
     *
     * Validate starting and ending position
-    * 
+    *
     * @internal
-    * 
+    *
     * @access private
-    * 
+    *
     * @param int|string $start The starting position
     * @param int|string $end The ending position
-    * 
+    *
     * @return null|array $_startEnd index 0 => start, index 1 => end
-    * 
+    *
     * @throws \UnexpectedValueException
     */
-    private function validateStartEnd($start,$end)
+    private function validateStartEnd($start, $end)
     {
         $_startEnd = array();
         
-        if(preg_match('/[0-9]/', $start))
-        {
+        if (preg_match('/[0-9]/', $start)) {
             $_startEnd[0] = (int)$start;
-        }
-        elseif('#' === $start)
-        {
+        } elseif ('#' === $start) {
             $_startEnd[0] = '#';
-        }
-        else
-        {
+        } else {
             throw new InvalidMARCspecException(
                 InvalidMARCspecException::PR.
                 InvalidMARCspecException::PR7,
@@ -198,36 +181,27 @@ class PositionOrRange implements PositionOrRangeInterface
             );
         }
 
-        if(preg_match('/[0-9#]/', $end))
-        {
-            if('#' === $end)
-            {
+        if (preg_match('/[0-9#]/', $end)) {
+            if ('#' === $end) {
                 $_startEnd[1] = '#';
-            }
-            elseif(preg_match('/[0-9]/', $end))
-            {
+            } elseif (preg_match('/[0-9]/', $end)) {
                 $_startEnd[1] = (int)$end;
                 
-                if($_startEnd[1] < $_startEnd[0])
-                {
+                if ($_startEnd[1] < $_startEnd[0]) {
                     throw new InvalidMARCspecException(
                         InvalidMARCspecException::PR.
                         InvalidMARCspecException::PR8,
                         $start.'-'.$end
                     );
                 }
-            }
-            else
-            {
+            } else {
                 throw new InvalidMARCspecException(
                     InvalidMARCspecException::PR.
                     InvalidMARCspecException::PR8,
                     $start.'-'.$end
                 );
             }
-        }
-        else
-        {
+        } else {
             $_startEnd[1] = null;
         }
         return $_startEnd;
@@ -236,32 +210,27 @@ class PositionOrRange implements PositionOrRangeInterface
     /**
     *
     * Validate starting position and length
-    * 
+    *
     * @internal
-    * 
+    *
     * @access private
-    * 
+    *
     * @param string $start The starting position
     * @param string $length $length The length count
-    * 
+    *
     * @return array $_startEnd index 0 => start, index 1 => end
-    * 
+    *
     * @throws \UnexpectedValueException
     */
-    private function validateStartLength($start,$length)
+    private function validateStartLength($start, $length)
     {
 
         $_startEnd = array();
-        if(preg_match('/[0-9]/', $start))
-        {
+        if (preg_match('/[0-9]/', $start)) {
             $_startEnd[0] = (int)$start;
-        }
-        elseif('#' === $start)
-        {
+        } elseif ('#' === $start) {
             $_startEnd[0] = '#';
-        }
-        else
-        {
+        } else {
             throw new \UnexpectedValueException(
                 'First argument must be positive int, 0 or character #.',
                 $start
@@ -269,12 +238,9 @@ class PositionOrRange implements PositionOrRangeInterface
         }
         
         
-        if(preg_match('/^[1-9]\d*/', $length)) // only positive int without 0
-        {
+        if (preg_match('/^[1-9]\d*/', $length)) { // only positive int without 0
             $_startEnd[1] = (int)$length - 1;
-        }
-        else
-        {
+        } else {
             throw new \UnexpectedValueException(
                 'Second argument must be positive int without 0.',
                 $length
@@ -285,22 +251,20 @@ class PositionOrRange implements PositionOrRangeInterface
     
     /**
      * checks if argument is a string
-     * 
+     *
      * @internal
-     * 
+     *
      * @access private
-     * 
+     *
      * @param string $arg The argument to check
-     * 
+     *
      * @throws \InvalidArgumentException if the argument is not a string
      */
     protected function checkIfString($arg)
     {
-        if(!is_string($arg))
-        {
-            throw new \InvalidArgumentException("Method only accepts string as argument. " 
-                .gettype($arg)." given."
-            );
+        if (!is_string($arg)) {
+            throw new \InvalidArgumentException("Method only accepts string as argument. "
+                .gettype($arg)." given.");
         }
     }
 } // EOC

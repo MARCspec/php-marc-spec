@@ -1,16 +1,17 @@
 <?php
 /**
- * MARCspec is the specification of a reference, encoded as string, to a set of data 
+ * MARCspec is the specification of a reference, encoded as string, to a set of data
  * from within a MARC record.
- * 
+ *
  * @author Carsten Klee <mailme.klee@yahoo.de>
  * @package CK\MARCspec
- * @copyright For the full copyright and license information, please view the LICENSE 
+ * @copyright For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 namespace CK\MARCspec;
 
 use CK\MARCspec\Exception\InvalidMARCspecException;
+
 /**
 * A MARCspec comparison string class
 */
@@ -19,28 +20,25 @@ class ComparisonString implements ComparisonStringInterface, \JsonSerializable, 
 
     /**
      * @var string The escaped comparison string
-     */ 
+     */
     private $raw;
 
     /**
     *
     * {@inheritdoc}
-    * 
-    * @throws \InvalidArgumentException if argument is not a string or 
+    *
+    * @throws \InvalidArgumentException if argument is not a string or
     * comparison string is not properly escaped
     */
     public function __construct($raw)
     {
         
-        if(!is_string($raw))
-        {
+        if (!is_string($raw)) {
             throw new \InvalidArgumentException('Argument must be of type string. Got '
-                .gettype($raw).'.'
-            );
+                .gettype($raw).'.');
         }
         
-        if(false !== strpos($raw,' '))
-        {
+        if (false !== strpos($raw, ' ')) {
             throw new InvalidMARCspecException(
                 InvalidMARCspecException::CS.
                 InvalidMARCspecException::SPACE,
@@ -49,8 +47,7 @@ class ComparisonString implements ComparisonStringInterface, \JsonSerializable, 
         }
         
         /** char of list ${}!=~?|\s must be escaped if not at index 0*/
-        if(!preg_match('/^(.(?:[^${}!=~?| ]|(?<=\\\\)[${}!=~?|])*)$/',$raw))
-        {
+        if (!preg_match('/^(.(?:[^${}!=~?| ]|(?<=\\\\)[${}!=~?|])*)$/', $raw)) {
             throw new InvalidMARCspecException(
                 InvalidMARCspecException::CS.
                 InvalidMARCspecException::ESCAPE,
@@ -66,7 +63,7 @@ class ComparisonString implements ComparisonStringInterface, \JsonSerializable, 
     */
     public function getComparable()
     {
-        $comparable = str_replace('\s',' ',$this->raw);
+        $comparable = str_replace('\s', ' ', $this->raw);
         return stripcslashes($comparable);
     }
     
@@ -84,11 +81,10 @@ class ComparisonString implements ComparisonStringInterface, \JsonSerializable, 
     public static function escape($arg)
     {
         $specialChars = ['{','}','!','=','~','?'];
-        for($i = 0; $i < count($specialChars);$i++)
-        {
-            $arg = str_replace($specialChars[$i],'\\'.$specialChars[$i],$arg);
+        for ($i = 0; $i < count($specialChars); $i++) {
+            $arg = str_replace($specialChars[$i], '\\'.$specialChars[$i], $arg);
         }
-        return $arg = str_replace(' ','\s',$arg);
+        return $arg = str_replace(' ', '\s', $arg);
     }
     
     /**
@@ -109,58 +105,61 @@ class ComparisonString implements ComparisonStringInterface, \JsonSerializable, 
     
     /**
      * Access object like an associative array
-     * 
+     *
      * @api
-     * 
+     *
      * @param string $offset Key raw|comparable
-     */ 
+     */
     public function offsetExists($offset)
     {
-        switch($offset)
-        {
-            case 'raw': 
-            case 'comparable': return true;
+        switch ($offset) {
+            case 'raw':
+            case 'comparable':
+                return true;
             break;
-            default: return false;
+            default:
+                return false;
         }
     }
     
     /**
      * Access object like an associative array
-     * 
+     *
      * @api
-     * 
+     *
      * @param string $offset Key operator|leftSubTerm|rightSubTerm
-     */ 
+     */
     public function offsetGet($offset)
     {
-        switch($offset)
-        {
-            case 'raw': return $this->getRaw();
+        switch ($offset) {
+            case 'raw':
+                return $this->getRaw();
             break;
-            case 'comparable': return $this->getComparable();
+            case 'comparable':
+                return $this->getComparable();
             break;
-            default: throw new \UnexpectedValueException("Offset $offset does not exist.");
+            default:
+                throw new \UnexpectedValueException("Offset $offset does not exist.");
         }
     }
     
     /**
      * Access object like an associative array
-     * 
+     *
      * @api
-     * 
+     *
      * @param string $offset
-     */ 
-    public function offsetSet($offset,$value)
+     */
+    public function offsetSet($offset, $value)
     {
         throw new \UnexpectedValueException("Offset $offset cannot be set.");
     }
     
     /**
      * Access object like an associative array
-     * 
+     *
      * @param string $offset
-     */ 
+     */
     public function offsetUnset($offset)
     {
         throw new \BadMethodCallException("Offset $offset can not be unset.");

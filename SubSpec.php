@@ -1,11 +1,11 @@
 <?php
 /**
- * MARCspec is the specification of a reference, encoded as string, to a set of data 
+ * MARCspec is the specification of a reference, encoded as string, to a set of data
  * from within a MARC record.
- * 
+ *
  * @author Carsten Klee <mailme.klee@yahoo.de>
  * @package CK\MARCspec
- * @copyright For the full copyright and license information, please view the LICENSE 
+ * @copyright For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 namespace CK\MARCspec;
@@ -20,48 +20,42 @@ class SubSpec implements SubSpecInterface, \JsonSerializable, \ArrayAccess, \Ite
 
     /**
      * @var string Operator
-     */ 
+     */
     private $operator;
     
     /**
      * @var MARCspecInterface|ComparisonStringInterface The left hand subterm
-     */ 
+     */
     private $leftSubTerm;
     
     /**
      * @var MARCspecInterface|ComparisonStringInterface The right hand subterm
-     */ 
+     */
     private $rightSubTerm;
     
     /**
      * {@inheritdoc}
-     * 
+     *
      * @throws \InvalidArgumentException
      * @throws InvalidMARCspecException
      */
     public function __construct($leftSubTerm, $operator, $rightSubTerm)
     {
 
-        if($leftSubTerm instanceOf MARCspecInterface 
-            || $leftSubTerm instanceOf ComparisonStringInterface)
-        {
+        if ($leftSubTerm instanceof MARCspecInterface
+            || $leftSubTerm instanceof ComparisonStringInterface) {
             $this->leftSubTerm = $leftSubTerm;
-        }
-        else
-        {
+        } else {
             throw new \InvalidArgumentException(
                 'Argument 1 must be instance of CK\MARCspec\MARCspecInterface or 
                 CK\MARCspec\ComparisonStringInterface'
             );
         }
         
-        if($rightSubTerm instanceOf MARCspecInterface 
-            || $rightSubTerm instanceOf ComparisonStringInterface)
-        {
+        if ($rightSubTerm instanceof MARCspecInterface
+            || $rightSubTerm instanceof ComparisonStringInterface) {
             $this->rightSubTerm = $rightSubTerm;
-        }
-        else
-        {
+        } else {
             throw new \InvalidArgumentException(
                 'Argument 3 must be instance of CK\MARCspec\MARCspecInterface or 
                 CK\MARCspec\ComparisonStringInterface. Got '
@@ -74,13 +68,12 @@ class SubSpec implements SubSpecInterface, \JsonSerializable, \ArrayAccess, \Ite
     
     /**
      * Set operator
-     * 
+     *
      * @throws InvalidMARCspecException
      */
     private function setOperator($operator)
     {
-        if(!in_array($operator,["=", "!=", "~", "!~", "!", "?"],true))
-        {
+        if (!in_array($operator, ["=", "!=", "~", "!~", "!", "?"], true)) {
             throw new InvalidMARCspecException(
                 InvalidMARCspecException::SS.
                 InvalidMARCspecException::OPERATOR,
@@ -120,8 +113,7 @@ class SubSpec implements SubSpecInterface, \JsonSerializable, \ArrayAccess, \Ite
      */
     public function __toString()
     {
-        switch($this->operator)
-        {
+        switch ($this->operator) {
             case "!":
                 $subSpecString = $this->operator."$this->rightSubTerm";
                 break;
@@ -141,8 +133,7 @@ class SubSpec implements SubSpecInterface, \JsonSerializable, \ArrayAccess, \Ite
      */
     public function jsonSerialize()
     {
-        if(!is_null($this->leftSubTerm))
-        {
+        if (!is_null($this->leftSubTerm)) {
             $_subSpec['leftSubTerm'] = $this->leftSubTerm->jsonSerialize();
         }
         $_subSpec['operator'] = $this->operator;
@@ -152,65 +143,69 @@ class SubSpec implements SubSpecInterface, \JsonSerializable, \ArrayAccess, \Ite
 
     /**
      * Access object like an associative array
-     * 
+     *
      * @api
-     * 
+     *
      * @param string $offset Key operator|leftSubTerm|rightSubTerm
-     */ 
+     */
     public function offsetExists($offset)
     {
-        switch($offset)
-        {
-            case 'operator': 
+        switch ($offset) {
+            case 'operator':
             case 'leftSubTerm':
-            case 'rightSubTerm': return true;
+            case 'rightSubTerm':
+                return true;
                 break;
             
-            default: return false;
+            default:
+                return false;
         }
     }
     
     /**
      * Access object like an associative array
-     * 
+     *
      * @api
-     * 
+     *
      * @param string $offset Key operator|leftSubTerm|rightSubTerm
-     */ 
+     */
     public function offsetGet($offset)
     {
-        switch($offset)
-        {
-            case 'operator': return $this->getOperator();
+        switch ($offset) {
+            case 'operator':
+                return $this->getOperator();
                 break;
             
-            case 'leftSubTerm': return $this->getLeftSubTerm();
+            case 'leftSubTerm':
+                return $this->getLeftSubTerm();
                 break;
             
-            case 'rightSubTerm': return $this->getRightSubTerm();
+            case 'rightSubTerm':
+                return $this->getRightSubTerm();
                 break;
             
-            default: throw new \UnexpectedValueException("Offset $offset does not exist.");
+            default:
+                throw new \UnexpectedValueException("Offset $offset does not exist.");
         }
     }
     
     /**
      * Access object like an associative array
-     * 
+     *
      * @api
-     * 
+     *
      * @param string $offset
-     */ 
-    public function offsetSet($offset,$value)
+     */
+    public function offsetSet($offset, $value)
     {
         throw new \UnexpectedValueException("Offset $offset cannot be set.");
     }
     
     /**
      * Access object like an associative array
-     * 
+     *
      * @param string $offset
-     */ 
+     */
     public function offsetUnset($offset)
     {
         throw new \BadMethodCallException("Offset $offset can not be unset.");

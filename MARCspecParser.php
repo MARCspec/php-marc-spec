@@ -1,11 +1,11 @@
 <?php
 /**
- * MARCspec is the specification of a reference, encoded as string, to a set of data 
+ * MARCspec is the specification of a reference, encoded as string, to a set of data
  * from within a MARC record.
- * 
+ *
  * @author Carsten Klee <mailme.klee@yahoo.de>
  * @package CK\MARCspec
- * @copyright For the full copyright and license information, please view the LICENSE 
+ * @copyright For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 namespace CK\MARCspec;
@@ -14,7 +14,7 @@ use CK\MARCspec\Exception\InvalidMARCspecException;
 
 /**
  * Parses a MARCspec into an array
- */ 
+ */
 class MARCspecParser
 {
     /**
@@ -101,28 +101,28 @@ class MARCspecParser
     {
         $this->setConstants();
         
-        if(is_null($spec)) return;
+        if (is_null($spec)) {
+            return;
+        }
         
         $this->fieldToArray($spec);
         
-        if(array_key_exists('subfields',$this->parsed))
-        {
+        if (array_key_exists('subfields', $this->parsed)) {
             $this->subfields = $this->matchSubfields($this->parsed['subfields']);
         }
     }
     
     /**
-     * parses fieldspecs into array 
-     * 
+     * parses fieldspecs into array
+     *
      * @param string $fieldspec The fieldspec
      * @return array An Array of fieldspec
-     */ 
+     */
     public function fieldToArray($fieldspec)
     {
         $_fieldGroups = ['field','tag','index','charpos','indicators','subfields'];
         
-        if(!preg_match_all('/'.$this->FIELD.'/',$fieldspec,$_fieldMatches,PREG_SET_ORDER))
-        {
+        if (!preg_match_all('/'.$this->FIELD.'/', $fieldspec, $_fieldMatches, PREG_SET_ORDER)) {
             throw new InvalidMARCspecException(
                 InvalidMARCspecException::FS.
                 InvalidMARCspecException::MISSINGFIELD,
@@ -130,10 +130,9 @@ class MARCspecParser
             );
         }
 
-        $this->parsed = array_filter($_fieldMatches[0],'strlen');
+        $this->parsed = array_filter($_fieldMatches[0], 'strlen');
 
-        if(!array_key_exists('field',$this->parsed)) // TODO: check if 'tag' is the required key
-        {
+        if (!array_key_exists('field', $this->parsed)) { // TODO: check if 'tag' is the required key
             throw new InvalidMARCspecException(
                 InvalidMARCspecException::FS.
                 InvalidMARCspecException::FTAG,
@@ -141,8 +140,7 @@ class MARCspecParser
             );
         }
         
-        if(strlen($this->parsed['field']) !== strlen($fieldspec))
-        {
+        if (strlen($this->parsed['field']) !== strlen($fieldspec)) {
             throw new InvalidMARCspecException(
                 InvalidMARCspecException::FS.
                 InvalidMARCspecException::USELESS,
@@ -150,18 +148,14 @@ class MARCspecParser
             );
         }
         
-        foreach($_fieldGroups as $fieldgroup)
-        {
-            if(array_key_exists($fieldgroup,$this->parsed))
-            {
+        foreach ($_fieldGroups as $fieldgroup) {
+            if (array_key_exists($fieldgroup, $this->parsed)) {
                 $this->field[$fieldgroup] = $this->parsed[$fieldgroup];
             }
         }
 
-        if(array_key_exists('charpos',$this->field))
-        {
-            if(array_key_exists('indicators',$this->field))
-            {
+        if (array_key_exists('charpos', $this->field)) {
+            if (array_key_exists('indicators', $this->field)) {
                 throw new InvalidMARCspecException(
                     InvalidMARCspecException::FS.
                     InvalidMARCspecException::CHARORIND,
@@ -169,8 +163,7 @@ class MARCspecParser
                 );
             }
             
-            if(array_key_exists('subfields',$this->field))
-            {
+            if (array_key_exists('subfields', $this->field)) {
                 throw new InvalidMARCspecException(
                     InvalidMARCspecException::FS.
                     InvalidMARCspecException::CHARANDSF,
@@ -180,22 +173,16 @@ class MARCspecParser
             
         }
         
-        if(array_key_exists('subspecs',$this->parsed))
-        {
+        if (array_key_exists('subspecs', $this->parsed)) {
             $_fieldSubSpecs = $this->matchSubSpecs($this->parsed['subspecs']);
 
-            foreach($_fieldSubSpecs as $fieldSubSpec)
-            {
-                if(1 < count($fieldSubSpec))
-                {
-                    foreach($fieldSubSpec as $orSubSpec)
-                    {
+            foreach ($_fieldSubSpecs as $fieldSubSpec) {
+                if (1 < count($fieldSubSpec)) {
+                    foreach ($fieldSubSpec as $orSubSpec) {
                         $_or[] = $this->matchSubTerms($orSubSpec);
                     }
                     $this->field['subspecs'][] = $_or; // TODO: Check if array is required since $_or is an array
-                }
-                else
-                {
+                } else {
                     $this->field['subspecs'][] = $this->matchSubTerms($fieldSubSpec[0]);
                 }
             }
@@ -204,13 +191,12 @@ class MARCspecParser
     
     /**
     * Matches subfieldspecs
-    * 
+    *
     * @param string $subfieldspec A string of one or more subfieldspecs
-    */ 
+    */
     public function matchSubfields($subfieldspec)
     {
-        if(!preg_match_all('/'.$this->SUBFIELD.'/',$subfieldspec,$_subfieldMatches,PREG_SET_ORDER))
-        {
+        if (!preg_match_all('/'.$this->SUBFIELD.'/', $subfieldspec, $_subfieldMatches, PREG_SET_ORDER)) {
             throw new InvalidMARCspecException(
                 InvalidMARCspecException::SF.
                 InvalidMARCspecException::SFCHAR,
@@ -226,33 +212,26 @@ class MARCspecParser
         */
         array_walk(
             $_subfieldMatches,
-            function(&$_subfield) use (&$test)
-            {
-                $_subfield = array_filter($_subfield,'strlen');
+            function (&$_subfield) use (&$test) {
+            
+                $_subfield = array_filter($_subfield, 'strlen');
                 
                 $test .= $_subfield['subfield'];
                 
-                if(array_key_exists('subspecs',$_subfield))
-                {
+                if (array_key_exists('subspecs', $_subfield)) {
                     $_ss = [];
                     
-                    if(!$_subfieldSubSpecs = $this->matchSubSpecs($_subfield['subspecs']))
-                    {
-                        // TODO: raise error;
+                    if (!$_subfieldSubSpecs = $this->matchSubSpecs($_subfield['subspecs'])) {
+                    // TODO: raise error;
                     }
                     
-                    foreach($_subfieldSubSpecs as $key => $_subfieldSubSpec)
-                    {
-                        if(1 < count($_subfieldSubSpec))
-                        {
-                            foreach($_subfieldSubSpec as $orSubSpec)
-                            {
+                    foreach ($_subfieldSubSpecs as $key => $_subfieldSubSpec) {
+                        if (1 < count($_subfieldSubSpec)) {
+                            foreach ($_subfieldSubSpec as $orSubSpec) {
                                 $_or[] = $this->matchSubTerms($orSubSpec);
                             }
                             $_ss[] = $_or;
-                        }
-                        else
-                        {
+                        } else {
                             $_ss[] = $this->matchSubTerms($_subfieldSubSpec[0]);
                         }
                     }
@@ -262,8 +241,7 @@ class MARCspecParser
             }
         );
 
-        if($test !== $subfieldspec)
-        {
+        if ($test !== $subfieldspec) {
             throw new InvalidMARCspecException(
                 InvalidMARCspecException::SF.
                 InvalidMARCspecException::USELESS,
@@ -275,15 +253,14 @@ class MARCspecParser
     }
     
     /**
-    * calls matchSubfields but makes sure only one subfield is present 
-    * 
+    * calls matchSubfields but makes sure only one subfield is present
+    *
     * @param string $subfieldspec A subfieldspec
     * @return array An Array of subfieldspec
-    */ 
+    */
     public function subfieldToArray($subfieldspec)
     {
-        if(!$_sf = $this->matchSubfields($subfieldspec))
-        {
+        if (!$_sf = $this->matchSubfields($subfieldspec)) {
             throw new InvalidMARCspecException(
                 InvalidMARCspecException::SF.
                 InvalidMARCspecException::UNKNOWN,
@@ -291,8 +268,7 @@ class MARCspecParser
             );
         }
         
-        if(1 < count($_sf))
-        {
+        if (1 < count($_sf)) {
             throw new InvalidMARCspecException(
                 InvalidMARCspecException::SF.
                 InvalidMARCspecException::MULTISF,
@@ -300,12 +276,11 @@ class MARCspecParser
             );
         }
         
-        if($_sf[0]['subfield'] !== $subfieldspec)
-        {
+        if ($_sf[0]['subfield'] !== $subfieldspec) {
             throw new InvalidMARCspecException(
-            InvalidMARCspecException::SF.
-            InvalidMARCspecException::USELESS,
-            $subfieldspec
+                InvalidMARCspecException::SF.
+                InvalidMARCspecException::USELESS,
+                $subfieldspec
             );
         }
         
@@ -314,15 +289,14 @@ class MARCspecParser
     
     /**
     * parses subspecs into an array
-    * 
+    *
     * @param string $subSpecs One or more subspecs
     * @return array Array of subspecs
     */
     private function matchSubSpecs($subSpecs)
     {
         $_subSpecs = [];
-        if(!preg_match_all('/'.$this->SUBSPEC.'/U',$subSpecs,$_subSpecMatches,PREG_SET_ORDER))
-        {
+        if (!preg_match_all('/'.$this->SUBSPEC.'/U', $subSpecs, $_subSpecMatches, PREG_SET_ORDER)) {
             throw new InvalidMARCspecException(
                 InvalidMARCspecException::SS.
                 InvalidMARCspecException::UNKNOWN,
@@ -330,14 +304,10 @@ class MARCspecParser
             );
         }
 
-        foreach($_subSpecMatches as $key => $_subSpecMatch)
-        {
-            if(array_key_exists(1,$_subSpecMatch) && !empty($_subSpecMatch[1]))
-            {
-                $_subSpecs[$key] = preg_split('/(?<!\\\)\|/',$_subSpecMatch[1],-1,PREG_SPLIT_NO_EMPTY);
-            }
-            else
-            {
+        foreach ($_subSpecMatches as $key => $_subSpecMatch) {
+            if (array_key_exists(1, $_subSpecMatch) && !empty($_subSpecMatch[1])) {
+                $_subSpecs[$key] = preg_split('/(?<!\\\)\|/', $_subSpecMatch[1], -1, PREG_SPLIT_NO_EMPTY);
+            } else {
                 throw new InvalidMARCspecException(
                     InvalidMARCspecException::SS.
                     InvalidMARCspecException::UNKNOWN,
@@ -350,14 +320,13 @@ class MARCspecParser
     
     /**
     * Parses a single SubSpec into sunTerms
-    * 
+    *
     * @param string $subSpec A single SubSpec
     * @return array subTerms as array
     */
     private function matchSubTerms($subSpec)
     {
-        if(preg_match('/(?<![\\\\\$])[\{\}]/',$subSpec,$_error, PREG_OFFSET_CAPTURE))
-        {
+        if (preg_match('/(?<![\\\\\$])[\{\}]/', $subSpec, $_error, PREG_OFFSET_CAPTURE)) {
             throw new InvalidMARCspecException(
                 InvalidMARCspecException::SS.
                 InvalidMARCspecException::ESCAPE,
@@ -365,24 +334,19 @@ class MARCspecParser
             );
         }
         
-        if(preg_match_all('/'.$this->SUBTERMS.'/',$subSpec,$_subTermMatches,PREG_SET_ORDER))
-        {
-            if(empty($_subTermMatches[0]['operator']))
-            {
+        if (preg_match_all('/'.$this->SUBTERMS.'/', $subSpec, $_subTermMatches, PREG_SET_ORDER)) {
+            if (empty($_subTermMatches[0]['operator'])) {
                 $_subTermMatches[0]['operator'] = "?";
             }
-            if(!$_subTermMatches[0]['rightsubterm'])
-            {
+            if (!$_subTermMatches[0]['rightsubterm']) {
                 throw new InvalidMARCspecException(
                     InvalidMARCspecException::SS.
                     InvalidMARCspecException::MISSINGRIGHT,
                     $subSpec
                 );
             }
-            return array_filter($_subTermMatches[0],'strlen');
-        }
-        else
-        {
+            return array_filter($_subTermMatches[0], 'strlen');
+        } else {
             throw new InvalidMARCspecException(
                 InvalidMARCspecException::SS.
                 InvalidMARCspecException::UNKNOWN,
