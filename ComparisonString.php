@@ -4,7 +4,6 @@
  * from within a MARC record.
  *
  * @author Carsten Klee <mailme.klee@yahoo.de>
- * @package CK\MARCspec
  * @copyright For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,31 +12,28 @@ namespace CK\MARCspec;
 use CK\MARCspec\Exception\InvalidMARCspecException;
 
 /**
-* A MARCspec comparison string class
-*/
+ * A MARCspec comparison string class.
+ */
 class ComparisonString implements ComparisonStringInterface, \JsonSerializable, \ArrayAccess
 {
-
     /**
      * @var string The escaped comparison string
      */
     private $raw;
 
     /**
-    *
-    * {@inheritdoc}
-    *
-    * @throws \InvalidArgumentException if argument is not a string or
-    * comparison string is not properly escaped
-    */
+     * {@inheritdoc}
+     *
+     * @throws \InvalidArgumentException if argument is not a string or
+     *                                   comparison string is not properly escaped
+     */
     public function __construct($raw)
     {
-        
         if (!is_string($raw)) {
             throw new \InvalidArgumentException('Argument must be of type string. Got '
                 .gettype($raw).'.');
         }
-        
+
         if (false !== strpos($raw, ' ')) {
             throw new InvalidMARCspecException(
                 InvalidMARCspecException::CS.
@@ -45,8 +41,8 @@ class ComparisonString implements ComparisonStringInterface, \JsonSerializable, 
                 $raw
             );
         }
-        
-        /** char of list ${}!=~?|\s must be escaped if not at index 0*/
+
+        /* char of list ${}!=~?|\s must be escaped if not at index 0*/
         if (!preg_match('/^(.(?:[^${}!=~?| ]|(?<=\\\\)[${}!=~?|])*)$/', $raw)) {
             throw new InvalidMARCspecException(
                 InvalidMARCspecException::CS.
@@ -54,57 +50,59 @@ class ComparisonString implements ComparisonStringInterface, \JsonSerializable, 
                 $raw
             );
         }
-        
+
         $this->raw = $raw;
     }
-    
+
     /**
-    * {@inheritdoc}
-    */
+     * {@inheritdoc}
+     */
     public function getComparable()
     {
         $comparable = str_replace('\s', ' ', $this->raw);
+
         return stripcslashes($comparable);
     }
-    
+
     /**
-    * {@inheritdoc}
-    */
+     * {@inheritdoc}
+     */
     public function getRaw()
     {
         return $this->raw;
     }
-    
+
     /**
-    * {@inheritdoc}
-    */
+     * {@inheritdoc}
+     */
     public static function escape($arg)
     {
-        $specialChars = ['{','}','!','=','~','?'];
+        $specialChars = ['{', '}', '!', '=', '~', '?'];
         for ($i = 0; $i < count($specialChars); $i++) {
             $arg = str_replace($specialChars[$i], '\\'.$specialChars[$i], $arg);
         }
+
         return $arg = str_replace(' ', '\s', $arg);
     }
-    
+
     /**
      * {@inheritdoc}
      */
     public function __toString()
     {
-        return "\\".$this->raw;
+        return '\\'.$this->raw;
     }
-    
+
     /**
      * {@inheritdoc}
      */
     public function jsonSerialize()
     {
-        return ['comparisonString'=>$this->raw];
+        return ['comparisonString' => $this->raw];
     }
-    
+
     /**
-     * Access object like an associative array
+     * Access object like an associative array.
      *
      * @api
      *
@@ -121,9 +119,9 @@ class ComparisonString implements ComparisonStringInterface, \JsonSerializable, 
                 return false;
         }
     }
-    
+
     /**
-     * Access object like an associative array
+     * Access object like an associative array.
      *
      * @api
      *
@@ -142,9 +140,9 @@ class ComparisonString implements ComparisonStringInterface, \JsonSerializable, 
                 throw new \UnexpectedValueException("Offset $offset does not exist.");
         }
     }
-    
+
     /**
-     * Access object like an associative array
+     * Access object like an associative array.
      *
      * @api
      *
@@ -154,9 +152,9 @@ class ComparisonString implements ComparisonStringInterface, \JsonSerializable, 
     {
         throw new \UnexpectedValueException("Offset $offset cannot be set.");
     }
-    
+
     /**
-     * Access object like an associative array
+     * Access object like an associative array.
      *
      * @param string $offset
      */
