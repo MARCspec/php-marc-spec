@@ -4,7 +4,6 @@
  * from within a MARC record.
  *
  * @author Carsten Klee <mailme.klee@yahoo.de>
- * @package CK\MARCspec
  * @copyright For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,11 +12,10 @@ namespace CK\MARCspec;
 use CK\MARCspec\Exception\InvalidMARCspecException;
 
 /**
-* A MARCspec fieldspec class
-*/
+ * A MARCspec fieldspec class.
+ */
 class Field extends PositionOrRange implements FieldInterface, \JsonSerializable, \ArrayAccess
 {
-
     /**
      * @var string field tag
      */
@@ -56,26 +54,25 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
     /**
      * @var array subSpec
      */
-    private $subSpecs = array();
-
+    private $subSpecs = [];
 
     /**
-    * {@inheritdoc}
-    *
-    * @throws InvalidMARCspecException
-    */
+     * {@inheritdoc}
+     *
+     * @throws InvalidMARCspecException
+     */
     public function __construct($fieldspec = null)
     {
         if (is_null($fieldspec)) {
             return;
         }
-        
+
         $this->checkIfString($fieldspec);
-        
+
         $spec = trim($fieldspec);
-        
+
         $specLength = strlen($fieldspec);
-        
+
         // check string length
         if (3 > $specLength) {
             throw new InvalidMARCspecException(
@@ -98,11 +95,11 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
                 $fieldspec
             );
         }
-        
+
         $parser = new MARCspecParser();
-        
+
         $parser->fieldToArray($fieldspec);
-        
+
         if (array_key_exists('subfields', $parser->parsed)) {
             throw new InvalidMARCspecException(
                 InvalidMARCspecException::FS.
@@ -110,31 +107,30 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
                 $fieldspec
             );
         }
-       
+
         $this->setTag($parser->field['tag']);
-        
+
         if (array_key_exists('index', $parser->field)) {
             $_pos = MARCspec::validatePos($parser->field['index']);
-            
+
             $this->setIndexStartEnd($_pos[0], $_pos[1]);
         } else {
             // as of MARCspec 3.2.2 spec without index is always an abbreviation
-            $this->setIndexStartEnd(0, "#");
+            $this->setIndexStartEnd(0, '#');
         }
-        
+
         if (array_key_exists('indicators', $parser->field)) {
             $this->setIndicators($parser->field['indicators']);
         } elseif (array_key_exists('charpos', $parser->field)) {
             $_chars = MARCspec::validatePos($parser->field['charpos']);
-            
+
             $this->setCharStartEnd($_chars[0], $_chars[1]);
         }
     }
 
     /**
-    *
-    * {@inheritdoc}
-    */
+     * {@inheritdoc}
+     */
     public function setTag($arg)
     {
         if ($this->validateTag($arg)) {
@@ -143,20 +139,16 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
     }
 
     /**
-    *
-    * {@inheritdoc}
-    *
-    */
+     * {@inheritdoc}
+     */
     public function getTag()
     {
         return $this->tag;
     }
 
-
     /**
-    *
-    * {@inheritdoc}
-    */
+     * {@inheritdoc}
+     */
     public function setIndicators($arg)
     {
         $this->checkIfString($arg);
@@ -177,9 +169,8 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
     }
 
     /**
-    *
-    * {@inheritdoc}
-    */
+     * {@inheritdoc}
+     */
     public function setIndicator1($arg)
     {
         if ($this->validateIndicators($arg)) {
@@ -188,18 +179,16 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
     }
 
     /**
-    *
-    * {@inheritdoc}
-    */
+     * {@inheritdoc}
+     */
     public function getIndicator1()
     {
         return (isset($this->indicator1)) ? $this->indicator1 : null;
     }
 
     /**
-    *
-    * {@inheritdoc}
-    */
+     * {@inheritdoc}
+     */
     public function setIndicator2($arg)
     {
         if ($this->validateIndicators($arg)) {
@@ -208,28 +197,24 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
     }
 
     /**
-    *
-    * {@inheritdoc}
-    */
+     * {@inheritdoc}
+     */
     public function getIndicator2()
     {
         return (isset($this->indicator2)) ? $this->indicator2 : null;
     }
 
-
     /**
-    * validate a field tag
-    *
-    * @internal
-    *
-    * @access private
-    *
-    * @param string $tag The MARC spec as string field tag
-    *
-    * @throws InvalidMARCspecException
-    *
-    * @return true if string is a valid field tag
-    */
+     * validate a field tag.
+     *
+     * @internal
+     *
+     * @param string $tag The MARC spec as string field tag
+     *
+     * @throws InvalidMARCspecException
+     *
+     * @return true if string is a valid field tag
+     */
     private function validateTag($tag)
     {
         if (!preg_match('/[.0-9a-z]{3,3}|[.0-9A-Z]{3,3}/', $tag)) {
@@ -239,15 +224,14 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
                 $tag
             );
         }
+
         return true;
     }
 
     /**
-     * validate indicators
+     * validate indicators.
      *
      * @internal
-     *
-     * @access private
      *
      * @param string $indicators The MARC spec as string indicators
      *
@@ -265,7 +249,7 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
                 $indicators
             );
         }
-        
+
         if (preg_match('/[^a-z0-9_]/', $indicators)) {
             throw new InvalidMARCspecException(
                 InvalidMARCspecException::FS.
@@ -273,12 +257,13 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
                 $indicators
             );
         }
+
         return true;
     }
+
     /**
-    *
-    * {@inheritdoc}
-    */
+     * {@inheritdoc}
+     */
     public function addSubSpec($SubSpec)
     {
         if ($SubSpec instanceof SubSpecInterface) {
@@ -299,17 +284,16 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
     }
 
     /**
-    *
-    * {@inheritdoc}
-    */
+     * {@inheritdoc}
+     */
     public function getSubSpecs()
     {
         return (0 < count($this->subSpecs)) ? $this->subSpecs : null;
     }
 
     /**
-    * {@inheritdoc}
-    */
+     * {@inheritdoc}
+     */
     public function jsonSerialize()
     {
         $_fieldSpec['tag'] = $this->getTag();
@@ -346,12 +330,12 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
                     foreach ($subSpec as $altSubSpec) {
                         $_fieldSpec['subSpecs'][$key][] = $altSubSpec->jsonSerialize();
                     }
-
                 } else {
                     $_fieldSpec['subSpecs'][$key] = $subSpec->jsonSerialize();
                 }
             }
         }
+
         return $_fieldSpec;
     }
 
@@ -361,42 +345,42 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
     public function getBaseSpec()
     {
         $fieldSpec = $this->getTag();
-        
+
         $indexStart = $this->getIndexStart();
         $indexEnd = $this->getIndexEnd();
 
-        $fieldSpec .= "[".$indexStart;
-       
+        $fieldSpec .= '['.$indexStart;
+
         if ($indexStart !== $indexEnd) {
-            $fieldSpec .= "-".$indexEnd;
+            $fieldSpec .= '-'.$indexEnd;
         }
-        $fieldSpec .= "]";
-        
+        $fieldSpec .= ']';
+
         if (($charStart = $this->getCharStart()) !== null) {
             $charEnd = $this->getCharEnd();
-            if ($charStart === 0 && $charEnd === "#") {
-            // use abbreviation
+            if ($charStart === 0 && $charEnd === '#') {
+                // use abbreviation
             } else {
-                $fieldSpec .= "/".$charStart;
+                $fieldSpec .= '/'.$charStart;
                 if ($charEnd !== $charStart) {
-                    $fieldSpec .= "-".$charEnd;
+                    $fieldSpec .= '-'.$charEnd;
                 }
             }
         }
-        
-        $indicator1 = ($this->getIndicator1() !== null) ? $this->indicator1 : "_";
-        $indicator2 = ($this->getIndicator2() !== null) ? $this->indicator2 : "_";
+
+        $indicator1 = ($this->getIndicator1() !== null) ? $this->indicator1 : '_';
+        $indicator2 = ($this->getIndicator2() !== null) ? $this->indicator2 : '_';
         $indicators = $indicator1.$indicator2;
-        if ($indicators != "__") {
-            $fieldSpec .= "_".$indicators;
+        if ($indicators != '__') {
+            $fieldSpec .= '_'.$indicators;
         }
-        
+
         return $fieldSpec;
     }
 
     /**
-    * {@inheritdoc}
-    */
+     * {@inheritdoc}
+     */
     public function __toString()
     {
         $fieldSpec = $this->getBaseSpec();
@@ -413,16 +397,17 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
                 }
             }
         }
+
         return $fieldSpec;
     }
 
     /**
-     * Access object like an associative array
+     * Access object like an associative array.
      *
      * @api
      *
      * @param string $offset Key indexStart|indexEnd|charStart|charEnd|charLength
-     * |indicator1|indicator2|subSpecs
+     *                       |indicator1|indicator2|subSpecs
      */
     public function offsetExists($offset)
     {
@@ -463,12 +448,12 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
     }
 
     /**
-     * Access object like an associative array
+     * Access object like an associative array.
      *
      * @api
      *
      * @param string $offset Key indexStart|indexEnd|charStart|charEnd|charLength
-     * |indicator1|indicator2|subSpecs
+     *                       |indicator1|indicator2|subSpecs
      */
     public function offsetGet($offset)
     {
@@ -509,12 +494,12 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
     }
 
     /**
-     * Access object like an associative array
+     * Access object like an associative array.
      *
      * @api
      *
      * @param string $offset Key indexStart|indexEnd|charStart|charEnd|charLength
-     * |indicator1|indicator2|subSpecs
+     *                       |indicator1|indicator2|subSpecs
      */
     public function offsetSet($offset, $value)
     {
@@ -522,7 +507,7 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
             case 'tag':
                 $this->setTag($value);
                 break;
-            
+
             case 'indexStart':
                 $this->setIndexStartEnd($value);
                 break;
@@ -536,7 +521,7 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
                 break;
 
             case 'indexLength':
-                throw new \UnexpectedValueException("indexLength is always calculated.");
+                throw new \UnexpectedValueException('indexLength is always calculated.');
             break;
 
             case 'charStart':
@@ -552,7 +537,7 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
                 break;
 
             case 'charLength':
-                throw new \UnexpectedValueException("CharLength is always calculated.");
+                throw new \UnexpectedValueException('CharLength is always calculated.');
             break;
 
             case 'indicator1':
@@ -573,7 +558,7 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
     }
 
     /**
-     * Access object like an associative array
+     * Access object like an associative array.
      */
     public function offsetUnset($offset)
     {

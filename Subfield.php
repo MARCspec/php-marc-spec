@@ -4,7 +4,6 @@
  * from within a MARC record.
  *
  * @author Carsten Klee <mailme.klee@yahoo.de>
- * @package CK\MARCspec
  * @copyright For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,62 +12,59 @@ namespace CK\MARCspec;
 use CK\MARCspec\Exception\InvalidMARCspecException;
 
 /**
-* A MARCspec subfield class
-*/
+ * A MARCspec subfield class.
+ */
 class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerializable, \ArrayAccess, \IteratorAggregate
 {
-
     /**
      * @var string subfield tag
      */
     private $tag;
-    
+
     /**
      * @var int|string indexStart
      */
     protected $indexStart;
-    
+
     /**
      * @var int|string indexEnd
      */
     protected $indexEnd;
-    
+
     /**
      * @var int|string starting position
      */
     protected $charStart;
-    
+
     /**
      * @var int|string ending position
      */
     protected $charEnd;
-    
+
     /**
      * @var array subSpec
      */
     private $subSpecs = [];
 
     /**
-    *
-    * {@inheritdoc}
-    *
-    * @throws \InvalidArgumentException
-    * @throws InvalidMARCspecException
-    *
-    */
+     * {@inheritdoc}
+     *
+     * @throws \InvalidArgumentException
+     * @throws InvalidMARCspecException
+     */
     public function __construct($subfieldspec = null)
     {
         if (is_null($subfieldspec)) {
             return;
         }
-        
+
         if (!is_string($subfieldspec)) {
-            throw new \InvalidArgumentException("Method only accepts string as argument. " .
-            gettype($subfieldspec)." given.");
+            throw new \InvalidArgumentException('Method only accepts string as argument. '.
+            gettype($subfieldspec).' given.');
         }
-        
+
         $argLength = strlen($subfieldspec);
-        
+
         if (0 === $argLength) {
             throw new InvalidMARCspecException(
                 InvalidMARCspecException::SF.
@@ -76,12 +72,12 @@ class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerial
                 $subfieldspec
             );
         }
-        
+
         if (1 == $argLength) {
-            $subfieldspec = "$".$subfieldspec;
+            $subfieldspec = '$'.$subfieldspec;
         }
 
-        if (1<$argLength) {
+        if (1 < $argLength) {
             if ('-' == $subfieldspec[1]) { // assuming subfield range
                 throw new InvalidMARCspecException(
                     InvalidMARCspecException::SF.
@@ -90,7 +86,7 @@ class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerial
                 );
             }
         }
-        
+
         if (preg_match('/\{.*\}$/', $subfieldspec)) {
             throw new InvalidMARCspecException(
                 InvalidMARCspecException::SF.
@@ -98,33 +94,32 @@ class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerial
                 $subfieldspec
             );
         }
-        
+
         $parser = new MARCspecParser();
-        
+
         $subfield = $parser->subfieldToArray($subfieldspec);
-        
+
         $this->setTag($subfield['subfieldtag']);
-        
+
         if (array_key_exists('index', $subfield)) {
             $_pos = MARCspec::validatePos($subfield['index']);
-            
+
             $this->setIndexStartEnd($_pos[0], $_pos[1]);
         } else {
             // as of MARCspec 3.2.2 spec without index is always an abbreviation
-            $this->setIndexStartEnd(0, "#");
+            $this->setIndexStartEnd(0, '#');
         }
-        
+
         if (array_key_exists('charpos', $subfield)) {
             $_chars = MARCspec::validatePos($subfield['charpos']);
-            
+
             $this->setCharStartEnd($_chars[0], $_chars[1]);
         }
     }
-    
 
     /**
-    * {@inheritdoc}
-    */
+     * {@inheritdoc}
+     */
     public function setTag($arg)
     {
         if (!preg_match('/^[\!-\?\[-\{\}-~]$/', $arg)) {
@@ -138,17 +133,16 @@ class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerial
     }
 
     /**
-    * {@inheritdoc}
-    */
+     * {@inheritdoc}
+     */
     public function getTag()
     {
         return (isset($this->tag)) ? $this->tag : null;
     }
-    
+
     /**
-    *
-    * {@inheritdoc}
-    */
+     * {@inheritdoc}
+     */
     public function addSubSpec($SubSpec)
     {
         if ($SubSpec instanceof SubSpecInterface) {
@@ -167,40 +161,39 @@ class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerial
                 .gettype($subSpec).'".');
         }
     }
-    
+
     /**
-    *
-    * {@inheritdoc}
-    */
+     * {@inheritdoc}
+     */
     public function getSubSpecs()
     {
         return (0 < count($this->subSpecs)) ? $this->subSpecs : null;
     }
-    
+
     /**
      * {@inheritdoc}
      */
     public function jsonSerialize()
     {
         $_subfieldSpec['tag'] = $this->getTag();
-        
-        $_subfieldSpec['indexStart'] =  $this->getIndexStart();
-        
+
+        $_subfieldSpec['indexStart'] = $this->getIndexStart();
+
         $_subfieldSpec['indexEnd'] = $this->getIndexEnd();
-        
+
         if (($indexLength = $this->getIndexLength()) !== null) {
             $_subfieldSpec['indexLength'] = $indexLength;
         }
-        
+
         if (($charStart = $this->getCharStart()) !== null) {
             $_subfieldSpec['charStart'] = $charStart;
             $_subfieldSpec['charEnd'] = $this->getCharEnd();
         }
-        
+
         if (($charLength = $this->getCharLength()) !== null) {
             $_subfieldSpec['charLength'] = $charLength;
         }
-        
+
         if (($subSpecs = $this->getSubSpecs()) !== null) {
             $_subfieldSpec['subSpecs'] = [];
             foreach ($subSpecs as $key => $subSpec) {
@@ -208,15 +201,15 @@ class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerial
                     foreach ($subSpec as $altSubSpec) {
                         $_subfieldSpec['subSpecs'][$key][] = $altSubSpec->jsonSerialize();
                     }
-                    
                 } else {
                     $_subfieldSpec['subSpecs'][$key] = $subSpec->jsonSerialize();
                 }
             }
         }
+
         return $_subfieldSpec;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -226,24 +219,25 @@ class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerial
         $indexStart = $this->getIndexStart();
         $indexEnd = $this->getIndexEnd();
 
-        $subfieldSpec .= "[".$indexStart;
-        
+        $subfieldSpec .= '['.$indexStart;
+
         if ($indexStart !== $indexEnd) {
-            $subfieldSpec .= "-".$indexEnd;
+            $subfieldSpec .= '-'.$indexEnd;
         }
-        $subfieldSpec .= "]";
-        
+        $subfieldSpec .= ']';
+
         if (($charStart = $this->getCharStart()) !== null) {
             $charEnd = $this->getCharEnd();
-            if ($charStart === 0 && $charEnd === "#") {
-            // use abbreviation
+            if ($charStart === 0 && $charEnd === '#') {
+                // use abbreviation
             } else {
-                $subfieldSpec .= "/".$charStart;
+                $subfieldSpec .= '/'.$charStart;
                 if ($charEnd !== $charStart) {
-                    $subfieldSpec .= "-".$charEnd;
+                    $subfieldSpec .= '-'.$charEnd;
                 }
             }
         }
+
         return $subfieldSpec;
     }
 
@@ -253,7 +247,7 @@ class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerial
     public function __toString()
     {
         $subfieldSpec = $this->getBaseSpec();
-        
+
         if (($subSpecs = $this->getSubSpecs()) !== null) {
             foreach ($subSpecs as $subSpec) {
                 if (is_array($subSpec)) {
@@ -266,12 +260,12 @@ class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerial
                 }
             }
         }
+
         return $subfieldSpec;
     }
-    
-    
+
     /**
-     * Access object like an associative array
+     * Access object like an associative array.
      *
      * @api
      *
@@ -308,9 +302,9 @@ class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerial
                 return false;
         }
     }
-    
+
     /**
-     * Access object like an associative array
+     * Access object like an associative array.
      *
      * @api
      *
@@ -344,12 +338,12 @@ class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerial
                 return $this->getSubSpecs();
             break;
             default:
-                return null;
+                return;
         }
     }
-    
+
     /**
-     * Access object like an associative array
+     * Access object like an associative array.
      *
      * @api
      *
@@ -361,11 +355,11 @@ class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerial
             case 'tag':
                 $this->setTag($value);
                 break;
-            
+
             case 'indexStart':
                 $this->setIndexStartEnd($value);
                 break;
-            
+
             case 'indexEnd':
                 if (!isset($this['indexStart'])) {
                     $this->setIndexStartEnd($value, $value);
@@ -373,11 +367,11 @@ class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerial
                     $this->setIndexStartEnd($this['indexStart'], $value);
                 }
                 break;
-            
+
             case 'indexLength':
-                throw new \UnexpectedValueException("indexLength is always calculated.");
+                throw new \UnexpectedValueException('indexLength is always calculated.');
             break;
-            
+
             case 'charStart':
                 $this->setCharStartEnd($value);
                 break;
@@ -391,7 +385,7 @@ class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerial
                 break;
 
             case 'charLength':
-                throw new \UnexpectedValueException("CharLength is always calculated.");
+                throw new \UnexpectedValueException('CharLength is always calculated.');
             break;
 
             case 'subSpecs':
@@ -402,20 +396,21 @@ class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerial
                 throw new \UnexpectedValueException("Offset $offset cannot be set.");
         }
     }
-    
+
     /**
-     * Access object like an associative array
+     * Access object like an associative array.
      */
     public function offsetUnset($offset)
     {
         throw new \BadMethodCallException("Offset $offset can not be unset.");
     }
-    
+
     public function getIterator()
     {
         foreach ($this as $key => $value) {
             $_[$key] = $value;
         }
+
         return new SpecIterator($_);
     }
 } // EOC
