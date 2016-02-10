@@ -12,6 +12,10 @@ use CK\MARCspec\Field;
 use CK\MARCspec\MARCspec;
 use CK\MARCspec\SubSpec;
 
+/**
+* @covers CK\MARCspec\Field
+* @covers CK\MARCspec\PositionOrRange
+*/ 
 class FieldTest extends \PHPUnit_Framework_TestCase
 {
     protected $validTests = [];
@@ -129,8 +133,6 @@ class FieldTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
-     * @covers CK\MARCspec\Field::validateTag
-     * @covers CK\MARCspec\Field::offsetSet
      */
     public function testInvalidFieldSpec114()
     {
@@ -144,7 +146,6 @@ class FieldTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
-     * @covers CK\MARCspec\Field::validateIndicators
      */
     public function testInvalidFieldSpec30()
     {
@@ -182,10 +183,6 @@ class FieldTest extends \PHPUnit_Framework_TestCase
     {
         $this->fieldspec('245_10_');
     }
-
-    /**
-     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
-     }*/
 
     /**
      * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
@@ -299,11 +296,7 @@ class FieldTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('1', $fieldSpec->getindicator2());
     }
 
-    /**
-     * @covers CK\MARCspec\Field::offsetSet
-     * @covers CK\MARCspec\Field::offsetExists
-     * @covers CK\MARCspec\Field::addSubSpec
-     */
+
     public function testValidFieldSpec24()
     {
         $fieldSpec = $this->fieldspec(null);

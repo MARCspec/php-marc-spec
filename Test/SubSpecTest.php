@@ -13,6 +13,9 @@ use CK\MARCspec\MARCspec;
 use CK\MARCspec\Subfield;
 use CK\MARCspec\SubSpec;
 
+/**
+ * @covers CK\MARCspec\SubSpec
+ */ 
 class SubSpecTest extends \PHPUnit_Framework_TestCase
 {
     public function subspec($arg1, $arg2, $arg3)

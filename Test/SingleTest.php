@@ -11,9 +11,6 @@ namespace CK\MARCspec\Test;
 use CK\MARCspec\Field;
 use CK\MARCspec\MARCspec;
 
-#use CK\MARCspec\Subfield;
-#use CK\MARCspec\SubSpec;
-
 class SingleTest extends \PHPUnit_Framework_TestCase
 {
     public function marcspec($arg)

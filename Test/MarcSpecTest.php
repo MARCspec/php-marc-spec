@@ -11,9 +11,12 @@ namespace CK\MARCspec\Test;
 use CK\MARCspec\Field;
 use CK\MARCspec\MARCspec;
 
-#use CK\MARCspec\Subfield;
-#use CK\MARCspec\SubSpec;
-
+/**
+ * @covers CK\MARCspec\MARCspec
+ * @covers CK\MARCspec\MARCspecParser
+ * @covers CK\MARCspec\SpecIterator
+ * @covers CK\MARCspec\Exception\InvalidMARCspecException
+ */ 
 class MarcSpecTest extends \PHPUnit_Framework_TestCase
 {
     protected $validTests = [];
@@ -195,16 +198,7 @@ class MarcSpecTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('d', $ms['a'][0]['subSpecs'][0][1]['rightSubTerm']['subfields'][0]['tag']);
     }
 
-    /**
-     * @covers CK\MARCspec\Subfield::getIterator
-     * @covers CK\MARCspec\SubSpec::getIterator
-     * @covers CK\MARCspec\SpecIterator::__construct
-     * @covers CK\MARCspec\SpecIterator::rewind
-     * @covers CK\MARCspec\SpecIterator::valid
-     * @covers CK\MARCspec\SpecIterator::current
-     * @covers CK\MARCspec\SpecIterator::next
-     * @covers CK\MARCspec\SpecIterator::key
-     */
+
     public function testIteration()
     {
         $ms = $this->marcspec('245$a-c{$b|$c}{$e}');
@@ -238,10 +232,7 @@ class MarcSpecTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    /**
-     * @covers CK\MARCspec\Field::offsetExists
-     * @covers CK\MARCspec\Subfield::offsetExists
-     */
+
     public function testOffsets()
     {
         $ms = $this->marcspec('LDR/0-3');
@@ -260,12 +251,7 @@ class MarcSpecTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($ms['a'][0]->offsetExists('charLength'));
     }
 
-    /**
-     * @covers CK\MARCspec\Field::jsonSerialize
-     * @covers CK\MARCspec\Subfield::jsonSerialize
-     * @covers CK\MARCspec\SubSpec::jsonSerialize
-     * @covers CK\MARCspec\ComparisonString::jsonSerialize
-     */
+
     public function testJsonSerialize()
     {
         $ms = $this->marcspec('...[0-3]_01{$a|$b!=$c}$a{300/1-3=\abc}{245$a!~\test}');
@@ -275,12 +261,7 @@ class MarcSpecTest extends \PHPUnit_Framework_TestCase
         $this->assertsame($encode, $test);
     }
 
-    /**
-     * @covers CK\MARCspec\Field::__toString
-     * @covers CK\MARCspec\Subfield::__toString
-     * @covers CK\MARCspec\SubSpec::__toString
-     * @covers CK\MARCspec\ComparisonString::__toString
-     */
+
     public function testToString()
     {
         $ms = $this->marcspec('...[0-3]_01{$a|$b!=$c}$a{300/1-3=\abc}{245$a!~\test}');
