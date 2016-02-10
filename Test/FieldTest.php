@@ -296,7 +296,6 @@ class FieldTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('1', $fieldSpec->getindicator2());
     }
 
-
     public function testValidFieldSpec24()
     {
         $fieldSpec = $this->fieldspec(null);
