@@ -13,9 +13,9 @@ use CK\MARCspec\MARCspec;
 use CK\MARCspec\SubSpec;
 
 /**
-* @covers CK\MARCspec\Field
-* @covers CK\MARCspec\PositionOrRange
-*/ 
+ * @covers CK\MARCspec\Field
+ * @covers CK\MARCspec\PositionOrRange
+ */
 class FieldTest extends \PHPUnit_Framework_TestCase
 {
     protected $validTests = [];

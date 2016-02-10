@@ -370,7 +370,6 @@ class MARCspecParser
         $this->CHARPOS = '\/(?<charpos>'.$this->POSITIONORRANGE.')';
         $this->INDICATORS = '_(?<indicators>(?:[_a-z0-9][_a-z0-9]{0,1}))';
         $this->SUBSPECS = '(?<subspecs>(?:\{.+?(?<!(?<!(\$|\\\))(\$|\\\))\})*)';
-        #$this->SF_SUBSPECS = '(?<subspecs>(?:\{.+?\})*)';
         $this->SUBFIELDS = '(?<subfields>\$.+)?';
         $this->FIELD = '(?<field>(?:'.$this->FIELDTAG.$this->INDEX.'(?:'.$this->CHARPOS.'|'.$this->INDICATORS.')?'.$this->SUBSPECS.$this->SUBFIELDS.'))';
         $this->SUBFIELDTAGRANGE = '(?<subfieldtagrange>(?:[0-9a-z]\-[0-9a-z]))';

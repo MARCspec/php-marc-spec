@@ -15,7 +15,7 @@ use CK\MARCspec\SubSpec;
 /**
  * @covers CK\MARCspec\Subfield
  * @covers CK\MARCspec\PositionOrRange
- */ 
+ */
 class SubfieldTest extends \PHPUnit_Framework_TestCase
 {
     protected $validTests = [];

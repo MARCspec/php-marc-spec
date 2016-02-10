@@ -16,7 +16,7 @@ use CK\MARCspec\MARCspec;
  * @covers CK\MARCspec\MARCspecParser
  * @covers CK\MARCspec\SpecIterator
  * @covers CK\MARCspec\Exception\InvalidMARCspecException
- */ 
+ */
 class MarcSpecTest extends \PHPUnit_Framework_TestCase
 {
     protected $validTests = [];
@@ -198,7 +198,6 @@ class MarcSpecTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('d', $ms['a'][0]['subSpecs'][0][1]['rightSubTerm']['subfields'][0]['tag']);
     }
 
-
     public function testIteration()
     {
         $ms = $this->marcspec('245$a-c{$b|$c}{$e}');
@@ -232,7 +231,6 @@ class MarcSpecTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-
     public function testOffsets()
     {
         $ms = $this->marcspec('LDR/0-3');
@@ -251,7 +249,6 @@ class MarcSpecTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($ms['a'][0]->offsetExists('charLength'));
     }
 
-
     public function testJsonSerialize()
     {
         $ms = $this->marcspec('...[0-3]_01{$a|$b!=$c}$a{300/1-3=\abc}{245$a!~\test}');
@@ -260,7 +257,6 @@ class MarcSpecTest extends \PHPUnit_Framework_TestCase
 
         $this->assertsame($encode, $test);
     }
-
 
     public function testToString()
     {

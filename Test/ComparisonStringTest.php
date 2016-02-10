@@ -12,7 +12,7 @@ use CK\MARCspec\ComparisonString;
 
 /**
  * @covers CK\MARCspec\ComparisonString
- */ 
+ */
 class ComparisonStringTest extends \PHPUnit_Framework_TestCase
 {
     protected $validTests;
