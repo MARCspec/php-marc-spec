@@ -3,6 +3,7 @@
     "type": "library",
     "description": "PHP based MARCspec parser and validator",
     "keywords": [ "MARCspec", "MARC 21" ],
+    "license": "MIT",
     "authors": [
         {
             "name": "Carsten Klee",
