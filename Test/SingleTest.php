@@ -20,7 +20,6 @@ class SingleTest extends \PHPUnit_Framework_TestCase
 
     public function testSingle()
     {
-        $marcSpec = $this->marcspec('245_1{[1]}');
         $marcSpec = $this->marcspec('245_1$[{[1]}');
         $this->assertSame(1, $marcSpec['subfields'][0]['subSpecs'][0]['rightSubTerm']['subfields'][0]['indexStart']);
         $marcSpec = $this->marcspec('245{/0}');

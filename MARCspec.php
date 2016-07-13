@@ -449,9 +449,12 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess, \I
                         if ($refPos) {
                             if ('$' !== substr($context, $refPos - 1, 1)) {
                                 return new MARCspec(substr($context, 0, $refPos).$subTerm);
+                            } else {
+                                return new MARCspec($context.$subTerm);
+                            
                             }
                         } else {
-                            throw new \RuntimeException('Abbreviated spec cannot resolved since context spec must have an index, which can\'t be found.');
+                            return new MARCspec(substr($context, 0, 3).$subTerm);
                         }
 
                     default:

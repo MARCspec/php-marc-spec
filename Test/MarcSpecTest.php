@@ -261,8 +261,8 @@ class MarcSpecTest extends \PHPUnit_Framework_TestCase
     public function testToString()
     {
         $ms = $this->marcspec('...[0-3]_01{$a|$b!=$c}$a{300/1-3=\abc}{245$a!~\test}');
-        $test = '...[0-3]_01{...[0-3]_01$a[0-#]|...[0-3]_01$b[0-#]!=...[0-3]_01$c[0-#]}$a[0-#]{300[0-#]/1-3=\abc}{245[0-#]$a[0-#]!~\test}';
-        $this->assertsame($ms->__toString(), $test);
+        $test = '...[0-3]_01{...[0-3]_01$a|...[0-3]_01$b!=...[0-3]_01$c}$a{300/1-3=\abc}{245$a!~\test}';
+        $this->assertsame($test, $ms->__toString());
     }
 
     /**

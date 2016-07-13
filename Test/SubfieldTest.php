@@ -353,14 +353,14 @@ class SubfieldTest extends \PHPUnit_Framework_TestCase
     public function testEncode()
     {
         $Subfield = $this->subfieldspec('$a');
-        $this->assertSame('$a[0-#]', "$Subfield");
+        $this->assertSame('$a', "$Subfield");
 
         $Subfield = $this->subfieldspec('$a/1');
-        $this->assertSame('$a[0-#]/1', "$Subfield");
+        $this->assertSame('$a/1', "$Subfield");
         $this->assertSame(1, $Subfield->getCharLength());
 
         $Subfield = $this->subfieldspec('$a/1-3');
-        $this->assertSame('$a[0-#]/1-3', "$Subfield");
+        $this->assertSame('$a/1-3', "$Subfield");
         $this->assertSame(3, $Subfield->getCharLength());
 
         $Subfield = $this->subfieldspec('$a[1]');

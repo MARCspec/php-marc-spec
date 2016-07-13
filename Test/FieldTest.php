@@ -396,23 +396,23 @@ class FieldTest extends \PHPUnit_Framework_TestCase
     public function testEncode()
     {
         $fieldSpec = $this->fieldspec('245');
-        $this->assertSame('245[0-#]', "$fieldSpec");
+        $this->assertSame('245', "$fieldSpec");
 
         $fieldSpec = $this->fieldspec('245_1');
-        $this->assertSame('245[0-#]_1_', "$fieldSpec");
+        $this->assertSame('245_1_', "$fieldSpec");
 
         $fieldSpec = $this->fieldspec('245__0');
-        $this->assertSame('245[0-#]__0', "$fieldSpec");
+        $this->assertSame('245__0', "$fieldSpec");
 
         $fieldSpec = $this->fieldspec('245_1_');
-        $this->assertSame('245[0-#]_1_', "$fieldSpec");
+        $this->assertSame('245_1_', "$fieldSpec");
 
         $fieldSpec = $this->fieldspec('007/1');
-        $this->assertSame('007[0-#]/1', "$fieldSpec");
+        $this->assertSame('007/1', "$fieldSpec");
         $this->assertSame(1, $fieldSpec->getCharLength());
 
         $fieldSpec = $this->fieldspec('007/1-3');
-        $this->assertSame('007[0-#]/1-3', "$fieldSpec");
+        $this->assertSame('007/1-3', "$fieldSpec");
         $this->assertSame(3, $fieldSpec->getCharLength());
 
         $fieldSpec = $this->fieldspec('300[1]');

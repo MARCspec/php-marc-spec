@@ -219,12 +219,15 @@ class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerial
         $indexStart = $this->getIndexStart();
         $indexEnd = $this->getIndexEnd();
 
-        $subfieldSpec .= '['.$indexStart;
-
-        if ($indexStart !== $indexEnd) {
-            $subfieldSpec .= '-'.$indexEnd;
+        if ($indexStart === 0 && $indexEnd === '#') {
+            // use abbreviation
+        } else {
+            $subfieldSpec .= '['.$indexStart;
+            if ($indexStart !== $indexEnd) {
+                $subfieldSpec .= '-'.$indexEnd;
+            }
+            $subfieldSpec .= ']';
         }
-        $subfieldSpec .= ']';
 
         if (($charStart = $this->getCharStart()) !== null) {
             $charEnd = $this->getCharEnd();
@@ -275,6 +278,7 @@ class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerial
     {
         switch ($offset) {
             case 'tag':
+            case 'code':
                 return isset($this->tag);
             break;
             case 'indexStart':
