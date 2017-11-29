@@ -22,6 +22,5 @@
             "CK\\MARCspec\\": "src/",
             "CK\\MARCspec\\Exception\\": "src/Exception/"
         }
-    },
-    "target-dir": "CK/MARCspec"
+    }
 }
