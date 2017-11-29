@@ -26,39 +26,39 @@ use CK\MARCspec;
 // parse and access MARCspec like an array
 $fixed = new MARCspec('007[0]/1-8{/0=\a}');
 
-$fixed['field'];                                                   // CK/MARCspec/FieldInterface
+$fixed['field'];                                                   // CK\MARCspec\FieldInterface
 echo $fixed['field']['tag'];                                       // '007'
 echo $fixed['field']['charStart'];                                 // 1
 echo $fixed['field']['charEnd'];                                   // 8
 echo $fixed['field']['charLength'];                                // 8
-$fixed['field']['subSpecs'][0]['leftSubTerm'];                     // CK/MARCspec/MARCspecInterface
+$fixed['field']['subSpecs'][0]['leftSubTerm'];                     // CK\MARCspec\MARCspecInterface
 echo $fixed['field']['subSpecs'][0]['leftSubTerm'];                // '007[0]/0'
 echo $fixed['field']['subSpecs'][0]['operator'];                   // '='
-$fixed['field']['subSpecs'][0]['rightSubTerm'];                    // CK/MARCspec/ComparisonStringInterface
+$fixed['field']['subSpecs'][0]['rightSubTerm'];                    // CK\MARCspec\ComparisonStringInterface
 echo $fixed['field']['subSpecs'][0]['rightSubTerm'];               // '\a'
 echo $fixed['field']['subSpecs'][0]['rightSubTerm']['comparable']; // 'a'
-$fixed;                                                            // CK/MARCspec/MARCspecInterface
+$fixed;                                                            // CK\MARCspec\MARCspecInterface
 echo $fixed;                                                       // '007[0]/1-8{007[0]/0=\a}'
 
 $variable = new MARCspec('245^1');
 
 echo $variable['field']['tag'];          // '245'
-echo $variable['indicator'];             // CK/MARCspec/IndicatorInterface
+echo $variable['indicator'];             // CK\MARCspec\IndicatorInterface
 echo $variable['indicator']['position']; // '1'
-$variable;                               // CK/MARCspec/MARCspecInterface
+$variable;                               // CK\MARCspec\MARCspecInterface
 echo $variable;                          // '245[0-#]^1'
 
 $complex = new MARCspec('020$a{$q[0]~\pbk}{$c/0=\€|$c/0=\$}');
 
 echo $complex['field']['tag'];        // '020'
 $complex['subfields'];                // Array
-$complex['subfields'][0]['tag'];      // CK/MARCspec/SubfieldInterface
+$complex['subfields'][0]['tag'];      // CK\MARCspec\SubfieldInterface
 echo $complex['subfields'][0]['tag']; // 'a'
 
-$complex['a'][0]['subSpecs'][0]['leftSubTerm'];                     // CK/MARCspec/MARCspecInterface
+$complex['a'][0]['subSpecs'][0]['leftSubTerm'];                     // CK\MARCspec\MARCspecInterface
 echo $complex['a'][0]['subSpecs'][0]['leftSubTerm'];                // '020[0-#]$q[0]'
 echo $complex['a'][0]['subSpecs'][0]['operator'];                   // '~'
-$complex['a'][0]['subSpecs'][0]['rightSubTerm'];                    // CK/MARCspec/ComparisonStringInterface
+$complex['a'][0]['subSpecs'][0]['rightSubTerm'];                    // CK\MARCspec\ComparisonStringInterface
 echo $complex['a'][0]['subSpecs'][0]['rightSubTerm']['comparable']; // 'pbk'
 
 echo $complex['a'][0]['subSpecs'][1][0]['leftSubTerm'];                       // '020[0-#]$c[0-#]/0'

@@ -11,18 +11,39 @@ use CK\MARCspec\MARCspec;
 use CK\MARCspec\Field;
 use CK\MARCspec\SubSpec;
 use CK\MARCspec\Exception\InvalidMARCspecException;
+use PHPUnit\Framework\TestCase;
 
-class FieldTest extends \PHPUnit_Framework_TestCase
+class FieldTest extends TestCase
 {
     
-    protected $validTests = [];
-    protected $invalidTests = [];
-    
-    protected function setUp()
+    /**
+     * @dataProvider invalidFromTestSuiteProvider
+     * 
+     * @expectedException Exception
+     */
+    public function testInvalidFromTestSuite($test)
     {
-        if(0 < count($this->validTests)) return;
-        $this->validTests[] = json_decode(file_get_contents(__DIR__. '/../' ."vendor/ck/marcspec-test-suite/valid/validFieldTag.json"));
-        $this->invalidTests[] = json_decode(file_get_contents(__DIR__. '/../' ."vendor/ck/marcspec-test-suite/invalid/invalidFieldTag.json"));
+        new Field($test);
+    }
+
+    public function invalidFromTestSuiteProvider()
+    {
+        $invalidTests = json_decode(file_get_contents(__DIR__. '/../' ."vendor/ck/marcspec-test-suite/invalid/invalidFieldTag.json"));
+        $data = [];
+        foreach($invalidTests->{'tests'} as $test)
+        {
+            $data[0][] = $test->{'data'};
+        }
+        return $data;
+    }
+    
+    public function testValidFromTestSuite()
+    {
+        $validTests = json_decode(file_get_contents(__DIR__. '/../' ."vendor/ck/marcspec-test-suite/valid/validFieldTag.json"));
+        foreach($validTests->{'tests'} as $test)
+        {
+            $this->assertInstanceOf('CK\MARCspec\FieldInterface', new Field($test->{'data'}));
+        }
     }
     
     public function fieldspec($arg)
@@ -392,35 +413,5 @@ class FieldTest extends \PHPUnit_Framework_TestCase
     {
         $fieldSpec =  $this->fieldspec('245');
         unset($fieldSpec['tag']);
-    }
-    
-    public function testInvalidFromTestSuite()
-    {
-        foreach($this->invalidTests as $invalid)
-        {
-            foreach($invalid->{'tests'} as $test)
-            {
-                try
-                {
-                    new Field($test->{'data'});
-                }
-                catch(\Exception $e)
-                {
-                    continue;
-                }
-                $this->fail('An expected exception has not been raised for '.$test->{'data'});
-            }
-        }
-    }
-    
-    public function testValidFromTestSuite()
-    {
-        foreach($this->validTests as $valid)
-        {
-            foreach($valid->{'tests'} as $test)
-            {
-                new Field($test->{'data'});
-            }
-        }
     }
 }

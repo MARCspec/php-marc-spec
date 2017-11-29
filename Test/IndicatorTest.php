@@ -11,55 +11,48 @@ use CK\MARCspec\Indicator;
 use CK\MARCspec\Exception\InvalidMARCspecException;
 use CK\MARCspec\MARCspec;
 use CK\MARCspec\SubSpec;
+use PHPUnit\Framework\TestCase;
 
 
-class IndicatorTest extends \PHPUnit_Framework_TestCase
+class IndicatorTest extends TestCase
 {
-    protected $validTests = [];
-    protected $invalidTests = [];
-    
-    protected function setUp()
-    {
-        if(0 < count($this->validTests)) return;
-        $this->validTests[] = json_decode(file_get_contents(__DIR__. '/../' ."vendor/ck/marcspec-test-suite/valid/validIndicators.json"));
-        $this->invalidTests[] = json_decode(file_get_contents(__DIR__. '/../' ."vendor/ck/marcspec-test-suite/invalid/invalidIndicators.json"));
-    }
 
-    public function indicatorPos($arg)
+    protected function indicatorPos($arg)
     {
         $ind = new Indicator($arg);
         return $ind->getPos();
     }
 
-    public function testInvalidFromTestSuite()
+    /**
+     * @dataProvider invalidFromTestSuiteProvider
+     * 
+     * @expectedException Exception
+     */
+    public function testInvalidFromTestSuite($test)
     {
-        foreach($this->invalidTests as $invalid)
+        new Indicator($test);
+        
+    }
+
+    public function invalidFromTestSuiteProvider()
+    {
+        $invalidTests = json_decode(file_get_contents(__DIR__. '/../' ."vendor/ck/marcspec-test-suite/invalid/invalidIndicators.json"));
+        $data = [];
+        foreach($invalidTests->{'tests'} as $test)
         {
-            foreach($invalid->{'tests'} as $test)
-            {
-                try
-                {
-                    $this->indicatorPos($test->{'data'});
-                }
-                catch(\Exception $e)
-                {
-                    continue;
-                }
-                $this->fail('An expected exception has not been raised for '.$test->{'data'});
-            }
+            $data[0][] = $test->{'data'};
         }
+        return $data;
     }
     
 
     public function testValidFromTestSuite()
     {
-        foreach($this->validTests as $valid)
+        $validTests = json_decode(file_get_contents(__DIR__. '/../' ."vendor/ck/marcspec-test-suite/valid/validIndicators.json"));
+        foreach($validTests->{'tests'} as $test)
         {
-            foreach($valid->{'tests'} as $test)
-            {
-                $pos = $this->indicatorPos($test->{'data'});
-                $this->assertTrue($pos === "1" or $pos === "2");
-            }
+            $pos = $this->indicatorPos($test->{'data'});
+            $this->assertTrue($pos === "1" or $pos === "2");
         }
     }
 
@@ -68,12 +61,6 @@ class IndicatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testPosFail(){
         $ind = new Indicator('3');
-    }
-    /**
-     * @expectedException ArgumentCountError
-     */
-    public function testPosFail2(){
-        $ind = new Indicator();
     }
 
     public function testSetPos(){
@@ -123,7 +110,7 @@ class IndicatorTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($ind->offsetExists('subSpecs'));
     }
 
-        /**
+    /**
      * @covers CK\MARCspec\Indicator::jsonSerialize
      */
     public function testJson()

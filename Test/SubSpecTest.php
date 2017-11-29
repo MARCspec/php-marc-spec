@@ -12,15 +12,16 @@ use CK\MARCspec\SubSpec;
 use CK\MARCspec\Field;
 use CK\MARCspec\Subfield;
 use CK\MARCspec\Exception\InvalidMARCspecException;
+use PHPUnit\Framework\TestCase;
 
-class SubSpecTest extends \PHPUnit_Framework_TestCase
+class SubSpecTest extends TestCase
 {
     
-    public function subspec($arg1,$arg2,$arg3)
+    protected function subspec($arg1,$arg2,$arg3)
     {
         return new SubSpec($arg1,$arg2,$arg3);
     }    
-    public function marcspec($arg)
+    protected function marcspec($arg)
     {
         return new MARCspec($arg);
     }

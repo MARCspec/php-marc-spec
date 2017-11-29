@@ -24,6 +24,9 @@ bootstrap="Test/autoload.php"
             </exclude>
         </whitelist>
     </filter>
+    <php>
+        <ini name="error_reporting" value="-1" />
+    </php>
     <logging>
         <log type="coverage-text" target="php://stdout" showUncoveredFiles="true" />
         <log type="coverage-clover" target="build/logs/clover.xml"/>

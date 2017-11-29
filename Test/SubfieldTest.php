@@ -11,17 +11,38 @@ use CK\MARCspec\Subfield;
 use CK\MARCspec\SubSpec;
 use CK\MARCspec\MARCspec;
 use CK\MARCspec\Exception\InvalidMARCspecException;
+use PHPUnit\Framework\TestCase;
 
-class SubfieldTest extends \PHPUnit_Framework_TestCase
+class SubfieldTest extends TestCase
 {
-    protected $validTests = [];
-    protected $invalidTests = [];
-    
-    protected function setUp()
+    /**
+     * @dataProvider invalidFromTestSuiteProvider
+     * 
+     * @expectedException Exception
+     */
+    public function testInvalidFromTestSuite($test)
     {
-        if(0 < count($this->validTests)) return;
-        $this->validTests[] = json_decode(file_get_contents(__DIR__. '/../' ."vendor/ck/marcspec-test-suite/valid/validSubfieldTag.json"));
-        $this->invalidTests[] = json_decode(file_get_contents(__DIR__. '/../' ."vendor/ck/marcspec-test-suite/invalid/invalidSubfieldTag.json"));
+        new Subfield($test);
+    }
+
+    public function invalidFromTestSuiteProvider()
+    {
+        $invalidTests = json_decode(file_get_contents(__DIR__. '/../' ."vendor/ck/marcspec-test-suite/invalid/invalidSubfieldTag.json"));
+        $data = [];
+        foreach($invalidTests->{'tests'} as $test)
+        {
+            $data[0][] = $test->{'data'};
+        }
+        return $data;
+    }
+    
+    public function testValidFromTestSuite()
+    {
+        $validTests = json_decode(file_get_contents(__DIR__. '/../' ."vendor/ck/marcspec-test-suite/valid/validSubfieldTag.json"));
+        foreach($validTests->{'tests'} as $test)
+        {
+            $this->assertInstanceOf('CK\MARCspec\SubfieldInterface', new Subfield($test->{'data'}));
+        }
     }
     
     public function subfieldspec($arg)
@@ -367,42 +388,5 @@ class SubfieldTest extends \PHPUnit_Framework_TestCase
     {
         $Subfield = $this->subfieldspec('$a');
         unset($Subfield['tag']);
-    }
-    
-    public function testInvalidFromTestSuite()
-    {
-        foreach($this->invalidTests as $invalid)
-        {
-            foreach($invalid->{'tests'} as $test)
-            {
-                try
-                {
-                    new Subfield($test->{'data'});
-                }
-                catch(\Exception $e)
-                {
-                    continue;
-                }
-                $this->fail('An expected exception has not been raised for '.$test->{'data'});
-            }
-        }
-    }
-    
-    public function testValidFromTestSuite()
-    {
-        foreach($this->validTests as $valid)
-        {
-            foreach($valid->{'tests'} as $test)
-            {
-                try
-                {
-                    new Subfield($test->{'data'});
-                }
-                catch(\Exception $e)
-                {
-                    $this->fail('An unexpected exception has been raised for '.$test->{'data'}.': '.$e->getMessage());
-                }
-            }
-        }
     }
 }

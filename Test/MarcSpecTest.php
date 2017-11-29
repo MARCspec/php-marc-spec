@@ -10,36 +10,44 @@ namespace CK\MARCspec\Test;
 use CK\MARCspec\MARCspec;
 use CK\MARCspec\Field;
 use CK\MARCspec\Exception\InvalidMARCspecException;
+use PHPUnit\Framework\TestCase;
 
-class MARCspecTest extends \PHPUnit_Framework_TestCase
+class MARCspecTest extends TestCase
 {
-    protected $validTests = [];
-    protected $invalidTests = [];
-    
-    protected function setUp()
+    /**
+     * @dataProvider invalidFromTestSuiteProvider
+     * 
+     * @expectedException Exception
+     */
+    public function testInvalidFromTestSuite($test)
     {
-        if(0 < count($this->validTests)) return;
-        $valid = [];
-        $invalid = [];
-        $a = ['valid','invalid'];
-        array_walk($a, 
-            function($v,$k) use (&$valid,&$invalid)
-            {
-                foreach (glob(__DIR__. '/../' .'vendor/ck/marcspec-test-suite/'.$v.'/wildCombination_*.json') as $filename)
-                {
-                    if('valid' == $v)
-                    {
-                        $valid[] = json_decode(file_get_contents($filename));
-                    }
-                    else
-                    {
-                        $invalid[] = json_decode(file_get_contents($filename));
-                    }
-                }
-            }
-        );
-         $this->validTests = $valid;
-         $this->invalidTests = $invalid;
+        new MARCspec($test);
+    }
+
+    public function invalidFromTestSuiteProvider()
+    {
+        foreach (glob(__DIR__. '/../' .'vendor/ck/marcspec-test-suite/invalid/wildCombination_*.json') as $filename)
+        {
+            $invalidTests = json_decode(file_get_contents($filename));
+        }
+        $data = [];
+        foreach($invalidTests->{'tests'} as $test)
+        {
+            $data[0][] = $test->{'data'};
+        }
+        return $data;
+    }
+    
+    public function testValidFromTestSuite()
+    {
+        foreach (glob(__DIR__. '/../' .'vendor/ck/marcspec-test-suite/valid/wildCombination_*.json') as $filename)
+        {
+            $validTests = json_decode(file_get_contents($filename));
+        }
+        foreach($validTests->{'tests'} as $test)
+        {
+            $this->assertInstanceOf('CK\MARCspec\MARCspecInterface', new MARCspec($test->{'data'}));
+        }
     }
     
     public function marcspec($arg)
@@ -308,43 +316,5 @@ class MARCspecTest extends \PHPUnit_Framework_TestCase
     {
         $ms =  $this->marcspec('245');
         unset($ms['field']);
-    }
-    
-    public function testInvalidFromTestSuite()
-    {
-        foreach($this->invalidTests as $invalid)
-        {
-            foreach($invalid->{'tests'} as $test)
-            {
-                try
-                {
-                    new MARCspec($test->{'data'});
-                }
-                catch(\Exception $e)
-                {
-                    continue;
-                }
-                $this->fail('An expected exception has not been raised for '.$test->{'data'});
-            }
-        }
-    }
-    
-    public function testValidFromTestSuite()
-    {
-        foreach($this->validTests as $valid)
-        {
-            foreach($valid->{'tests'} as $test)
-            {
-                try
-                {
-                    new MARCspec($test->{'data'});
-                    
-                }
-                catch(\Exception $e)
-                {
-                    $this->fail('An unexpected exception has been raised for '.$test->{'data'}.' ('.$test->{'description'}.'): '.$e->getMessage());
-                }
-            }
-        }
     }
 }
