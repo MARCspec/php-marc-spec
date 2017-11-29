@@ -24,9 +24,12 @@ class InvalidMARCspecException extends \UnexpectedValueException {
     const PR           = 'PositionOrRange. ';
     const CS           = 'ComparisonString. ';
     const SS           = 'Subspec. ';
+    const IN           = 'Indicator. ';
     const RANGE        = 'Only ranges between "a-z", "A-Z" or "0-9" allowed.';
     const BRACKET      = 'Unequal count of opening and closing brackets';
     const SPACE        = 'Whitespace detected.';
+    const SFEX         = 'Unable to add spec. A subfield spec already exists.';
+    const CSEX         = 'Unable to add spec. A character postion already exists.';
     const MISSINGFIELD = 'Cannot detect fieldspec.';
     const MISSINGRIGHT = 'Right hand subTerm is missing.';
     const MINIMUM2     = 'Spec must be at least two characters long.';
@@ -37,6 +40,7 @@ class InvalidMARCspecException extends \UnexpectedValueException {
     const PREFIX       = 'Missing prefixed character "$".';
     const ESCAPE       = 'Unescaped character detected';
     const DETECTEDSF   = 'Detected Subfield. Use method MARCspec::addSubfields to add subfields.';
+    const DETECTEDIN   = 'Detected indicator postion. Use CK\MARCspec\Indicator to create a new indicator reference.';
     const DETECTEDSS   = 'Detected Subspec. Use method addSubSpec to add subspecs.';
     const MULTISF      = 'Detected more than one subfieldspecs. Use method addSubfields to add more than one subfield.';
     const INDEX        = 'Invalid index detected.';
@@ -57,12 +61,14 @@ class InvalidMARCspecException extends \UnexpectedValueException {
     const PR8          = 'Assuming index or character position or range. Ending index must be a higher number (or equal) than starting index.';
     const MISSINGTAG   = 'Unexpected empty subfield tag';
     const SFCHAR       = 'For subfields only digits, lowercase alphabetic characters or one of "!"#$%&\'()*+,-./0-9:;<=>?[\]^_`a-z{}~" are allowed.';
-    const SFRANGE      = 'Assuming subfield range. Use CK\MARCspec::addSubfields() to add multiple subfields via a subfield range.';
+    const INPOS        = 'For indicator position, only digit "1" or "2" is allowed.';
+    const SFRANGE      = 'Assuming subfield range. Use CK\MARCspec\MARCspec::addSubfields() to add multiple subfields via a subfield range.';
     const MISSINGSLASH = 'Assuming subfield character position or range. Missing "/" delimiter';
     const OPERATOR     = 'Operator must be one of "=" / "!=" / "~" / "!~" / "!" / "?".';
     const HINTESCAPED  = 'Hint: Check for unescaped characters.';
-    const CHARORIND    = 'Either characterSpec or indicators are allowed.';
-    const CHARANDSF    = 'Either characterSpec for field or subfields are allowed.';
+    const CHARORIND    = 'Either characterSpec or indicatorSpec is allowed.';
+    const CHARORSF     = 'Either characterSpec for field or subfields are allowed.';
+    const INDORSF      = 'Either subfields or indicatorSpec is allowed.';
     
     public function __construct($message, $context = null)
     {

@@ -10,8 +10,6 @@ namespace CK\MARCspec\Test;
 use CK\MARCspec\MARCspec;
 use CK\MARCspec\Field;
 use CK\MARCspec\Exception\InvalidMARCspecException;
-#use CK\MARCspec\Subfield;
-#use CK\MARCspec\SubSpec;
 
 class MARCspecTest extends \PHPUnit_Framework_TestCase
 {
@@ -134,7 +132,7 @@ class MARCspecTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidMarcSpec5()
     {
-        $ms = $this->marcspec('245[0]{$a!=$b|300_01$a!~\abc}{\!\=!=\!}$a{$c|!$d}');
+        $ms = $this->marcspec('245[0]{$a!=$b|300^1!~\1}{\!\=!=\!}');
         
         // field
         $this->assertSame('245',$ms['field']['tag']);
@@ -156,13 +154,11 @@ class MARCspecTest extends \PHPUnit_Framework_TestCase
         
         // subspec 01
         $this->assertSame('300',$ms['field']['subSpecs'][0][1]['leftSubTerm']['field']['tag']);
-        $this->assertSame('a',$ms['field']['subSpecs'][0][1]['leftSubTerm']['subfields'][0]['tag']);
-        $this->assertSame('0',$ms['field']['subSpecs'][0][1]['leftSubTerm']['field']['indicator1']);
-        $this->assertSame('1',$ms['field']['subSpecs'][0][1]['leftSubTerm']['field']['indicator2']);
+        $this->assertSame('1',$ms['field']['subSpecs'][0][1]['leftSubTerm']['indicator']['position']);
         
         $this->assertSame('!~',$ms['field']['subSpecs'][0][1]['operator']);
         
-        $this->assertSame('abc',$ms['field']['subSpecs'][0][1]['rightSubTerm']['comparable']);
+        $this->assertSame('1',$ms['field']['subSpecs'][0][1]['rightSubTerm']['comparable']);
         
         // subspec 1
         $this->assertSame('!=',$ms['field']['subSpecs'][1]['leftSubTerm']['comparable']);
@@ -172,6 +168,7 @@ class MARCspecTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('!',$ms['field']['subSpecs'][1]['rightSubTerm']['comparable']);
 
         // subfields
+        $ms = $this->marcspec('245[0]$a{$c|!$d}');
         $this->assertSame('a',$ms['subfields'][0]['tag']);
         
         // subfield subspec 00
@@ -212,13 +209,14 @@ class MARCspecTest extends \PHPUnit_Framework_TestCase
     public function testIteration()
     {
         $ms = $this->marcspec('245$a-c{$b|$c}{$e}');
+
         $count = 0;
 
         foreach($ms as $key => $value)
         {
             $count++;
         }
-        $this->assertSame(2, $count);
+        $this->assertSame(3, $count);
         
         $count = 0;
         foreach($ms['subfields'] as $key => $value)
@@ -283,9 +281,9 @@ class MARCspecTest extends \PHPUnit_Framework_TestCase
     */
     public function testJsonSerialize()
     {
-        $ms = $this->marcspec('...[0-3]_01{$a|$b!=$c}$a{300/1-3=\abc}{245$a!~\test}');
+        $ms = $this->marcspec('...[0-3]^1{$a|$b!=$c}');
         $encode = json_encode($ms);
-        $test = '{"field":{"tag":"...","indexStart":0,"indexEnd":3,"indexLength":4,"indicator1":"0","indicator2":"1","subSpecs":[[{"leftSubTerm":{"field":{"tag":"...","indexStart":0,"indexEnd":3,"indexLength":4,"indicator1":"0","indicator2":"1"}},"operator":"?","rightSubTerm":{"field":{"tag":"...","indexStart":0,"indexEnd":3,"indexLength":4,"indicator1":"0","indicator2":"1"},"subfields":[{"tag":"a","indexStart":0,"indexEnd":"#"}]}},{"leftSubTerm":{"field":{"tag":"...","indexStart":0,"indexEnd":3,"indexLength":4,"indicator1":"0","indicator2":"1"},"subfields":[{"tag":"b","indexStart":0,"indexEnd":"#"}]},"operator":"!=","rightSubTerm":{"field":{"tag":"...","indexStart":0,"indexEnd":3,"indexLength":4,"indicator1":"0","indicator2":"1"},"subfields":[{"tag":"c","indexStart":0,"indexEnd":"#"}]}}]]},"subfields":[{"tag":"a","indexStart":0,"indexEnd":"#","subSpecs":[{"leftSubTerm":{"field":{"tag":"300","indexStart":0,"indexEnd":"#","charStart":1,"charEnd":3,"charLength":3}},"operator":"=","rightSubTerm":{"comparisonString":"abc"}},{"leftSubTerm":{"field":{"tag":"245","indexStart":0,"indexEnd":"#"},"subfields":[{"tag":"a","indexStart":0,"indexEnd":"#"}]},"operator":"!~","rightSubTerm":{"comparisonString":"test"}}]}]}';
+        $test = '{"field":{"tag":"...","indexStart":0,"indexEnd":3,"indexLength":4},"indicator":{"position":"1","subSpecs":[[{"leftSubTerm":{"field":{"tag":"...","indexStart":0,"indexEnd":3,"indexLength":4}},"operator":"?","rightSubTerm":{"field":{"tag":"...","indexStart":0,"indexEnd":3,"indexLength":4},"subfields":[{"tag":"a","indexStart":0,"indexEnd":"#"}]}},{"leftSubTerm":{"field":{"tag":"...","indexStart":0,"indexEnd":3,"indexLength":4},"subfields":[{"tag":"b","indexStart":0,"indexEnd":"#"}]},"operator":"!=","rightSubTerm":{"field":{"tag":"...","indexStart":0,"indexEnd":3,"indexLength":4},"subfields":[{"tag":"c","indexStart":0,"indexEnd":"#"}]}}]]}}';
         
         $this->assertsame($encode,$test);
     }
@@ -298,8 +296,8 @@ class MARCspecTest extends \PHPUnit_Framework_TestCase
      */
     public function testToString()
     {
-        $ms = $this->marcspec('...[0-3]_01{$a|$b!=$c}$a{300/1-3=\abc}{245$a!~\test}');
-        $test = '...[0-3]_01{...[0-3]_01$a[0-#]|...[0-3]_01$b[0-#]!=...[0-3]_01$c[0-#]}$a[0-#]{300[0-#]/1-3=\abc}{245[0-#]$a[0-#]!~\test}';
+        $ms = $this->marcspec('...[0-3]$a{300/1-3=\abc}{245$a!~\test}');
+        $test = '...[0-3]$a[0-#]{300[0-#]/1-3=\abc}{245[0-#]$a[0-#]!~\test}';
         $this->assertsame($ms->__toString(),$test);
     }
     
@@ -340,10 +338,11 @@ class MARCspecTest extends \PHPUnit_Framework_TestCase
                 try
                 {
                     new MARCspec($test->{'data'});
+                    
                 }
                 catch(\Exception $e)
                 {
-                    $this->fail('An unexpected exception has been raised for '.$test->{'data'}.': '.$e->getMessage());
+                    $this->fail('An unexpected exception has been raised for '.$test->{'data'}.' ('.$test->{'description'}.'): '.$e->getMessage());
                 }
             }
         }

@@ -23,8 +23,6 @@ interface PositionOrRangeInterface
     *
     * @api
     * 
-    * @access public
-    * 
     * @param int|string $start The index starting position
     * @param int|string|null $end The index ending position
     */
@@ -35,8 +33,6 @@ interface PositionOrRangeInterface
     * Set the field index starting and ending position via length
     *
     * @api
-    * 
-    * @access public
     *
     * @param int|string $start The index starting position
     * @param int $length The length count
@@ -49,9 +45,7 @@ interface PositionOrRangeInterface
     *
     * @api
     * 
-    * @access public
-    * 
-    * @return int|string $indexStart The field index starting position
+    * @return int|string The field index starting position
     */
     public function getIndexStart();
 
@@ -61,9 +55,7 @@ interface PositionOrRangeInterface
     *
     * @api
     * 
-    * @access public
-    * 
-    * @return int|string $indexEnd The field index ending position
+    * @return int|string The field index ending position
     */
     public function getIndexEnd();
 
@@ -72,8 +64,6 @@ interface PositionOrRangeInterface
     * Set character starting and ending position
     *
     * @api
-    * 
-    * @access public
     * 
     * @param int|string $start The character starting position
     * @param int|string|null $end The character ending position
@@ -87,8 +77,6 @@ interface PositionOrRangeInterface
     * 
     * @api
     * 
-    * @access public
-    * 
     * @param int|string $start The character starting position
     * @param int $length The character length count
     *
@@ -101,9 +89,7 @@ interface PositionOrRangeInterface
     *
     * @api
     * 
-    * @access public
-    * 
-    * @return int|string $charStart The character starting position 
+    * @return int|string The character starting position 
     */
     public function getCharStart();
 
@@ -114,9 +100,7 @@ interface PositionOrRangeInterface
     *
     * @api
     * 
-    * @access public
-    * 
-    * @return int|string $charEnd The character ending position 
+    * @return int|string The character ending position 
     */
     public function getCharEnd();
 
@@ -126,11 +110,7 @@ interface PositionOrRangeInterface
     *
     * @api
     * 
-    * @access public
-    * 
-    * @return null|int $length The character length
-    * 
-    * @throws \InvalidArgumentException if length is less than 1
+    * @return null|int The character length
     */
     public function getCharLength();
     
@@ -140,11 +120,7 @@ interface PositionOrRangeInterface
     *
     * @api
     * 
-    * @access public
-    * 
-    * @return null|int $length The index range length
-    * 
-    * @throws \InvalidArgumentException if length is less than 1
+    * @return null|int The index range length
     */
     public function getIndexLength();
 } // EOI

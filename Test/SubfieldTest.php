@@ -178,8 +178,7 @@ class SubfieldTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidSubfieldSpec01()
     {
-        $Subfield = $this->subfieldspec(null);
-        $Subfield->setTag('a');
+        $Subfield = $this->subfieldspec('a');
         $this->assertSame('a', $Subfield->getTag());
         $Subspec = new SubSpec(new MARCspec('245$b'),'!=',new MARCspec('245$c'));
         $Subfield->addSubSpec($Subspec);
