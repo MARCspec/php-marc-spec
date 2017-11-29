@@ -18,7 +18,10 @@
          "ck/marcspec-test-suite": "@dev"
     },
     "autoload": {
-        "classmap": ["src/", "src/Exception/"]
+        "psr-4": {
+            "CK\\MARCspec\\": "src/",
+            "CK\\MARCspec\\Exception\\": "src/Exception/"
+        }
     },
     "target-dir": "CK/MARCspec"
 }

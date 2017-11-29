@@ -295,6 +295,22 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess, \I
      */
     public function addSubfields($subfields)
     {
+        if(!is_null($this->getIndicator())){
+            throw new InvalidMARCspecException(
+                InvalidMARCspecException::MS.
+                InvalidMARCspecException::INEX,
+                $this->__toString()
+            );
+        }
+
+        if(!is_null($this->field->getCharStart())){
+            throw new InvalidMARCspecException(
+                InvalidMARCspecException::MS.
+                InvalidMARCspecException::CSEX,
+                $this->__toString()
+            );
+        }
+
         if($subfields instanceof SubfieldInterface)
         {
             $this->subfields[] = $subfields;

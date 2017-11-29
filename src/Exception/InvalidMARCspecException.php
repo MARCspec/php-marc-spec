@@ -30,6 +30,7 @@ class InvalidMARCspecException extends \UnexpectedValueException {
     const SPACE        = 'Whitespace detected.';
     const SFEX         = 'Unable to add spec. A subfield spec already exists.';
     const CSEX         = 'Unable to add spec. A character postion already exists.';
+    const INEX         = 'Unable to add spec. An indicator already exists.';
     const MISSINGFIELD = 'Cannot detect fieldspec.';
     const MISSINGRIGHT = 'Right hand subTerm is missing.';
     const MINIMUM2     = 'Spec must be at least two characters long.';
