@@ -9,14 +9,13 @@
 namespace CK\MARCspec\Test;
 
 use CK\MARCspec\ComparisonString;
-use CK\MARCspec\Exception\InvalidMARCspecException;
 use PHPUnit\Framework\TestCase;
 
 class ComparisonStringTest extends TestCase
 {
     /**
      * @dataProvider invalidFromTestSuiteProvider
-     * 
+     *
      * @expectedException Exception
      */
     public function testInvalidFromTestSuite($test)
@@ -26,22 +25,21 @@ class ComparisonStringTest extends TestCase
 
     public function invalidFromTestSuiteProvider()
     {
-        $invalidTests = json_decode(file_get_contents(__DIR__. '/../' ."vendor/ck/marcspec-test-suite/invalid/invalidComparisonString.json"));
+        $invalidTests = json_decode(file_get_contents(__DIR__.'/../'.'vendor/ck/marcspec-test-suite/invalid/invalidComparisonString.json'));
         $data = [];
-        foreach($invalidTests->{'tests'} as $test)
-        {
+        foreach ($invalidTests->{'tests'} as $test) {
             $data[0][] = $test->{'data'};
         }
+
         return $data;
     }
-    
+
     public function testValidFromTestSuite()
     {
-        $validTests = json_decode(file_get_contents(__DIR__. '/../' ."vendor/ck/marcspec-test-suite/valid/validComparisonString.json"));
-        foreach($validTests->{'tests'} as $test)
-        {
+        $validTests = json_decode(file_get_contents(__DIR__.'/../'.'vendor/ck/marcspec-test-suite/valid/validComparisonString.json'));
+        foreach ($validTests->{'tests'} as $test) {
             new ComparisonString($test->{'data'});
-            $this->assertSame(1,preg_match('/'.$validTests->{'schema'}->{'pattern'}.'/',$test->{'data'}));
+            $this->assertSame(1, preg_match('/'.$validTests->{'schema'}->{'pattern'}.'/', $test->{'data'}));
         }
     }
 
@@ -100,7 +98,7 @@ class ComparisonStringTest extends TestCase
         $this->assertSame('this\sis\sa\sTest\s\\\{\}\!\=\~\?', $compare->getRaw());
         $this->assertSame('this is a Test \{}!=~?', $compare->getComparable());
     }
-    
+
     /**
      * @expectedException BadMethodCallException
      */

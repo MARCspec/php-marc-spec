@@ -10,14 +10,13 @@ namespace CK\MARCspec\Test;
 
 use CK\MARCspec\Field;
 use CK\MARCspec\MARCspec;
-use CK\MARCspec\Exception\InvalidMARCspecException;
 use PHPUnit\Framework\TestCase;
 
-class MARCspecTest extends TestCase
+class MarcSpecTest extends TestCase
 {
     /**
      * @dataProvider invalidFromTestSuiteProvider
-     * 
+     *
      * @expectedException Exception
      */
     public function testInvalidFromTestSuite($test)
@@ -27,26 +26,23 @@ class MARCspecTest extends TestCase
 
     public function invalidFromTestSuiteProvider()
     {
-        foreach (glob(__DIR__. '/../' .'vendor/ck/marcspec-test-suite/invalid/wildCombination_*.json') as $filename)
-        {
+        foreach (glob(__DIR__.'/../'.'vendor/ck/marcspec-test-suite/invalid/wildCombination_*.json') as $filename) {
             $invalidTests = json_decode(file_get_contents($filename));
         }
         $data = [];
-        foreach($invalidTests->{'tests'} as $test)
-        {
+        foreach ($invalidTests->{'tests'} as $test) {
             $data[0][] = $test->{'data'};
         }
+
         return $data;
     }
-    
+
     public function testValidFromTestSuite()
     {
-        foreach (glob(__DIR__. '/../' .'vendor/ck/marcspec-test-suite/valid/wildCombination_*.json') as $filename)
-        {
+        foreach (glob(__DIR__.'/../'.'vendor/ck/marcspec-test-suite/valid/wildCombination_*.json') as $filename) {
             $validTests = json_decode(file_get_contents($filename));
         }
-        foreach($validTests->{'tests'} as $test)
-        {
+        foreach ($validTests->{'tests'} as $test) {
             $this->assertInstanceOf('CK\MARCspec\MARCspecInterface', new MARCspec($test->{'data'}));
         }
     }
@@ -60,65 +56,65 @@ class MARCspecTest extends TestCase
     * invalid data types
     ***/
 
-     /**
-      * @expectedException RuntimeException
-      */
-     public function testInvalidArgument01Decode()
-     {
-         $this->marcspec('24');
-     }
+    /**
+     * @expectedException RuntimeException
+     */
+    public function testInvalidArgument01Decode()
+    {
+        $this->marcspec('24');
+    }
 
-     /**
-      * @expectedException InvalidArgumentException
-      */
-     public function testInvalidArgument1Decode()
-     {
-         $this->marcspec((int) '245$a');
-     }
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testInvalidArgument1Decode()
+    {
+        $this->marcspec((int) '245$a');
+    }
 
-     /**
-      * @expectedException InvalidArgumentException
-      */
-     public function testInvalidArgument2Decode()
-     {
-         $this->marcspec(['245$a']);
-     }
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testInvalidArgument2Decode()
+    {
+        $this->marcspec(['245$a']);
+    }
 
-     /**
-      * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
-      */
-     public function testInvalidArgument3Decode()
-     {
-         $this->marcspec('245/#$a');
-     }
+    /**
+     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
+     */
+    public function testInvalidArgument3Decode()
+    {
+        $this->marcspec('245/#$a');
+    }
 
-     /**
-      * assert same subfields.
-      */
-     public function testValidMarcSpec1()
-     {
-         $marcSpec = $this->marcspec('245$a-c');
-         $this->assertSame(3, count($marcSpec['subfields']));
-     }
+    /**
+     * assert same subfields.
+     */
+    public function testValidMarcSpec1()
+    {
+        $marcSpec = $this->marcspec('245$a-c');
+        $this->assertSame(3, count($marcSpec['subfields']));
+    }
 
-     /**
-      * assert same subfields.
-      */
-     public function testValidMarcSpec2()
-     {
-         $marcSpec = $this->marcspec('245');
-         $marcSpec['subfields'] = '$d-f';
-         $this->assertSame(3, count($marcSpec['subfields']));
-     }
+    /**
+     * assert same subfields.
+     */
+    public function testValidMarcSpec2()
+    {
+        $marcSpec = $this->marcspec('245');
+        $marcSpec['subfields'] = '$d-f';
+        $this->assertSame(3, count($marcSpec['subfields']));
+    }
 
-     /**
-      * assert same specs.
-      */
-     public function testValidMarcSpec4()
-     {
-         $marcSpec = $this->marcspec('...[#]/1-3');
-         $this->assertSame('...[#]/1-3', "$marcSpec");
-     }
+    /**
+     * assert same specs.
+     */
+    public function testValidMarcSpec4()
+    {
+        $marcSpec = $this->marcspec('...[#]/1-3');
+        $this->assertSame('...[#]/1-3', "$marcSpec");
+    }
 
     /**
      * assert same specs.
@@ -142,7 +138,7 @@ class MARCspecTest extends TestCase
     public function testValidMarcSpec5()
     {
         $ms = $this->marcspec('245[0]{$a!=$b|300^1!~\1}{\!\=!=\!}');
-        
+
         // field
         $this->assertSame('245', $ms['field']['tag']);
         $this->assertSame(0, $ms['field']['indexStart']);
@@ -162,13 +158,13 @@ class MARCspecTest extends TestCase
         $this->assertSame('b', $ms['field']['subSpecs'][0][0]['rightSubTerm']['subfields'][0]['tag']);
 
         // subspec 01
-        $this->assertSame('300',$ms['field']['subSpecs'][0][1]['leftSubTerm']['field']['tag']);
-        $this->assertSame('1',$ms['field']['subSpecs'][0][1]['leftSubTerm']['indicator']['position']);
-        
-        $this->assertSame('!~',$ms['field']['subSpecs'][0][1]['operator']);
-        
-        $this->assertSame('1',$ms['field']['subSpecs'][0][1]['rightSubTerm']['comparable']);
-        
+        $this->assertSame('300', $ms['field']['subSpecs'][0][1]['leftSubTerm']['field']['tag']);
+        $this->assertSame('1', $ms['field']['subSpecs'][0][1]['leftSubTerm']['indicator']['position']);
+
+        $this->assertSame('!~', $ms['field']['subSpecs'][0][1]['operator']);
+
+        $this->assertSame('1', $ms['field']['subSpecs'][0][1]['rightSubTerm']['comparable']);
+
         // subspec 1
         $this->assertSame('!=', $ms['field']['subSpecs'][1]['leftSubTerm']['comparable']);
 
@@ -178,8 +174,8 @@ class MARCspecTest extends TestCase
 
         // subfields
         $ms = $this->marcspec('245[0]$a{$c|!$d}');
-        $this->assertSame('a',$ms['subfields'][0]['tag']);
-        
+        $this->assertSame('a', $ms['subfields'][0]['tag']);
+
         // subfield subspec 00
         $this->assertSame('245', $ms['a'][0]['subSpecs'][0][0]['leftSubTerm']['field']['tag']);
         $this->assertSame(0, $ms['a'][0]['subSpecs'][0][0]['leftSubTerm']['field']['indexStart']);
@@ -213,7 +209,7 @@ class MARCspecTest extends TestCase
             $count++;
         }
         $this->assertSame(3, $count);
-        
+
         $count = 0;
         foreach ($ms['subfields'] as $key => $value) {
             $count++;
@@ -260,15 +256,15 @@ class MARCspecTest extends TestCase
         $ms = $this->marcspec('...[0-3]^1{$a|$b!=$c}');
         $encode = json_encode($ms);
         $test = '{"field":{"tag":"...","indexStart":0,"indexEnd":3,"indexLength":4},"indicator":{"position":"1","subSpecs":[[{"leftSubTerm":{"field":{"tag":"...","indexStart":0,"indexEnd":3,"indexLength":4}},"operator":"?","rightSubTerm":{"field":{"tag":"...","indexStart":0,"indexEnd":3,"indexLength":4},"subfields":[{"tag":"a","indexStart":0,"indexEnd":"#"}]}},{"leftSubTerm":{"field":{"tag":"...","indexStart":0,"indexEnd":3,"indexLength":4},"subfields":[{"tag":"b","indexStart":0,"indexEnd":"#"}]},"operator":"!=","rightSubTerm":{"field":{"tag":"...","indexStart":0,"indexEnd":3,"indexLength":4},"subfields":[{"tag":"c","indexStart":0,"indexEnd":"#"}]}}]]}}';
-        
-        $this->assertsame($encode,$test);
+
+        $this->assertsame($encode, $test);
     }
 
     public function testToString()
     {
         $ms = $this->marcspec('...[0-3]$a{300/1-3=\abc}{245$a!~\test}');
         $test = '...[0-3]$a{300/1-3=\abc}{245$a!~\test}';
-        $this->assertsame($ms->__toString(),$test);
+        $this->assertsame($ms->__toString(), $test);
     }
 
     /**

@@ -7,6 +7,7 @@
  * @copyright For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace CK\MARCspec;
 
 use CK\MARCspec\Exception\InvalidMARCspecException;
@@ -47,12 +48,12 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
     private $subSpecs = [];
 
     /**
-    * {@inheritdoc}
-    *
-    * @throws InvalidMARCspecException
-    */
+     * {@inheritdoc}
+     *
+     * @throws InvalidMARCspecException
+     */
     public function __construct($fieldspec)
-    {        
+    {
         $this->checkIfString($fieldspec);
 
         $spec = trim($fieldspec);
@@ -74,8 +75,7 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
                 $fieldspec
             );
         }
-        if($strpos = strpos($fieldspec, '{'))
-        {
+        if ($strpos = strpos($fieldspec, '{')) {
             throw new InvalidMARCspecException(
                 InvalidMARCspecException::FS.
                 InvalidMARCspecException::DETECTEDSS,
@@ -84,11 +84,10 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
         }
 
         $parser = new MARCspecParser();
-        
+
         $parser->parse($fieldspec);
-        
-        if(array_key_exists('subfields',$parser->parsed))
-        {
+
+        if (array_key_exists('subfields', $parser->parsed)) {
             throw new InvalidMARCspecException(
                 InvalidMARCspecException::FS.
                 InvalidMARCspecException::DETECTEDSF,
@@ -96,42 +95,37 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
             );
         }
 
-        if(array_key_exists('indicatorpos',$parser->parsed))
-        {
+        if (array_key_exists('indicatorpos', $parser->parsed)) {
             throw new InvalidMARCspecException(
                 InvalidMARCspecException::FS.
                 InvalidMARCspecException::DETECTEDIN,
                 $fieldspec
             );
         }
-       
-        if($this->validateTag($parser->parsed['tag'])) $this->tag = $parser->parsed['tag'];
-        
-        if(array_key_exists('index',$parser->parsed))
-        {
-            $_pos = MARCspec::validatePos($parser->parsed['index']);
-            
-            $this->setIndexStartEnd($_pos[0],$_pos[1]);
+
+        if ($this->validateTag($parser->parsed['tag'])) {
+            $this->tag = $parser->parsed['tag'];
         }
-        else
-        {
+
+        if (array_key_exists('index', $parser->parsed)) {
+            $_pos = MARCspec::validatePos($parser->parsed['index']);
+
+            $this->setIndexStartEnd($_pos[0], $_pos[1]);
+        } else {
             // as of MARCspec 3.2.2 spec without index is always an abbreviation
             $this->setIndexStartEnd(0, '#');
         }
-        
-        if(array_key_exists('charpos',$parser->parsed))
-        {
+
+        if (array_key_exists('charpos', $parser->parsed)) {
             $_chars = MARCspec::validatePos($parser->parsed['charpos']);
-            
-            $this->setCharStartEnd($_chars[0],$_chars[1]);
+
+            $this->setCharStartEnd($_chars[0], $_chars[1]);
         }
     }
 
     /**
-    *
-    * {@inheritdoc}
-    *
-    */
+     * {@inheritdoc}
+     */
     public function getTag()
     {
         return $this->tag;
@@ -162,9 +156,8 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
     }
 
     /**
-    *
-    * {@inheritdoc}
-    */
+     * {@inheritdoc}
+     */
     public function addSubSpec($SubSpec)
     {
         if ($SubSpec instanceof SubSpecInterface) {
@@ -216,8 +209,7 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
             $_fieldSpec['charLength'] = $charLength;
         }
 
-        if(($subSpecs = $this->getSubSpecs()) !== null)
-        {
+        if (($subSpecs = $this->getSubSpecs()) !== null) {
             $_fieldSpec['subSpecs'] = [];
             foreach ($subSpecs as $key => $subSpec) {
                 if (is_array($subSpec)) {
@@ -264,7 +256,7 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
                 }
             }
         }
-        
+
         return $fieldSpec;
     }
 
