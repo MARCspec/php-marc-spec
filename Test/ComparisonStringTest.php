@@ -9,24 +9,40 @@
 namespace CK\MARCspec\Test;
 
 use CK\MARCspec\ComparisonString;
+use CK\MARCspec\Exception\InvalidMARCspecException;
+use PHPUnit\Framework\TestCase;
 
-/**
- * @covers CK\MARCspec\ComparisonString
- */
-class ComparisonStringTest extends \PHPUnit_Framework_TestCase
+class ComparisonStringTest extends TestCase
 {
-    protected $validTests;
-    protected $invalidTests;
-
-    protected function setUp()
+    /**
+     * @dataProvider invalidFromTestSuiteProvider
+     * 
+     * @expectedException Exception
+     */
+    public function testInvalidFromTestSuite($test)
     {
-        if (0 < count($this->validTests)) {
-            return;
+        new ComparisonString($test);
+    }
+
+    public function invalidFromTestSuiteProvider()
+    {
+        $invalidTests = json_decode(file_get_contents(__DIR__. '/../' ."vendor/ck/marcspec-test-suite/invalid/invalidComparisonString.json"));
+        $data = [];
+        foreach($invalidTests->{'tests'} as $test)
+        {
+            $data[0][] = $test->{'data'};
         }
-        $validTestsJson = file_get_contents(__DIR__.'/../'.'vendor/ck/marcspec-test-suite/valid/validComparisonString.json');
-        $invalidTestsJson = file_get_contents(__DIR__.'/../'.'vendor/ck/marcspec-test-suite/invalid/invalidComparisonString.json');
-        $this->validTests = json_decode($validTestsJson);
-        $this->invalidTests = json_decode($invalidTestsJson);
+        return $data;
+    }
+    
+    public function testValidFromTestSuite()
+    {
+        $validTests = json_decode(file_get_contents(__DIR__. '/../' ."vendor/ck/marcspec-test-suite/valid/validComparisonString.json"));
+        foreach($validTests->{'tests'} as $test)
+        {
+            new ComparisonString($test->{'data'});
+            $this->assertSame(1,preg_match('/'.$validTests->{'schema'}->{'pattern'}.'/',$test->{'data'}));
+        }
     }
 
     public function compare($arg)
@@ -84,27 +100,7 @@ class ComparisonStringTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('this\sis\sa\sTest\s\\\{\}\!\=\~\?', $compare->getRaw());
         $this->assertSame('this is a Test \{}!=~?', $compare->getComparable());
     }
-
-    public function testInvalidFromTestSuite()
-    {
-        foreach ($this->invalidTests->{'tests'} as $test) {
-            try {
-                new ComparisonString($test->{'data'});
-            } catch (\Exception $e) {
-                continue;
-            }
-            $this->fail('An expected exception has not been raised for '.$test->{'data'});
-        }
-    }
-
-    public function testValidFromTestSuite()
-    {
-        foreach ($this->validTests->{'tests'} as $test) {
-            new ComparisonString($test->{'data'});
-            $this->assertSame(1, preg_match('/'.$this->validTests->{'schema'}->{'pattern'}.'/', $test->{'data'}));
-        }
-    }
-
+    
     /**
      * @expectedException BadMethodCallException
      */

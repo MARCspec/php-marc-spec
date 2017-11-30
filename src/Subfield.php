@@ -47,15 +47,20 @@ class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerial
     private $subSpecs = [];
 
     /**
-     * {@inheritdoc}
      *
+     * {@inheritdoc}
+     * 
      * @throws \InvalidArgumentException
      * @throws InvalidMARCspecException
+     * 
      */
-    public function __construct($subfieldspec = null)
-    {
-        if (is_null($subfieldspec)) {
-            return;
+    public function __construct($subfieldspec)
+    {        
+        if(!is_string($subfieldspec))
+        {
+            throw new \InvalidArgumentException("Method only accepts string as argument. " .
+            gettype($subfieldspec)." given."
+            );
         }
 
         if (!is_string($subfieldspec)) {
@@ -99,9 +104,19 @@ class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerial
 
         $subfield = $parser->subfieldToArray($subfieldspec);
 
-        $this->setTag($subfield['subfieldtag']);
+        if(!preg_match('/^[\!-\?\[-\{\}-~]$/', $subfield['subfieldtag']))
+        {
+            throw new InvalidMARCspecException(
+                InvalidMARCspecException::SF.
+                InvalidMARCspecException::SFCHAR,
+                $arg
+            );
+        }
 
-        if (array_key_exists('index', $subfield)) {
+        $this->tag = $subfield['subfieldtag'];
+        
+        if(array_key_exists('index',$subfield))
+        {
             $_pos = MARCspec::validatePos($subfield['index']);
 
             $this->setIndexStartEnd($_pos[0], $_pos[1]);
@@ -120,27 +135,13 @@ class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerial
     /**
      * {@inheritdoc}
      */
-    public function setTag($arg)
-    {
-        if (!preg_match('/^[\!-\?\[-\{\}-~]$/', $arg)) {
-            throw new InvalidMARCspecException(
-                InvalidMARCspecException::SF.
-                InvalidMARCspecException::SFCHAR,
-                $arg
-            );
-        }
-        $this->tag = $arg;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getTag()
     {
         return (isset($this->tag)) ? $this->tag : null;
     }
 
     /**
+     *
      * {@inheritdoc}
      */
     public function addSubSpec($SubSpec)
@@ -163,6 +164,7 @@ class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerial
     }
 
     /**
+     *
      * {@inheritdoc}
      */
     public function getSubSpecs()
@@ -276,10 +278,11 @@ class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerial
      */
     public function offsetExists($offset)
     {
-        switch ($offset) {
-            case 'tag':
+        switch($offset)
+        {
+            
             case 'code':
-                return isset($this->tag);
+            case 'tag': return isset($this->tag);
             break;
             case 'indexStart':
                 return isset($this->indexStart);
@@ -316,9 +319,10 @@ class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerial
      */
     public function offsetGet($offset)
     {
-        switch ($offset) {
-            case 'tag':
-                return $this->getTag();
+        switch($offset)
+        {
+            case 'tag': 
+            case 'code': return $this->getTag();
             break;
             case 'indexStart':
                 return $this->getIndexStart();
@@ -355,15 +359,12 @@ class Subfield extends PositionOrRange implements SubfieldInterface, \JsonSerial
      */
     public function offsetSet($offset, $value)
     {
-        switch ($offset) {
-            case 'tag':
-                $this->setTag($value);
-                break;
-
-            case 'indexStart':
-                $this->setIndexStartEnd($value);
-                break;
-
+        switch($offset)
+        {
+            
+            case 'indexStart': $this->setIndexStartEnd($value);
+            break;
+            
             case 'indexEnd':
                 if (!isset($this['indexStart'])) {
                     $this->setIndexStartEnd($value, $value);

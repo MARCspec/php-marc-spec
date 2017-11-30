@@ -33,9 +33,9 @@ class MARCspecParser
      */
     protected $CHARPOS;
     /**
-     * @var string Regex for indicators
+     * @var string Regex for indicator position
      */
-    protected $INDICATORS;
+    protected $INDICATOR;
     /**
      * @var string Regex for field subspecs
      */
@@ -52,6 +52,10 @@ class MARCspecParser
      * @var string Regex for field
      */
     protected $FIELD;
+    /**
+     * @var string Regex for the MARCspec
+     */
+    protected $MARCSPEC;
     /**
      * @var string Regex for subfield range
      */
@@ -87,113 +91,130 @@ class MARCspecParser
     public $parsed = [];
 
     /**
-     * @var array The parsed fieldspec
-     */
-    public $field = [];
-
-    /**
      * @var array The parsed subfieldspecs
      */
     public $subfields = [];
-
+    
+    /**
+     * @var string The parsed indicator position
+     */
+    public $indicatorpos;
+    
     public function __construct($spec = null)
     {
         $this->setConstants();
-
-        if (is_null($spec)) {
-            return;
-        }
-
-        $this->fieldToArray($spec);
-
-        if (array_key_exists('subfields', $this->parsed)) {
-            $this->subfields = $this->matchSubfields($this->parsed['subfields']);
+        
+        if(is_null($spec)) return;
+        
+        $this->parse($spec);
+        
+        if(array_key_exists('subfields',$this->parsed))
+        {
+            $this->subfields = $this->parseSubfields($this->parsed['subfields']);
         }
     }
 
     /**
-     * parses fieldspecs into array.
-     *
-     * @param string $fieldspec The fieldspec
-     *
-     * @return array An Array of fieldspec
-     */
-    public function fieldToArray($fieldspec)
+     * parses MARCspec 
+     * 
+     * @param string $marcspec The MARCspec
+     * 
+     * @throws CK\MARCspec\Exception\InvalidMARCspecException
+     */ 
+    public function parse($marcspec)
     {
-        $_fieldGroups = ['field', 'tag', 'index', 'charpos', 'indicators', 'subfields'];
-
-        if (!preg_match_all('/'.$this->FIELD.'/', $fieldspec, $_fieldMatches, PREG_SET_ORDER)) {
+        
+        if(!preg_match_all('/'.$this->MARCSPEC.'/',$marcspec,$this->parsed,PREG_SET_ORDER))
+        {
             throw new InvalidMARCspecException(
                 InvalidMARCspecException::FS.
                 InvalidMARCspecException::MISSINGFIELD,
-                $fieldspec
+                $marcspec
             );
         }
 
-        $this->parsed = array_filter($_fieldMatches[0], 'strlen');
+        $this->parsed = array_filter($this->parsed[0],'strlen');
 
         if (!array_key_exists('field', $this->parsed)) { // TODO: check if 'tag' is the required key
             throw new InvalidMARCspecException(
                 InvalidMARCspecException::FS.
                 InvalidMARCspecException::FTAG,
-                $fieldspec
+                $marcspec
             );
         }
-
-        if (strlen($this->parsed['field']) !== strlen($fieldspec)) {
+        
+        if(strlen($this->parsed[0]) !== strlen($marcspec))
+        {
             throw new InvalidMARCspecException(
                 InvalidMARCspecException::FS.
                 InvalidMARCspecException::USELESS,
-                $fieldspec
+                $marcspec
             );
         }
 
-        foreach ($_fieldGroups as $fieldgroup) {
-            if (array_key_exists($fieldgroup, $this->parsed)) {
-                $this->field[$fieldgroup] = $this->parsed[$fieldgroup];
-            }
-        }
-
-        if (array_key_exists('charpos', $this->field)) {
-            if (array_key_exists('indicators', $this->field)) {
+        if(array_key_exists('charpos',$this->parsed))
+        {
+            if(array_key_exists('indicatorpos',$this->parsed))
+            {
                 throw new InvalidMARCspecException(
                     InvalidMARCspecException::FS.
                     InvalidMARCspecException::CHARORIND,
-                    $fieldspec
+                    $marcspec
                 );
             }
-
-            if (array_key_exists('subfields', $this->field)) {
+            
+            if(array_key_exists('subfields',$this->parsed))
+            {
                 throw new InvalidMARCspecException(
                     InvalidMARCspecException::FS.
-                    InvalidMARCspecException::CHARANDSF,
-                    $fieldspec
+                    InvalidMARCspecException::CHARORSF,
+                    $marcspec
                 );
             }
         }
 
-        if (array_key_exists('subspecs', $this->parsed)) {
-            $_fieldSubSpecs = $this->matchSubSpecs($this->parsed['subspecs']);
+        if(array_key_exists('subfields',$this->parsed))
+        {
+            if(array_key_exists('indicatorpos',$this->parsed))
+            {
+                throw new InvalidMARCspecException(
+                    InvalidMARCspecException::FS.
+                    InvalidMARCspecException::INDORSF,
+                    $marcspec
+                );
+            }
+        }
+        
+        if(array_key_exists('subspecs',$this->parsed))
+        {
+            $_subSpecs = $this->matchSubSpecs($this->parsed['subspecs']);
+            
+            $this->parsed['subspecs'] = [];
 
-            foreach ($_fieldSubSpecs as $fieldSubSpec) {
-                if (1 < count($fieldSubSpec)) {
-                    foreach ($fieldSubSpec as $orSubSpec) {
+            foreach($_subSpecs as $subSpec)
+            {
+                if(1 < count($subSpec))
+                {
+                    foreach($subSpec as $orSubSpec)
+                    {
                         $_or[] = $this->matchSubTerms($orSubSpec);
                     }
-                    $this->field['subspecs'][] = $_or; // TODO: Check if array is required since $_or is an array
-                } else {
-                    $this->field['subspecs'][] = $this->matchSubTerms($fieldSubSpec[0]);
+                    $this->parsed['subspecs'][] = $_or; // TODO: Check if array is required since $_or is an array
+                }
+                else
+                {
+                    $this->parsed['subspecs'][] = $this->matchSubTerms($subSpec[0]);
                 }
             }
         }
     }
 
     /**
-     * Matches subfieldspecs.
-     *
-     * @param string $subfieldspec A string of one or more subfieldspecs
-     */
-    public function matchSubfields($subfieldspec)
+    * Matches subfieldspecs
+    * 
+    * @param string $subfieldspec A string of one or more subfieldspecs
+    */ 
+    public function parseSubfields($subfieldspec)
     {
         if (!preg_match_all('/'.$this->SUBFIELD.'/', $subfieldspec, $_subfieldMatches, PREG_SET_ORDER)) {
             throw new InvalidMARCspecException(
@@ -252,15 +273,15 @@ class MARCspecParser
     }
 
     /**
-     * calls matchSubfields but makes sure only one subfield is present.
-     *
-     * @param string $subfieldspec A subfieldspec
-     *
-     * @return array An Array of subfieldspec
-     */
+    * calls parseSubfields but makes sure only one subfield is present 
+    * 
+    * @param string $subfieldspec A subfieldspec
+    * @return array An Array of subfieldspec
+    */ 
     public function subfieldToArray($subfieldspec)
     {
-        if (!$_sf = $this->matchSubfields($subfieldspec)) {
+        if(!$_sf = $this->parseSubfields($subfieldspec))
+        {
             throw new InvalidMARCspecException(
                 InvalidMARCspecException::SF.
                 InvalidMARCspecException::UNKNOWN,
@@ -364,20 +385,24 @@ class MARCspecParser
      */
     private function setConstants()
     {
-        $this->FIELDTAG = '^(?<tag>(?:[a-z0-9\.]{3,3}|[A-Z0-9\.]{3,3}|[0-9\.]{3,3}))?';
-        $this->POSITIONORRANGE = '(?:(?:(?:[0-9]+|#)\-(?:[0-9]+|#))|(?:[0-9]+|#))';
-        $this->INDEX = '(?:\[(?<index>'.$this->POSITIONORRANGE.')\])?';
-        $this->CHARPOS = '\/(?<charpos>'.$this->POSITIONORRANGE.')';
-        $this->INDICATORS = '_(?<indicators>(?:[_a-z0-9][_a-z0-9]{0,1}))';
-        $this->SUBSPECS = '(?<subspecs>(?:\{.+?(?<!(?<!(\$|\\\))(\$|\\\))\})*)';
-        $this->SUBFIELDS = '(?<subfields>\$.+)?';
-        $this->FIELD = '(?<field>(?:'.$this->FIELDTAG.$this->INDEX.'(?:'.$this->CHARPOS.'|'.$this->INDICATORS.')?'.$this->SUBSPECS.$this->SUBFIELDS.'))';
+        $this->FIELDTAG         = '(?<tag>(?:[a-z0-9\.]{3,3}|[A-Z0-9\.]{3,3}|[0-9\.]{3,3}))';
+        $this->POSITIONORRANGE  = '(?:(?:(?:[0-9]+|#)\-(?:[0-9]+|#))|(?:[0-9]+|#))';
+        $this->INDEX            = '(?:\[(?<index>'.$this->POSITIONORRANGE.')\])?';
+        $this->CHARPOS          = '(?:\/(?<charpos>'.$this->POSITIONORRANGE.'))?';
+        $this->INDICATORPOS     = '(?:\^(?<indicatorpos>[12]))?';
+        #$this->INDICATOR        = '(?:\^)(?<indicator>'.$this->INDICATORPOS.')?';
+        $this->SUBSPECS         = '(?<subspecs>(?:\{.+?(?<!(?<!(\$|\\\))(\$|\\\))\})+)?';
+        $this->SUBFIELDS        = '(?<subfields>\$.+)';
+        $this->FIELD            = '(?<field>(?:'.$this->FIELDTAG.$this->INDEX.'))';
+        $this->MARCSPEC         = '^'.$this->FIELD.'(?:'.$this->SUBFIELDS.'|(?:'.$this->INDICATORPOS.'|'.$this->CHARPOS.')'.$this->SUBSPECS.')$';
         $this->SUBFIELDTAGRANGE = '(?<subfieldtagrange>(?:[0-9a-z]\-[0-9a-z]))';
-        $this->SUBFIELDTAG = '(?<subfieldtag>[\!-\?\[-\{\}-~])';
-        $this->SUBFIELD = '(?<subfield>\$(?:'.$this->SUBFIELDTAGRANGE.'|'.$this->SUBFIELDTAG.')'.$this->INDEX.'(?:'.$this->CHARPOS.')?'.$this->SUBSPECS.')';
-        $this->LEFTSUBTERM = '^(?<leftsubterm>(?:\\\(?:(?<=\\\)[\!\=\~\?]|[^\!\=\~\?])+)|(?:(?<=\$)[\!\=\~\?]|[^\!\=\~\?])+)?';
-        $this->OPERATOR = '(?<operator>\!\=|\!\~|\=|\~|\!|\?)';
-        $this->SUBTERMS = '(?:'.$this->LEFTSUBTERM.$this->OPERATOR.')?(?<rightsubterm>.+)$';
-        $this->SUBSPEC = '(?:\{(.+)\})';
+        $this->SUBFIELDTAG      = '(?<subfieldtag>[\!-\?\[-\{\}-~])';
+        $this->SUBFIELD         = '(?<subfield>\$(?:'.$this->SUBFIELDTAGRANGE.'|'.$this->SUBFIELDTAG.')'.$this->INDEX.$this->CHARPOS.$this->SUBSPECS.')';
+        $this->LEFTSUBTERM      = '^(?<leftsubterm>(?:\\\(?:(?<=\\\)[\!\=\~\?]|[^\!\=\~\?])+)|(?:(?<=\$)[\!\=\~\?]|[^\!\=\~\?])+)?';
+        $this->OPERATOR         = '(?<operator>\!\=|\!\~|\=|\~|\!|\?)';
+        $this->SUBTERMS         = '(?:'.$this->LEFTSUBTERM.$this->OPERATOR.')?(?<rightsubterm>.+)$';
+        $this->SUBSPEC          = '(?:\{(.+)\})';
     }
 }
+
+$test = new \CK\MARCspec\MARCspecParser();

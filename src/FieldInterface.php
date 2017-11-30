@@ -20,19 +20,8 @@ interface FieldInterface
      *
      * @param string $fieldspec The field spec
      */
-    public function __construct($fieldspec);
-
-    /**
-     * Set the field tag.
-     *
-     * Provided param gets validated
-     *
-     * @api
-     *
-     * @param string $arg The field tag
-     */
-    public function setTag($arg);
-
+     public function __construct($fieldspec);
+    
     /**
      * Get the field tag.
      *
@@ -41,58 +30,13 @@ interface FieldInterface
      * @return string $fieldTag The field tag
      */
     public function getTag();
-
-    /**
-     * Set indicators.
-     *
-     * @api
-     *
-     * @param string $arg
-     */
-    public function setIndicators($arg);
-
-    /**
-     * Set indicator 1.
-     *
-     * @api
-     *
-     * @param string $arg
-     */
-    public function setIndicator1($arg);
-
-    /**
-     * Get indicator 1.
-     *
-     * @api
-     *
-     * @return null|string $indicator1 The indicator 1
-     */
-    public function getIndicator1();
-
-    /**
-     * Set indicator 2.
-     *
-     * @api
-     *
-     * @param string $arg
-     */
-    public function setIndicator2($arg);
-
-    /**
-     * Get indicator 2.
-     *
-     * @api
-     *
-     * @return null|string $indicator2 The indicator 2
-     */
-    public function getIndicator2();
-
+    
     /**
      * get array of subspecs.
      *
      * @api
-     *
-     * @return null|array
+     * 
+     * @return null|CK\MARCspec\SubSpecInterface[] An array of SubSpecInferace instances
      */
     public function getSubSpecs();
 
@@ -100,9 +44,9 @@ interface FieldInterface
      * add a subspec to the array of subspecs.
      *
      * @api
-     *
-     * @param SubSpecInterface|array[SubSpecInterface]
-     *
+     * 
+     * @param SubSpecInterface|CK\MARCspec\SubSpecInterface[]
+     * 
      * @return null|array
      */
     public function addSubSpec($SubSpec);
