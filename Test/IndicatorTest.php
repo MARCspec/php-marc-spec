@@ -104,7 +104,7 @@ class IndicatorTest extends TestCase
         $ind = new Indicator('1');
         $Subspec = new SubSpec(new MARCspec('245$b'),'!=',new MARCspec('245$c'));
         $ind['subSpecs'] = $Subspec;
-        $this->assertSame('^1{245[0-#]$b[0-#]!=245[0-#]$c[0-#]}',$ind->__toString());
+        $this->assertSame('^1{245$b!=245$c}',$ind->__toString());
         $ind->addSubSpec($Subspec);
         $this->assertTrue($ind->offsetExists('position'));
         $this->assertTrue($ind->offsetExists('subSpecs'));

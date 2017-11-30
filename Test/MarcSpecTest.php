@@ -9,6 +9,7 @@
 namespace CK\MARCspec\Test;
 
 use CK\MARCspec\Field;
+use CK\MARCspec\MARCspec;
 use CK\MARCspec\Exception\InvalidMARCspecException;
 use PHPUnit\Framework\TestCase;
 
@@ -266,7 +267,7 @@ class MARCspecTest extends TestCase
     public function testToString()
     {
         $ms = $this->marcspec('...[0-3]$a{300/1-3=\abc}{245$a!~\test}');
-        $test = '...[0-3]$a[0-#]{300[0-#]/1-3=\abc}{245[0-#]$a[0-#]!~\test}';
+        $test = '...[0-3]$a{300/1-3=\abc}{245$a!~\test}';
         $this->assertsame($ms->__toString(),$test);
     }
 

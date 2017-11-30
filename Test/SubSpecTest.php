@@ -8,8 +8,9 @@
 
 namespace CK\MARCspec\Test;
 
-use CK\MARCspec\Field;
 use CK\MARCspec\MARCspec;
+use CK\MARCspec\SubSpec;
+use CK\MARCspec\Field;
 use CK\MARCspec\Subfield;
 use CK\MARCspec\Exception\InvalidMARCspecException;
 use PHPUnit\Framework\TestCase;
