@@ -4,7 +4,7 @@
 
 PHP *MARCspec* parser and validator.
 
-For currently supported version of **MARCspec - A common MARC record path language** see http://cklee.github.io/marc-spec/marc-spec-e66931e.html .
+For currently supported version of **MARCspec - A common MARC record path language** see http://marcspec.github.io/ .
 
 # Installation
 
