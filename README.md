@@ -46,7 +46,7 @@ echo $variable['field']['tag'];          // '245'
 echo $variable['indicator'];             // CK\MARCspec\IndicatorInterface
 echo $variable['indicator']['position']; // '1'
 $variable;                               // CK\MARCspec\MARCspecInterface
-echo $variable;                          // '245[0-#]^1'
+echo $variable;                          // '245^1'
 
 $complex = new MARCspec('020$a{$q[0]~\pbk}{$c/0=\€|$c/0=\$}');
 
@@ -56,19 +56,19 @@ $complex['subfields'][0]['tag'];      // CK\MARCspec\SubfieldInterface
 echo $complex['subfields'][0]['tag']; // 'a'
 
 $complex['a'][0]['subSpecs'][0]['leftSubTerm'];                     // CK\MARCspec\MARCspecInterface
-echo $complex['a'][0]['subSpecs'][0]['leftSubTerm'];                // '020[0-#]$q[0]'
+echo $complex['a'][0]['subSpecs'][0]['leftSubTerm'];                // '020$q[0]'
 echo $complex['a'][0]['subSpecs'][0]['operator'];                   // '~'
 $complex['a'][0]['subSpecs'][0]['rightSubTerm'];                    // CK\MARCspec\ComparisonStringInterface
 echo $complex['a'][0]['subSpecs'][0]['rightSubTerm']['comparable']; // 'pbk'
 
-echo $complex['a'][0]['subSpecs'][1][0]['leftSubTerm'];                       // '020[0-#]$c[0-#]/0'
+echo $complex['a'][0]['subSpecs'][1][0]['leftSubTerm'];                       // '020$c/0'
 echo $complex['a'][0]['subSpecs'][1][0]['leftSubTerm']['c'][0]['charStart'];  // 0
 echo $complex['a'][0]['subSpecs'][1][0]['leftSubTerm']['c'][0]['charEnd'];    // 0
 echo $complex['a'][0]['subSpecs'][1][0]['leftSubTerm']['c'][0]['charLength']; // 1
 echo $complex['a'][0]['subSpecs'][1][0]['operator'];                          // '='
 echo $complex['a'][0]['subSpecs'][1][0]['rightSubTerm']['comparable'];        // '€'
 
-echo $complex['a'][0]['subSpecs'][1][1]['leftSubTerm'];                       // '020[0-#]$c[0-#]/0'
+echo $complex['a'][0]['subSpecs'][1][1]['leftSubTerm'];                       // '020$c/0'
 echo $complex['a'][0]['subSpecs'][1][1]['leftSubTerm']['c'][0]['charStart'];  // 0
 echo $complex['a'][0]['subSpecs'][1][1]['leftSubTerm']['c'][0]['charEnd'];    // 0
 echo $complex['a'][0]['subSpecs'][1][1]['leftSubTerm']['c'][0]['charLength']; // 1
@@ -100,7 +100,7 @@ $SubSpec = new SubSpec($LeftSubTerm,'=',$RightSubTerm);
 $Subfield['subSpecs'] = $SubSpec;
 
 // whole MARCspec
-echo $MARCspec; // '...[0]$a[0-#]{...[0-#]$a[0-#]/#-#=\,}' 
+echo $MARCspec; // '...[0]$a{...$a/#-#=\,}' 
 ```
 
 # ArrayAccess vs. Methods
