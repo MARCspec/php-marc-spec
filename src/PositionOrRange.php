@@ -1,12 +1,13 @@
 <?php
 /**
-* MARCspec is the specification of a reference, encoded as string, to a set of data
-* from within a MARC record.
-*
-* @author Carsten Klee <mailme.klee@yahoo.de>
-* @copyright For the full copyright and license information, please view the LICENSE
-* file that was distributed with this source code.
-*/
+ * MARCspec is the specification of a reference, encoded as string, to a set of data
+ * from within a MARC record.
+ *
+ * @author Carsten Klee <mailme.klee@yahoo.de>
+ * @copyright For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace CK\MARCspec;
 
 use CK\MARCspec\Exception\InvalidMARCspecException;
@@ -101,12 +102,12 @@ class PositionOrRange implements PositionOrRangeInterface
     }
 
     /**
-     * Calculate the length of charrange or index range
+     * Calculate the length of charrange or index range.
      *
      * @param bool $type True for charrange and false for indexrange
-     * 
+     *
      * @throws CK\MARCspec\Exception\InvalidMARCspecException
-     * 
+     *
      * @return int $length
      */
     private function getLength($type = true)
@@ -152,19 +153,18 @@ class PositionOrRange implements PositionOrRangeInterface
     }
 
     /**
+     * Validate starting and ending position.
      *
-     * Validate starting and ending position
-     * 
      * @internal
-     * 
+     *
      * @param int|string $start The starting position
-     * @param int|string $end The ending position
-     * 
-     * @return null|array $_startEnd index 0 => start, index 1 => end
-     * 
+     * @param int|string $end   The ending position
+     *
      * @throws CK\MARCspec\Exception\InvalidMARCspecException
+     *
+     * @return null|array $_startEnd index 0 => start, index 1 => end
      */
-    private function validateStartEnd($start,$end)
+    private function validateStartEnd($start, $end)
     {
         $_startEnd = [];
 
@@ -208,19 +208,18 @@ class PositionOrRange implements PositionOrRangeInterface
     }
 
     /**
+     * Validate starting position and length.
      *
-     * Validate starting position and length
-     * 
      * @internal
-     * 
-     * @param string $start The starting position
+     *
+     * @param string $start  The starting position
      * @param string $length $length The length count
-     * 
-     * @return array $_startEnd index 0 => start, index 1 => end
-     * 
+     *
      * @throws \UnexpectedValueException
+     *
+     * @return array $_startEnd index 0 => start, index 1 => end
      */
-    private function validateStartLength($start,$length)
+    private function validateStartLength($start, $length)
     {
         $_startEnd = [];
         if (preg_match('/[0-9]/', $start)) {

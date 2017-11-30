@@ -11,15 +11,13 @@ namespace CK\MARCspec\Test;
 use CK\MARCspec\Field;
 use CK\MARCspec\MARCspec;
 use CK\MARCspec\SubSpec;
-use CK\MARCspec\Exception\InvalidMARCspecException;
 use PHPUnit\Framework\TestCase;
 
 class FieldTest extends TestCase
 {
-    
     /**
      * @dataProvider invalidFromTestSuiteProvider
-     * 
+     *
      * @expectedException Exception
      */
     public function testInvalidFromTestSuite($test)
@@ -29,20 +27,19 @@ class FieldTest extends TestCase
 
     public function invalidFromTestSuiteProvider()
     {
-        $invalidTests = json_decode(file_get_contents(__DIR__. '/../' ."vendor/ck/marcspec-test-suite/invalid/invalidFieldTag.json"));
+        $invalidTests = json_decode(file_get_contents(__DIR__.'/../'.'vendor/ck/marcspec-test-suite/invalid/invalidFieldTag.json'));
         $data = [];
-        foreach($invalidTests->{'tests'} as $test)
-        {
+        foreach ($invalidTests->{'tests'} as $test) {
             $data[0][] = $test->{'data'};
         }
+
         return $data;
     }
-    
+
     public function testValidFromTestSuite()
     {
-        $validTests = json_decode(file_get_contents(__DIR__. '/../' ."vendor/ck/marcspec-test-suite/valid/validFieldTag.json"));
-        foreach($validTests->{'tests'} as $test)
-        {
+        $validTests = json_decode(file_get_contents(__DIR__.'/../'.'vendor/ck/marcspec-test-suite/valid/validFieldTag.json'));
+        foreach ($validTests->{'tests'} as $test) {
             $this->assertInstanceOf('CK\MARCspec\FieldInterface', new Field($test->{'data'}));
         }
     }
@@ -161,8 +158,9 @@ class FieldTest extends TestCase
      */
     public function testInvalidFieldSpec31()
     {
-            $this->fieldspec('245^1');
-    }    
+        $this->fieldspec('245^1');
+    }
+
     /**
      * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
@@ -176,9 +174,9 @@ class FieldTest extends TestCase
      */
     public function testInvalidFieldSpec33()
     {
-            $this->fieldspec('245^');
-    }    
-    
+        $this->fieldspec('245^');
+    }
+
     /**
      * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
@@ -261,31 +259,31 @@ class FieldTest extends TestCase
      */
     public function testValidFieldSpec22()
     {
-            $fieldSpec = $this->fieldspec('245/#');
-            $this->assertSame(1, $fieldSpec->getCharLength());
-            $fieldSpec = $this->fieldspec('245/#-#');
-            $this->assertSame(1, $fieldSpec->getCharLength());
-            $fieldSpec = $this->fieldspec('245/#-0');
-            $this->assertSame(1, $fieldSpec->getCharLength());
-            $fieldSpec = $this->fieldspec('245/#-1');
-            $this->assertSame(2, $fieldSpec->getCharLength());
-            $fieldSpec = $this->fieldspec('245/0-#');
-            $this->assertSame(0, $fieldSpec->getCharStart());
-            $this->assertSame("#", $fieldSpec->getCharEnd());
-            $this->assertSame(null, $fieldSpec->getCharLength());
+        $fieldSpec = $this->fieldspec('245/#');
+        $this->assertSame(1, $fieldSpec->getCharLength());
+        $fieldSpec = $this->fieldspec('245/#-#');
+        $this->assertSame(1, $fieldSpec->getCharLength());
+        $fieldSpec = $this->fieldspec('245/#-0');
+        $this->assertSame(1, $fieldSpec->getCharLength());
+        $fieldSpec = $this->fieldspec('245/#-1');
+        $this->assertSame(2, $fieldSpec->getCharLength());
+        $fieldSpec = $this->fieldspec('245/0-#');
+        $this->assertSame(0, $fieldSpec->getCharStart());
+        $this->assertSame('#', $fieldSpec->getCharEnd());
+        $this->assertSame(null, $fieldSpec->getCharLength());
     }
-    
+
     /**
      * @covers CK\MARCspec\Field::offsetSet
      * @covers CK\MARCspec\Field::offsetExists
      * @covers CK\MARCspec\Field::addSubSpec
      */
-    public function  testValidFieldSpec24()
+    public function testValidFieldSpec24()
     {
         $fieldSpec = $this->fieldspec('...');
         $fieldSpec['indexStart'] = '0';
         $fieldSpec['indexEnd'] = '1';
-        $Subspec = new SubSpec(new MARCspec('245$b'),'!=',new MARCspec('245$c'));
+        $Subspec = new SubSpec(new MARCspec('245$b'), '!=', new MARCspec('245$c'));
         $fieldSpec['subSpecs'] = $Subspec;
         $fieldSpec->addSubSpec($Subspec);
         $this->assertTrue($fieldSpec->offsetExists('tag'));
@@ -389,7 +387,7 @@ class FieldTest extends TestCase
         $this->assertSame('300[1]', "$fieldSpec");
 
         $fieldSpec = $this->fieldspec('300[1-3]');
-        $this->assertSame('300[1-3]',$fieldSpec->__toString());
+        $this->assertSame('300[1-3]', $fieldSpec->__toString());
     }
 
     /**

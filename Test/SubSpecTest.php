@@ -8,20 +8,19 @@
 
 namespace CK\MARCspec\Test;
 
-use CK\MARCspec\MARCspec;
-use CK\MARCspec\SubSpec;
 use CK\MARCspec\Field;
+use CK\MARCspec\MARCspec;
 use CK\MARCspec\Subfield;
-use CK\MARCspec\Exception\InvalidMARCspecException;
+use CK\MARCspec\SubSpec;
 use PHPUnit\Framework\TestCase;
 
 class SubSpecTest extends TestCase
 {
-    
-    protected function subspec($arg1,$arg2,$arg3)
+    protected function subspec($arg1, $arg2, $arg3)
     {
-        return new SubSpec($arg1,$arg2,$arg3);
-    }    
+        return new SubSpec($arg1, $arg2, $arg3);
+    }
+
     protected function marcspec($arg)
     {
         return new MARCspec($arg);

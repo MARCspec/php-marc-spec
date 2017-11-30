@@ -11,14 +11,13 @@ namespace CK\MARCspec\Test;
 use CK\MARCspec\MARCspec;
 use CK\MARCspec\Subfield;
 use CK\MARCspec\SubSpec;
-use CK\MARCspec\Exception\InvalidMARCspecException;
 use PHPUnit\Framework\TestCase;
 
 class SubfieldTest extends TestCase
 {
     /**
      * @dataProvider invalidFromTestSuiteProvider
-     * 
+     *
      * @expectedException Exception
      */
     public function testInvalidFromTestSuite($test)
@@ -28,20 +27,19 @@ class SubfieldTest extends TestCase
 
     public function invalidFromTestSuiteProvider()
     {
-        $invalidTests = json_decode(file_get_contents(__DIR__. '/../' ."vendor/ck/marcspec-test-suite/invalid/invalidSubfieldTag.json"));
+        $invalidTests = json_decode(file_get_contents(__DIR__.'/../'.'vendor/ck/marcspec-test-suite/invalid/invalidSubfieldTag.json'));
         $data = [];
-        foreach($invalidTests->{'tests'} as $test)
-        {
+        foreach ($invalidTests->{'tests'} as $test) {
             $data[0][] = $test->{'data'};
         }
+
         return $data;
     }
-    
+
     public function testValidFromTestSuite()
     {
-        $validTests = json_decode(file_get_contents(__DIR__. '/../' ."vendor/ck/marcspec-test-suite/valid/validSubfieldTag.json"));
-        foreach($validTests->{'tests'} as $test)
-        {
+        $validTests = json_decode(file_get_contents(__DIR__.'/../'.'vendor/ck/marcspec-test-suite/valid/validSubfieldTag.json'));
+        foreach ($validTests->{'tests'} as $test) {
             $this->assertInstanceOf('CK\MARCspec\SubfieldInterface', new Subfield($test->{'data'}));
         }
     }
