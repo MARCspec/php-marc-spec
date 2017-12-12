@@ -23,7 +23,7 @@ interface MARCspecInterface
      * @api
      *
      * @param string|CK\MARCspec\FieldInterface $spec The MARCspec as string or an instance of
-     * FieldInterface
+     *                                                FieldInterface
      */
     public function __construct($spec);
 
