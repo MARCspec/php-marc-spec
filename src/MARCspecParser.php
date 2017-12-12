@@ -391,5 +391,3 @@ class MARCspecParser
         $this->SUBSPEC = '(?:\{(.+)\})';
     }
 }
-
-$test = new \CK\MARCspec\MARCspecParser();
