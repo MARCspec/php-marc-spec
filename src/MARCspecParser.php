@@ -376,11 +376,10 @@ class MARCspecParser
         $this->POSITIONORRANGE = '(?:(?:(?:[0-9]+|#)\-(?:[0-9]+|#))|(?:[0-9]+|#))';
         $this->INDEX = '(?:\[(?<index>'.$this->POSITIONORRANGE.')\])?';
         $this->CHARPOS = '(?:\/(?<charpos>'.$this->POSITIONORRANGE.'))?';
-        $this->INDICATORPOS = '(?:\^(?<indicatorpos>[12]))?';
-        //$this->INDICATOR        = '(?:\^)(?<indicator>'.$this->INDICATORPOS.')?';
+        $this->INDICATORPOS = '(?:\^(?<indicatorpos>[12]))';
         $this->SUBSPECS = '(?<subspecs>(?:\{.+?(?<!(?<!(\$|\\\))(\$|\\\))\})+)?';
         $this->SUBFIELDS = '(?<subfields>\$.+)';
-        $this->FIELD = '(?<field>(?:'.$this->FIELDTAG.$this->INDEX.'))';
+        $this->FIELD = '(?<field>'.$this->FIELDTAG.$this->INDEX.')';
         $this->MARCSPEC = '^'.$this->FIELD.'(?:'.$this->SUBFIELDS.'|(?:'.$this->INDICATORPOS.'|'.$this->CHARPOS.')'.$this->SUBSPECS.')$';
         $this->SUBFIELDTAGRANGE = '(?<subfieldtagrange>(?:[0-9a-z]\-[0-9a-z]))';
         $this->SUBFIELDTAG = '(?<subfieldtag>[\!-\?\[-\{\}-~])';
