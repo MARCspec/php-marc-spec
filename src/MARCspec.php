@@ -556,7 +556,7 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess, \I
     public function __toString()
     {
         $marcspec = "$this->field";
-        if(isset($this->indicator)){
+        if (isset($this->indicator)) {
             $marcspec .= "$this->indicator";
         } else {
             foreach ($this->subfields as $subfield) {
