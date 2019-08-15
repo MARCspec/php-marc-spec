@@ -1,16 +1,13 @@
 language: php
 php:
+  - 7.2
   - 7.1
   - 7.0
   - 5.6
-  - hhvm
 
 fast_finish: true
 
 bin-dir: vendor/bin/
-
-allow_failures:
-  - php: hhvm
 
 before_script:
 - composer install -o -n
