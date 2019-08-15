@@ -56,7 +56,7 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
     {
         $this->checkIfString($fieldspec);
 
-        $spec = trim($fieldspec);
+        $fieldspec = trim($fieldspec);
 
         $specLength = strlen($fieldspec);
 
@@ -372,10 +372,6 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
     public function offsetSet($offset, $value)
     {
         switch ($offset) {
-            case 'tag':
-                $this->setTag($value);
-                break;
-
             case 'indexStart':
                 $this->setIndexStartEnd($value);
                 break;
