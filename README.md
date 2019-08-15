@@ -21,7 +21,13 @@ PHP-MARCspec requires PHP 5.4 or later.
 ```php
 <?php
 
-use CK\MARCspec;
+require("vendor/autoload.php");
+
+use CK\MARCspec\MARCspec;
+use CK\MARCspec\Field;
+use CK\MARCspec\Subfield;
+use CK\MARCspec\ComparisonString;
+use CK\MARCspec\SubSpec;
 
 // parse and access MARCspec like an array
 $fixed = new MARCspec('007[0]/1-8{/0=\a}');
