@@ -14,7 +14,7 @@ Installation can be done by using [composer](https://getcomposer.org/doc/00-intr
 composer require ck/php-marcspec
 ```
 
-PHP-MARCspec requires PHP 5.4 or later.
+PHP-MARCspec requires PHP 7.4 or later.
 
 # Usage
 
