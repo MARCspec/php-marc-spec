@@ -11,23 +11,21 @@ namespace CK\MARCspec\Test;
 use CK\MARCspec\Field;
 use CK\MARCspec\MARCspec;
 use CK\MARCspec\SubSpec;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class FieldTest extends TestCase
 {
-    /**
-     * @dataProvider invalidFromTestSuiteProvider
-     *
-     * @expectedException Exception
-     */
+    #[DataProvider('invalidFromTestSuiteProvider')]
     public function testInvalidFromTestSuite($test)
     {
+        $this->expectException(\Exception::class);
         new Field($test);
     }
 
-    public function invalidFromTestSuiteProvider()
+    public static function invalidFromTestSuiteProvider()
     {
-        $invalidTests = json_decode(file_get_contents(__DIR__.'/../'.'vendor/ck/marcspec-test-suite/invalid/invalidFieldTag.json'));
+        $invalidTests = json_decode(file_get_contents(__DIR__ . '/../' . 'vendor/ck/marcspec-test-suite/invalid/invalidFieldTag.json'));
         $data = [];
         foreach ($invalidTests->{'tests'} as $test) {
             $data[0][] = $test->{'data'};
@@ -38,7 +36,7 @@ class FieldTest extends TestCase
 
     public function testValidFromTestSuite()
     {
-        $validTests = json_decode(file_get_contents(__DIR__.'/../'.'vendor/ck/marcspec-test-suite/valid/validFieldTag.json'));
+        $validTests = json_decode(file_get_contents(__DIR__ . '/../' . 'vendor/ck/marcspec-test-suite/valid/validFieldTag.json'));
         foreach ($validTests->{'tests'} as $test) {
             $this->assertInstanceOf('CK\MARCspec\FieldInterface', new Field($test->{'data'}));
         }
@@ -50,146 +48,146 @@ class FieldTest extends TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
      */
     public function testInvalidArgument2Decode()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $this->fieldspec(['245']);
     }
 
     /**
-     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidFieldSpec13()
     {
+        $this->expectException(\CK\MARCspec\Exception\InvalidMARCspecException::class);
         $this->fieldspec('007/');
     }
 
     /**
-     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidFieldSpec14()
     {
+        $this->expectException(\CK\MARCspec\Exception\InvalidMARCspecException::class);
         $this->fieldspec('007/1-2-');
     }
 
     /**
-     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidFieldSpec15()
     {
+        $this->expectException(\CK\MARCspec\Exception\InvalidMARCspecException::class);
         $this->fieldspec('24#');
     }
 
     /**
-     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidFieldSpec16()
     {
+        $this->expectException(\CK\MARCspec\Exception\InvalidMARCspecException::class);
         $this->fieldspec('007/-2');
     }
 
     /**
-     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidFieldSpec17()
     {
+        $this->expectException(\CK\MARCspec\Exception\InvalidMARCspecException::class);
         $this->fieldspec('245[-2]');
     }
 
     /**
-     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidFieldSpec18()
     {
+        $this->expectException(\CK\MARCspec\Exception\InvalidMARCspecException::class);
         $this->fieldspec('245[1-2-]');
     }
 
     /**
-     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidFieldSpec19()
     {
+        $this->expectException(\CK\MARCspec\Exception\InvalidMARCspecException::class);
         $this->fieldspec('245[1-2');
     }
 
     /**
-     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidFieldSpec110()
     {
+        $this->expectException(\CK\MARCspec\Exception\InvalidMARCspecException::class);
         $this->fieldspec('007/1-X');
     }
 
     /**
-     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidFieldSpec111()
     {
+        $this->expectException(\CK\MARCspec\Exception\InvalidMARCspecException::class);
         $this->fieldspec('007/#-');
     }
 
     /**
-     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidFieldSpec112()
     {
+        $this->expectException(\CK\MARCspec\Exception\InvalidMARCspecException::class);
         $this->fieldspec('245[0-2a]');
     }
 
     /**
-     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidFieldSpec113()
     {
+        $this->expectException(\CK\MARCspec\Exception\InvalidMARCspecException::class);
         $this->fieldspec('300[1-]');
     }
 
     /**
-     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidFieldSpec114()
     {
+        $this->expectException(\CK\MARCspec\Exception\InvalidMARCspecException::class);
         $fieldSpec = $this->fieldspec('aA0');
     }
 
     /**
-     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidFieldSpec31()
     {
+        $this->expectException(\CK\MARCspec\Exception\InvalidMARCspecException::class);
         $this->fieldspec('245^1');
     }
 
     /**
-     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidFieldSpec32()
     {
+        $this->expectException(\CK\MARCspec\Exception\InvalidMARCspecException::class);
         $this->fieldspec('245_$');
     }
 
     /**
-     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidFieldSpec33()
     {
+        $this->expectException(\CK\MARCspec\Exception\InvalidMARCspecException::class);
         $this->fieldspec('245^');
     }
 
     /**
-     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidArgument310Decode()
     {
+        $this->expectException(\CK\MARCspec\Exception\InvalidMARCspecException::class);
         $this->fieldspec('245{$c=$d}$a');
     }
 
     /**
-     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidArgument311Decode()
     {
+        $this->expectException(\CK\MARCspec\Exception\InvalidMARCspecException::class);
         $this->fieldspec('245[1]/1_01');
     }
 
@@ -274,9 +272,7 @@ class FieldTest extends TestCase
     }
 
     /**
-     * @covers CK\MARCspec\Field::offsetSet
-     * @covers CK\MARCspec\Field::offsetExists
-     * @covers CK\MARCspec\Field::addSubSpec
+     * Field offset API and subspecs.
      */
     public function testValidFieldSpec24()
     {
@@ -391,7 +387,7 @@ class FieldTest extends TestCase
     }
 
     /**
-     * @covers CK\MARCspec\Field::jsonSerialize
+     * JSON encoding of a field spec.
      */
     public function testJson()
     {
@@ -407,10 +403,10 @@ class FieldTest extends TestCase
     }
 
     /**
-     * @expectedException BadMethodCallException
      */
     public function testOffsetUnset()
     {
+        $this->expectException(\BadMethodCallException::class);
         $fieldSpec = $this->fieldspec('245');
         unset($fieldSpec['tag']);
     }

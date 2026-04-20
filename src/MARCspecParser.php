@@ -1,4 +1,5 @@
 <?php
+
 /**
  * MARCspec is the specification of a reference, encoded as string, to a set of data
  * from within a MARC record.
@@ -34,9 +35,14 @@ class MARCspecParser
      */
     protected $CHARPOS;
     /**
-     * @var string Regex for indicator position
+     * @var string Regex for indicator position fragment
      */
-    protected $INDICATOR;
+    protected $INDICATORPOS;
+
+    /**
+     * @var string Regex for subspecs fragment
+     */
+    protected $SUBSPECS;
     /**
      * @var string Regex for field subspecs
      */
@@ -125,10 +131,10 @@ class MARCspecParser
      */
     public function parse($marcspec)
     {
-        if (!preg_match_all('/'.$this->MARCSPEC.'/', $marcspec, $this->parsed, PREG_SET_ORDER)) {
+        if (!preg_match_all('/' . $this->MARCSPEC . '/', $marcspec, $this->parsed, PREG_SET_ORDER)) {
             throw new InvalidMARCspecException(
-                InvalidMARCspecException::FS.
-                InvalidMARCspecException::MISSINGFIELD,
+                InvalidMARCspecException::FS .
+                    InvalidMARCspecException::MISSINGFIELD,
                 $marcspec
             );
         }
@@ -137,16 +143,16 @@ class MARCspecParser
 
         if (!array_key_exists('field', $this->parsed)) { // TODO: check if 'tag' is the required key
             throw new InvalidMARCspecException(
-                InvalidMARCspecException::FS.
-                InvalidMARCspecException::FTAG,
+                InvalidMARCspecException::FS .
+                    InvalidMARCspecException::FTAG,
                 $marcspec
             );
         }
 
         if (strlen($this->parsed[0]) !== strlen($marcspec)) {
             throw new InvalidMARCspecException(
-                InvalidMARCspecException::FS.
-                InvalidMARCspecException::USELESS,
+                InvalidMARCspecException::FS .
+                    InvalidMARCspecException::USELESS,
                 $marcspec
             );
         }
@@ -154,16 +160,16 @@ class MARCspecParser
         if (array_key_exists('charpos', $this->parsed)) {
             if (array_key_exists('indicatorpos', $this->parsed)) {
                 throw new InvalidMARCspecException(
-                    InvalidMARCspecException::FS.
-                    InvalidMARCspecException::CHARORIND,
+                    InvalidMARCspecException::FS .
+                        InvalidMARCspecException::CHARORIND,
                     $marcspec
                 );
             }
 
             if (array_key_exists('subfields', $this->parsed)) {
                 throw new InvalidMARCspecException(
-                    InvalidMARCspecException::FS.
-                    InvalidMARCspecException::CHARORSF,
+                    InvalidMARCspecException::FS .
+                        InvalidMARCspecException::CHARORSF,
                     $marcspec
                 );
             }
@@ -172,8 +178,8 @@ class MARCspecParser
         if (array_key_exists('subfields', $this->parsed)) {
             if (array_key_exists('indicatorpos', $this->parsed)) {
                 throw new InvalidMARCspecException(
-                    InvalidMARCspecException::FS.
-                    InvalidMARCspecException::INDORSF,
+                    InvalidMARCspecException::FS .
+                        InvalidMARCspecException::INDORSF,
                     $marcspec
                 );
             }
@@ -204,10 +210,10 @@ class MARCspecParser
      */
     public function parseSubfields($subfieldspec)
     {
-        if (!preg_match_all('/'.$this->SUBFIELD.'/', $subfieldspec, $_subfieldMatches, PREG_SET_ORDER)) {
+        if (!preg_match_all('/' . $this->SUBFIELD . '/', $subfieldspec, $_subfieldMatches, PREG_SET_ORDER)) {
             throw new InvalidMARCspecException(
-                InvalidMARCspecException::SF.
-                InvalidMARCspecException::SFCHAR,
+                InvalidMARCspecException::SF .
+                    InvalidMARCspecException::SFCHAR,
                 $subfieldspec
             );
         }
@@ -250,8 +256,8 @@ class MARCspecParser
 
         if ($test !== $subfieldspec) {
             throw new InvalidMARCspecException(
-                InvalidMARCspecException::SF.
-                InvalidMARCspecException::USELESS,
+                InvalidMARCspecException::SF .
+                    InvalidMARCspecException::USELESS,
                 $subfieldspec
             );
         }
@@ -270,24 +276,24 @@ class MARCspecParser
     {
         if (!$_sf = $this->parseSubfields($subfieldspec)) {
             throw new InvalidMARCspecException(
-                InvalidMARCspecException::SF.
-                InvalidMARCspecException::UNKNOWN,
+                InvalidMARCspecException::SF .
+                    InvalidMARCspecException::UNKNOWN,
                 $subfieldspec
             );
         }
 
         if (1 < count($_sf)) {
             throw new InvalidMARCspecException(
-                InvalidMARCspecException::SF.
-                InvalidMARCspecException::MULTISF,
+                InvalidMARCspecException::SF .
+                    InvalidMARCspecException::MULTISF,
                 $subfieldspec
             );
         }
 
         if ($_sf[0]['subfield'] !== $subfieldspec) {
             throw new InvalidMARCspecException(
-                InvalidMARCspecException::SF.
-                InvalidMARCspecException::USELESS,
+                InvalidMARCspecException::SF .
+                    InvalidMARCspecException::USELESS,
                 $subfieldspec
             );
         }
@@ -305,10 +311,10 @@ class MARCspecParser
     private function matchSubSpecs($subSpecs)
     {
         $_subSpecs = [];
-        if (!preg_match_all('/'.$this->SUBSPEC.'/U', $subSpecs, $_subSpecMatches, PREG_SET_ORDER)) {
+        if (!preg_match_all('/' . $this->SUBSPEC . '/U', $subSpecs, $_subSpecMatches, PREG_SET_ORDER)) {
             throw new InvalidMARCspecException(
-                InvalidMARCspecException::SS.
-                InvalidMARCspecException::UNKNOWN,
+                InvalidMARCspecException::SS .
+                    InvalidMARCspecException::UNKNOWN,
                 $subSpecs
             );
         }
@@ -318,8 +324,8 @@ class MARCspecParser
                 $_subSpecs[$key] = preg_split('/(?<!\\\)\|/', $_subSpecMatch[1], -1, PREG_SPLIT_NO_EMPTY);
             } else {
                 throw new InvalidMARCspecException(
-                    InvalidMARCspecException::SS.
-                    InvalidMARCspecException::UNKNOWN,
+                    InvalidMARCspecException::SS .
+                        InvalidMARCspecException::UNKNOWN,
                     $subSpecs
                 );
             }
@@ -339,20 +345,20 @@ class MARCspecParser
     {
         if (preg_match('/(?<![\\\\\$])[\{\}]/', $subSpec, $_error, PREG_OFFSET_CAPTURE)) {
             throw new InvalidMARCspecException(
-                InvalidMARCspecException::SS.
-                InvalidMARCspecException::ESCAPE,
+                InvalidMARCspecException::SS .
+                    InvalidMARCspecException::ESCAPE,
                 $subSpec
             );
         }
 
-        if (preg_match_all('/'.$this->SUBTERMS.'/', $subSpec, $_subTermMatches, PREG_SET_ORDER)) {
+        if (preg_match_all('/' . $this->SUBTERMS . '/', $subSpec, $_subTermMatches, PREG_SET_ORDER)) {
             if (empty($_subTermMatches[0]['operator'])) {
                 $_subTermMatches[0]['operator'] = '?';
             }
             if (!$_subTermMatches[0]['rightsubterm']) {
                 throw new InvalidMARCspecException(
-                    InvalidMARCspecException::SS.
-                    InvalidMARCspecException::MISSINGRIGHT,
+                    InvalidMARCspecException::SS .
+                        InvalidMARCspecException::MISSINGRIGHT,
                     $subSpec
                 );
             }
@@ -360,8 +366,8 @@ class MARCspecParser
             return array_filter($_subTermMatches[0], 'strlen');
         } else {
             throw new InvalidMARCspecException(
-                InvalidMARCspecException::SS.
-                InvalidMARCspecException::UNKNOWN,
+                InvalidMARCspecException::SS .
+                    InvalidMARCspecException::UNKNOWN,
                 $subSpec
             );
         }
@@ -374,19 +380,19 @@ class MARCspecParser
     {
         $this->FIELDTAG = '(?<tag>(?:[a-z0-9\.]{3,3}|[A-Z0-9\.]{3,3}|[0-9\.]{3,3}))';
         $this->POSITIONORRANGE = '(?:(?:(?:[0-9]+|#)\-(?:[0-9]+|#))|(?:[0-9]+|#))';
-        $this->INDEX = '(?:\[(?<index>'.$this->POSITIONORRANGE.')\])?';
-        $this->CHARPOS = '(?:\/(?<charpos>'.$this->POSITIONORRANGE.'))?';
+        $this->INDEX = '(?:\[(?<index>' . $this->POSITIONORRANGE . ')\])?';
+        $this->CHARPOS = '(?:\/(?<charpos>' . $this->POSITIONORRANGE . '))?';
         $this->INDICATORPOS = '(?:\^(?<indicatorpos>[12]))';
         $this->SUBSPECS = '(?<subspecs>(?:\{.+?(?<!(?<!(\$|\\\))(\$|\\\))\})+)?';
         $this->SUBFIELDS = '(?<subfields>\$.+)';
-        $this->FIELD = '(?<field>'.$this->FIELDTAG.$this->INDEX.')';
-        $this->MARCSPEC = '^'.$this->FIELD.'(?:'.$this->SUBFIELDS.'|(?:'.$this->INDICATORPOS.'|'.$this->CHARPOS.')'.$this->SUBSPECS.')$';
+        $this->FIELD = '(?<field>' . $this->FIELDTAG . $this->INDEX . ')';
+        $this->MARCSPEC = '^' . $this->FIELD . '(?:' . $this->SUBFIELDS . '|(?:' . $this->INDICATORPOS . '|' . $this->CHARPOS . ')' . $this->SUBSPECS . ')$';
         $this->SUBFIELDTAGRANGE = '(?<subfieldtagrange>(?:[0-9a-z]\-[0-9a-z]))';
         $this->SUBFIELDTAG = '(?<subfieldtag>[\!-\?\[-\{\}-~])';
-        $this->SUBFIELD = '(?<subfield>\$(?:'.$this->SUBFIELDTAGRANGE.'|'.$this->SUBFIELDTAG.')'.$this->INDEX.$this->CHARPOS.$this->SUBSPECS.')';
+        $this->SUBFIELD = '(?<subfield>\$(?:' . $this->SUBFIELDTAGRANGE . '|' . $this->SUBFIELDTAG . ')' . $this->INDEX . $this->CHARPOS . $this->SUBSPECS . ')';
         $this->LEFTSUBTERM = '^(?<leftsubterm>(?:\\\(?:(?<=\\\)[\!\=\~\?]|[^\!\=\~\?])+)|(?:(?<=\$)[\!\=\~\?]|[^\!\=\~\?])+)?';
         $this->OPERATOR = '(?<operator>\!\=|\!\~|\=|\~|\!|\?)';
-        $this->SUBTERMS = '(?:'.$this->LEFTSUBTERM.$this->OPERATOR.')?(?<rightsubterm>.+)$';
+        $this->SUBTERMS = '(?:' . $this->LEFTSUBTERM . $this->OPERATOR . ')?(?<rightsubterm>.+)$';
         $this->SUBSPEC = '(?:\{(.+)\})';
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * MARCspec is the specification of a reference, encoded as string, to a set of data
  * from within a MARC record.
@@ -36,15 +37,16 @@ class Indicator implements IndicatorInterface, \JsonSerializable, \ArrayAccess
     public function __construct($indicatorpos)
     {
         if (!is_string($indicatorpos) and !is_int($indicatorpos)) {
-            throw new \InvalidArgumentException('Method only accepts string as argument. '.
-                gettype($indicatorpos).' given.'
+            throw new \InvalidArgumentException(
+                'Method only accepts string as argument. ' .
+                    gettype($indicatorpos) . ' given.'
             );
         }
 
         if (strpos($indicatorpos, '{')) {
             throw new InvalidMARCspecException(
-                InvalidMARCspecException::IN.
-                InvalidMARCspecException::DETECTEDSS,
+                InvalidMARCspecException::IN .
+                    InvalidMARCspecException::DETECTEDSS,
                 $indicatorpos
             );
         }
@@ -82,16 +84,18 @@ class Indicator implements IndicatorInterface, \JsonSerializable, \ArrayAccess
         } elseif (is_array($SubSpec)) {
             foreach ($SubSpec as $sub) {
                 if (!($sub instanceof SubSpecInterface)) {
-                    throw new \InvalidArgumentException('Values of array of subSpecs
+                    throw new \InvalidArgumentException(
+                        'Values of array of subSpecs
                         must be instances of SubSpecInterface.'
                     );
                 }
             }
             $this->subSpecs[] = $SubSpec;
         } else {
-            throw new \InvalidArgumentException('Param 1 must be instance of
+            throw new \InvalidArgumentException(
+                'Param 1 must be instance of
                 SubSpecInterface or array with instances of SubSpecInterface. Got "'
-                .gettype($subSpec).'".'
+                    . gettype($SubSpec) . '".'
             );
         }
     }
@@ -101,7 +105,7 @@ class Indicator implements IndicatorInterface, \JsonSerializable, \ArrayAccess
      */
     public function getBaseSpec()
     {
-        return '^'.$this->position;
+        return '^' . $this->position;
     }
 
     /**
@@ -117,9 +121,9 @@ class Indicator implements IndicatorInterface, \JsonSerializable, \ArrayAccess
                     foreach ($subSpec as $orKey => $orSubSpec) {
                         $subSpec[$orKey] = $orSubSpec->__toString();
                     }
-                    $indicatorSpec .= '{'.implode('|', $subSpec).'}';
+                    $indicatorSpec .= '{' . implode('|', $subSpec) . '}';
                 } else {
-                    $indicatorSpec .= '{'.$subSpec->__toString().'}';
+                    $indicatorSpec .= '{' . $subSpec->__toString() . '}';
                 }
             }
         }
@@ -135,14 +139,17 @@ class Indicator implements IndicatorInterface, \JsonSerializable, \ArrayAccess
      * @param string $offset Key indexStart|indexEnd|charStart|charEnd|charLength
      *                       |indicator1|indicator2|subSpecs
      */
-    public function offsetExists($offset)
+    public function offsetExists(mixed $offset): bool
     {
         switch ($offset) {
-            case 'position': return isset($this->position);
-            break;
-            case 'subSpecs': return (0 < count($this->subSpecs)) ? true : false;
-            break;
-            default: return false;
+            case 'position':
+                return isset($this->position);
+                break;
+            case 'subSpecs':
+                return (0 < count($this->subSpecs)) ? true : false;
+                break;
+            default:
+                return false;
         }
     }
 
@@ -154,14 +161,17 @@ class Indicator implements IndicatorInterface, \JsonSerializable, \ArrayAccess
      * @param string $offset Key indexStart|indexEnd|charStart|charEnd|charLength
      *                       |indicator1|indicator2|subSpecs
      */
-    public function offsetGet($offset)
+    public function offsetGet(mixed $offset): mixed
     {
         switch ($offset) {
-            case 'position': return $this->getPos();
-            break;
-            case 'subSpecs': return $this->getSubSpecs();
-            break;
-            default: throw new \UnexpectedValueException("Offset $offset does not exist.");
+            case 'position':
+                return $this->getPos();
+                break;
+            case 'subSpecs':
+                return $this->getSubSpecs();
+                break;
+            default:
+                throw new \UnexpectedValueException("Offset $offset does not exist.");
         }
     }
 
@@ -173,19 +183,21 @@ class Indicator implements IndicatorInterface, \JsonSerializable, \ArrayAccess
      * @param string $offset Key indexStart|indexEnd|charStart|charEnd|charLength
      *                       |indicator1|indicator2|subSpecs
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet(mixed $offset, mixed $value): void
     {
         switch ($offset) {
-            case 'subSpecs': $this->addSubSpec($value);
-            break;
-            default: throw new \UnexpectedValueException("Offset $offset cannot be set.");
+            case 'subSpecs':
+                $this->addSubSpec($value);
+                break;
+            default:
+                throw new \UnexpectedValueException("Offset $offset cannot be set.");
         }
     }
 
     /**
      * Access object like an associative array.
      */
-    public function offsetUnset($offset)
+    public function offsetUnset(mixed $offset): void
     {
         throw new \BadMethodCallException("Offset $offset can not be unset.");
     }
@@ -193,7 +205,7 @@ class Indicator implements IndicatorInterface, \JsonSerializable, \ArrayAccess
     /**
      * {@inheritdoc}
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): mixed
     {
         $_indicatorSpec['position'] = $this->getPos();
 

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * MARCspec is the specification of a reference, encoded as string, to a set of data
  * from within a MARC record.
@@ -144,8 +145,8 @@ class PositionOrRange implements PositionOrRangeInterface
 
         if (1 > $length) {
             throw new InvalidMARCspecException(
-                InvalidMARCspecException::PR.
-                InvalidMARCspecException::NEGATIVE
+                InvalidMARCspecException::PR .
+                    InvalidMARCspecException::NEGATIVE
             );
         }
 
@@ -174,13 +175,15 @@ class PositionOrRange implements PositionOrRangeInterface
             $_startEnd[0] = '#';
         } else {
             throw new InvalidMARCspecException(
-                InvalidMARCspecException::PR.
-                InvalidMARCspecException::PR7,
+                InvalidMARCspecException::PR .
+                    InvalidMARCspecException::PR7,
                 $start
             );
         }
 
-        if (preg_match('/[0-9#]/', $end)) {
+        if (null === $end) {
+            $_startEnd[1] = null;
+        } elseif (preg_match('/[0-9#]/', $end)) {
             if ('#' === $end) {
                 $_startEnd[1] = '#';
             } elseif (preg_match('/[0-9]/', $end)) {
@@ -188,16 +191,16 @@ class PositionOrRange implements PositionOrRangeInterface
 
                 if ($_startEnd[1] < $_startEnd[0]) {
                     throw new InvalidMARCspecException(
-                        InvalidMARCspecException::PR.
-                        InvalidMARCspecException::PR8,
-                        $start.'-'.$end
+                        InvalidMARCspecException::PR .
+                            InvalidMARCspecException::PR8,
+                        $start . '-' . $end
                     );
                 }
             } else {
                 throw new InvalidMARCspecException(
-                    InvalidMARCspecException::PR.
-                    InvalidMARCspecException::PR8,
-                    $start.'-'.$end
+                    InvalidMARCspecException::PR .
+                        InvalidMARCspecException::PR8,
+                    $start . '-' . $end
                 );
             }
         } else {
@@ -258,7 +261,7 @@ class PositionOrRange implements PositionOrRangeInterface
     {
         if (!is_string($arg)) {
             throw new \InvalidArgumentException('Method only accepts string as argument. '
-                .gettype($arg).' given.');
+                . gettype($arg) . ' given.');
         }
     }
 } // EOC
