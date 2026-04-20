@@ -9,23 +9,21 @@
 namespace CK\MARCspec\Test;
 
 use CK\MARCspec\ComparisonString;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class ComparisonStringTest extends TestCase
 {
-    /**
-     * @dataProvider invalidFromTestSuiteProvider
-     *
-     * @expectedException Exception
-     */
+    #[DataProvider('invalidFromTestSuiteProvider')]
     public function testInvalidFromTestSuite($test)
     {
+        $this->expectException(\Exception::class);
         new ComparisonString($test);
     }
 
-    public function invalidFromTestSuiteProvider()
+    public static function invalidFromTestSuiteProvider()
     {
-        $invalidTests = json_decode(file_get_contents(__DIR__.'/../'.'vendor/ck/marcspec-test-suite/invalid/invalidComparisonString.json'));
+        $invalidTests = json_decode(file_get_contents(__DIR__ . '/../' . 'vendor/ck/marcspec-test-suite/invalid/invalidComparisonString.json'));
         $data = [];
         foreach ($invalidTests->{'tests'} as $test) {
             $data[0][] = $test->{'data'};
@@ -36,10 +34,10 @@ class ComparisonStringTest extends TestCase
 
     public function testValidFromTestSuite()
     {
-        $validTests = json_decode(file_get_contents(__DIR__.'/../'.'vendor/ck/marcspec-test-suite/valid/validComparisonString.json'));
+        $validTests = json_decode(file_get_contents(__DIR__ . '/../' . 'vendor/ck/marcspec-test-suite/valid/validComparisonString.json'));
         foreach ($validTests->{'tests'} as $test) {
             new ComparisonString($test->{'data'});
-            $this->assertSame(1, preg_match('/'.$validTests->{'schema'}->{'pattern'}.'/', $test->{'data'}));
+            $this->assertSame(1, preg_match('/' . $validTests->{'schema'}->{'pattern'} . '/', $test->{'data'}));
         }
     }
 
@@ -49,22 +47,22 @@ class ComparisonStringTest extends TestCase
     }
 
     /****
-    * invalid data types
-    ***/
+     * invalid data types
+     ***/
 
     /**
-     * @expectedException InvalidArgumentException
      */
     public function testInvalidArgument1Decode()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $this->compare(['a']);
     }
 
     /**
-     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidArgument2Decode()
     {
+        $this->expectException(\CK\MARCspec\Exception\InvalidMARCspecException::class);
         $this->compare('.{.');
     }
 
@@ -100,10 +98,10 @@ class ComparisonStringTest extends TestCase
     }
 
     /**
-     * @expectedException BadMethodCallException
      */
     public function testOffsetUnset()
     {
+        $this->expectException(\BadMethodCallException::class);
         $escaped_string = '\\.';
         $compare = $this->compare($escaped_string);
         unset($compare['raw']);

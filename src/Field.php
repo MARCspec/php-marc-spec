@@ -1,4 +1,5 @@
 <?php
+
 /**
  * MARCspec is the specification of a reference, encoded as string, to a set of data
  * from within a MARC record.
@@ -63,22 +64,22 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
         // check string length
         if (3 > $specLength) {
             throw new InvalidMARCspecException(
-                InvalidMARCspecException::FS.
-                InvalidMARCspecException::MINIMUM3,
+                InvalidMARCspecException::FS .
+                    InvalidMARCspecException::MINIMUM3,
                 $fieldspec
             );
         }
         if (preg_match('/\s/', $fieldspec)) {
             throw new InvalidMARCspecException(
-                InvalidMARCspecException::FS.
-                InvalidMARCspecException::SPACE,
+                InvalidMARCspecException::FS .
+                    InvalidMARCspecException::SPACE,
                 $fieldspec
             );
         }
         if ($strpos = strpos($fieldspec, '{')) {
             throw new InvalidMARCspecException(
-                InvalidMARCspecException::FS.
-                InvalidMARCspecException::DETECTEDSS,
+                InvalidMARCspecException::FS .
+                    InvalidMARCspecException::DETECTEDSS,
                 $fieldspec
             );
         }
@@ -89,16 +90,16 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
 
         if (array_key_exists('subfields', $parser->parsed)) {
             throw new InvalidMARCspecException(
-                InvalidMARCspecException::FS.
-                InvalidMARCspecException::DETECTEDSF,
+                InvalidMARCspecException::FS .
+                    InvalidMARCspecException::DETECTEDSF,
                 $fieldspec
             );
         }
 
         if (array_key_exists('indicatorpos', $parser->parsed)) {
             throw new InvalidMARCspecException(
-                InvalidMARCspecException::FS.
-                InvalidMARCspecException::DETECTEDIN,
+                InvalidMARCspecException::FS .
+                    InvalidMARCspecException::DETECTEDIN,
                 $fieldspec
             );
         }
@@ -146,8 +147,8 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
     {
         if (!preg_match('/[.0-9a-z]{3,3}|[.0-9A-Z]{3,3}/', $tag)) {
             throw new InvalidMARCspecException(
-                InvalidMARCspecException::FS.
-                InvalidMARCspecException::FTAG,
+                InvalidMARCspecException::FS .
+                    InvalidMARCspecException::FTAG,
                 $tag
             );
         }
@@ -173,7 +174,7 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
         } else {
             throw new \InvalidArgumentException('Param 1 must be instance of
                 SubSpecInterface or array with instances of SubSpecInterface. Got "'
-                .gettype($subSpec).'".');
+                . gettype($SubSpec) . '".');
         }
     }
 
@@ -188,7 +189,7 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
     /**
      * {@inheritdoc}
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): mixed
     {
         $_fieldSpec['tag'] = $this->getTag();
 
@@ -238,9 +239,9 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
         if ($indexStart === 0 && $indexEnd === '#') {
             // use abbreviation
         } else {
-            $fieldSpec .= '['.$indexStart;
+            $fieldSpec .= '[' . $indexStart;
             if ($indexStart !== $indexEnd) {
-                $fieldSpec .= '-'.$indexEnd;
+                $fieldSpec .= '-' . $indexEnd;
             }
             $fieldSpec .= ']';
         }
@@ -250,9 +251,9 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
             if ($charStart === 0 && $charEnd === '#') {
                 // use abbreviation
             } else {
-                $fieldSpec .= '/'.$charStart;
+                $fieldSpec .= '/' . $charStart;
                 if ($charEnd !== $charStart) {
-                    $fieldSpec .= '-'.$charEnd;
+                    $fieldSpec .= '-' . $charEnd;
                 }
             }
         }
@@ -273,9 +274,9 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
                     foreach ($subSpec as $orKey => $orSubSpec) {
                         $subSpec[$orKey] = $orSubSpec->__toString();
                     }
-                    $fieldSpec .= '{'.implode('|', $subSpec).'}';
+                    $fieldSpec .= '{' . implode('|', $subSpec) . '}';
                 } else {
-                    $fieldSpec .= '{'.$subSpec->__toString().'}';
+                    $fieldSpec .= '{' . $subSpec->__toString() . '}';
                 }
             }
         }
@@ -291,32 +292,33 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
      * @param string $offset Key indexStart|indexEnd|charStart|charEnd|charLength
      *                       |indicator1|indicator2|subSpecs
      */
-    public function offsetExists($offset)
+    public function offsetExists(mixed $offset): bool
     {
         switch ($offset) {
             case 'tag':
                 return isset($this->tag);
-            break;
+                break;
             case 'indexStart':
                 return isset($this->indexStart);
-            break;
+                break;
             case 'indexEnd':
                 return isset($this->indexEnd);
-            break;
+                break;
             case 'indexLength':
                 return !is_null($this->getIndexLength());
-            break;
+                break;
             case 'charStart':
                 return isset($this->charStart);
-            break;
+                break;
             case 'charEnd':
                 return isset($this->charEnd);
-            break;
+                break;
             case 'charLength':
                 return !is_null($this->getCharLength());
-            break;
-            case 'subSpecs': return (0 < count($this->subSpecs)) ? true : false;
-            break;
+                break;
+            case 'subSpecs':
+                return (0 < count($this->subSpecs)) ? true : false;
+                break;
             default:
                 return false;
         }
@@ -330,32 +332,33 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
      * @param string $offset Key indexStart|indexEnd|charStart|charEnd|charLength
      *                       |indicator1|indicator2|subSpecs
      */
-    public function offsetGet($offset)
+    public function offsetGet(mixed $offset): mixed
     {
         switch ($offset) {
             case 'tag':
                 return $this->getTag();
-            break;
+                break;
             case 'indexStart':
                 return $this->getIndexStart();
-            break;
+                break;
             case 'indexEnd':
                 return $this->getIndexEnd();
-            break;
+                break;
             case 'indexLength':
                 return $this->getIndexLength();
-            break;
+                break;
             case 'charStart':
                 return $this->getCharStart();
-            break;
+                break;
             case 'charEnd':
                 return $this->getCharEnd();
-            break;
+                break;
             case 'charLength':
                 return $this->getCharLength();
-            break;
-            case 'subSpecs': return $this->getSubSpecs();
-            break;
+                break;
+            case 'subSpecs':
+                return $this->getSubSpecs();
+                break;
             default:
                 throw new \UnexpectedValueException("Offset $offset does not exist.");
         }
@@ -369,7 +372,7 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
      * @param string $offset Key indexStart|indexEnd|charStart|charEnd|charLength
      *                       |indicator1|indicator2|subSpecs
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet(mixed $offset, mixed $value): void
     {
         switch ($offset) {
             case 'indexStart':
@@ -386,7 +389,7 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
 
             case 'indexLength':
                 throw new \UnexpectedValueException('indexLength is always calculated.');
-            break;
+                break;
 
             case 'charStart':
                 $this->setCharStartEnd($value);
@@ -402,10 +405,11 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
 
             case 'charLength':
                 throw new \UnexpectedValueException('CharLength is always calculated.');
-            break;
+                break;
 
-            case 'subSpecs': $this->addSubSpec($value);
-            break;
+            case 'subSpecs':
+                $this->addSubSpec($value);
+                break;
 
             default:
                 throw new \UnexpectedValueException("Offset $offset cannot be set.");
@@ -415,7 +419,7 @@ class Field extends PositionOrRange implements FieldInterface, \JsonSerializable
     /**
      * Access object like an associative array.
      */
-    public function offsetUnset($offset)
+    public function offsetUnset(mixed $offset): void
     {
         throw new \BadMethodCallException("Offset $offset can not be unset.");
     }

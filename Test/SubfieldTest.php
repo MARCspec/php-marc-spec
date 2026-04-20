@@ -11,23 +11,21 @@ namespace CK\MARCspec\Test;
 use CK\MARCspec\MARCspec;
 use CK\MARCspec\Subfield;
 use CK\MARCspec\SubSpec;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class SubfieldTest extends TestCase
 {
-    /**
-     * @dataProvider invalidFromTestSuiteProvider
-     *
-     * @expectedException Exception
-     */
+    #[DataProvider('invalidFromTestSuiteProvider')]
     public function testInvalidFromTestSuite($test)
     {
+        $this->expectException(\Exception::class);
         new Subfield($test);
     }
 
-    public function invalidFromTestSuiteProvider()
+    public static function invalidFromTestSuiteProvider()
     {
-        $invalidTests = json_decode(file_get_contents(__DIR__.'/../'.'vendor/ck/marcspec-test-suite/invalid/invalidSubfieldTag.json'));
+        $invalidTests = json_decode(file_get_contents(__DIR__ . '/../' . 'vendor/ck/marcspec-test-suite/invalid/invalidSubfieldTag.json'));
         $data = [];
         foreach ($invalidTests->{'tests'} as $test) {
             $data[0][] = $test->{'data'};
@@ -38,7 +36,7 @@ class SubfieldTest extends TestCase
 
     public function testValidFromTestSuite()
     {
-        $validTests = json_decode(file_get_contents(__DIR__.'/../'.'vendor/ck/marcspec-test-suite/valid/validSubfieldTag.json'));
+        $validTests = json_decode(file_get_contents(__DIR__ . '/../' . 'vendor/ck/marcspec-test-suite/valid/validSubfieldTag.json'));
         foreach ($validTests->{'tests'} as $test) {
             $this->assertInstanceOf('CK\MARCspec\SubfieldInterface', new Subfield($test->{'data'}));
         }
@@ -50,146 +48,146 @@ class SubfieldTest extends TestCase
     }
 
     /****
-    * invalid data types
-    ***/
+     * invalid data types
+     ***/
 
     /**
-     * @expectedException InvalidArgumentException
      */
     public function testInvalidArgument1Decode()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $this->subfieldspec((int) '$a');
     }
 
     /**
-     * @expectedException InvalidArgumentException
      */
     public function testInvalidArgument2Decode()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $this->subfieldspec(['$a']);
     }
 
     /****
-    * invalid subfield tags
-    ***/
+     * invalid subfield tags
+     ***/
 
     /**
-     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidSubfieldSpec1()
     {
+        $this->expectException(\CK\MARCspec\Exception\InvalidMARCspecException::class);
         $this->subfieldspec(' $a ');
     }
 
     /**
-     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidSubfieldSpec11()
     {
+        $this->expectException(\CK\MARCspec\Exception\InvalidMARCspecException::class);
         $this->subfieldspec('$a/');
     }
 
     /**
-     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidSubfieldSpec12()
     {
+        $this->expectException(\CK\MARCspec\Exception\InvalidMARCspecException::class);
         $this->subfieldspec('$a$b');
     }
 
     /**
-     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidSubfieldSpec13()
     {
+        $this->expectException(\CK\MARCspec\Exception\InvalidMARCspecException::class);
         $this->subfieldspec('|');
     }
 
     /**
-     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidSubfieldSpec14()
     {
+        $this->expectException(\CK\MARCspec\Exception\InvalidMARCspecException::class);
         $this->subfieldspec('$a/1-2-');
     }
 
     /**
-     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidSubfieldSpec15()
     {
+        $this->expectException(\CK\MARCspec\Exception\InvalidMARCspecException::class);
         $this->subfieldspec('$|');
     }
 
     /**
-     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidSubfieldSpec16()
     {
+        $this->expectException(\CK\MARCspec\Exception\InvalidMARCspecException::class);
         $this->subfieldspec('$a/-2');
     }
 
     /**
-     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidSubfieldSpec17()
     {
+        $this->expectException(\CK\MARCspec\Exception\InvalidMARCspecException::class);
         $this->subfieldspec('$a[-2]');
     }
 
     /**
-     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidSubfieldSpec18()
     {
+        $this->expectException(\CK\MARCspec\Exception\InvalidMARCspecException::class);
         $this->subfieldspec('$a[1-2-]');
     }
 
     /**
-     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidSubfieldSpec19()
     {
+        $this->expectException(\CK\MARCspec\Exception\InvalidMARCspecException::class);
         $this->subfieldspec('$a[1-2');
     }
 
     /**
-     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidSubfieldSpec110()
     {
+        $this->expectException(\CK\MARCspec\Exception\InvalidMARCspecException::class);
         $this->subfieldspec('$a/1-X');
     }
 
     /**
-     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidSubfieldSpec111()
     {
+        $this->expectException(\CK\MARCspec\Exception\InvalidMARCspecException::class);
         $this->subfieldspec('$a/#-');
     }
 
     /**
-     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidSubfieldSpec112()
     {
+        $this->expectException(\CK\MARCspec\Exception\InvalidMARCspecException::class);
         $this->subfieldspec('$a[0-2a]');
     }
 
     /**
-     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidSubfieldSpec113()
     {
+        $this->expectException(\CK\MARCspec\Exception\InvalidMARCspecException::class);
         $this->subfieldspec('$[1-]');
     }
 
     /**
-     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidSubfieldSpec114()
     {
+        $this->expectException(\CK\MARCspec\Exception\InvalidMARCspecException::class);
         $this->subfieldspec('$a{$b}');
     }
 
@@ -215,10 +213,10 @@ class SubfieldTest extends TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
      */
     public function testInvalidSubSpecAdd1()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $Subfield = $this->subfieldspec('a');
         $Subspec = new SubSpec('245$b', '!', '245$b');
         $Subfield->addSubSpec($Subspec);
@@ -384,10 +382,10 @@ class SubfieldTest extends TestCase
     }
 
     /**
-     * @expectedException BadMethodCallException
      */
     public function testOffsetUnset()
     {
+        $this->expectException(\BadMethodCallException::class);
         $Subfield = $this->subfieldspec('$a');
         unset($Subfield['tag']);
     }

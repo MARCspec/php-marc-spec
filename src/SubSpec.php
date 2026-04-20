@@ -1,4 +1,5 @@
 <?php
+
 /**
  * MARCspec is the specification of a reference, encoded as string, to a set of data
  * from within a MARC record.
@@ -40,8 +41,10 @@ class SubSpec implements SubSpecInterface, \JsonSerializable, \ArrayAccess, \Ite
      */
     public function __construct($leftSubTerm, $operator, $rightSubTerm)
     {
-        if ($leftSubTerm instanceof MARCspecInterface
-            || $leftSubTerm instanceof ComparisonStringInterface) {
+        if (
+            $leftSubTerm instanceof MARCspecInterface
+            || $leftSubTerm instanceof ComparisonStringInterface
+        ) {
             $this->leftSubTerm = $leftSubTerm;
         } else {
             throw new \InvalidArgumentException(
@@ -50,14 +53,16 @@ class SubSpec implements SubSpecInterface, \JsonSerializable, \ArrayAccess, \Ite
             );
         }
 
-        if ($rightSubTerm instanceof MARCspecInterface
-            || $rightSubTerm instanceof ComparisonStringInterface) {
+        if (
+            $rightSubTerm instanceof MARCspecInterface
+            || $rightSubTerm instanceof ComparisonStringInterface
+        ) {
             $this->rightSubTerm = $rightSubTerm;
         } else {
             throw new \InvalidArgumentException(
                 'Argument 3 must be instance of CK\MARCspec\MARCspecInterface or 
                 CK\MARCspec\ComparisonStringInterface. Got '
-                .gettype($rightSubTerm)
+                    . gettype($rightSubTerm)
             );
         }
 
@@ -73,8 +78,8 @@ class SubSpec implements SubSpecInterface, \JsonSerializable, \ArrayAccess, \Ite
     {
         if (!in_array($operator, ['=', '!=', '~', '!~', '!', '?'], true)) {
             throw new InvalidMARCspecException(
-                InvalidMARCspecException::SS.
-                InvalidMARCspecException::OPERATOR,
+                InvalidMARCspecException::SS .
+                    InvalidMARCspecException::OPERATOR,
                 $operator
             );
         }
@@ -112,7 +117,7 @@ class SubSpec implements SubSpecInterface, \JsonSerializable, \ArrayAccess, \Ite
     {
         switch ($this->operator) {
             case '!':
-                $subSpecString = $this->operator."$this->rightSubTerm";
+                $subSpecString = $this->operator . "$this->rightSubTerm";
                 break;
 
             case '?':
@@ -120,7 +125,7 @@ class SubSpec implements SubSpecInterface, \JsonSerializable, \ArrayAccess, \Ite
                 break;
 
             default:
-                $subSpecString = "$this->leftSubTerm".$this->operator."$this->rightSubTerm";
+                $subSpecString = "$this->leftSubTerm" . $this->operator . "$this->rightSubTerm";
         }
 
         return $subSpecString;
@@ -129,7 +134,7 @@ class SubSpec implements SubSpecInterface, \JsonSerializable, \ArrayAccess, \Ite
     /**
      * {@inheritdoc}
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): mixed
     {
         if (!is_null($this->leftSubTerm)) {
             $_subSpec['leftSubTerm'] = $this->leftSubTerm->jsonSerialize();
@@ -147,7 +152,7 @@ class SubSpec implements SubSpecInterface, \JsonSerializable, \ArrayAccess, \Ite
      *
      * @param string $offset Key operator|leftSubTerm|rightSubTerm
      */
-    public function offsetExists($offset)
+    public function offsetExists(mixed $offset): bool
     {
         switch ($offset) {
             case 'operator':
@@ -168,7 +173,7 @@ class SubSpec implements SubSpecInterface, \JsonSerializable, \ArrayAccess, \Ite
      *
      * @param string $offset Key operator|leftSubTerm|rightSubTerm
      */
-    public function offsetGet($offset)
+    public function offsetGet(mixed $offset): mixed
     {
         switch ($offset) {
             case 'operator':
@@ -195,7 +200,7 @@ class SubSpec implements SubSpecInterface, \JsonSerializable, \ArrayAccess, \Ite
      *
      * @param string $offset
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet(mixed $offset, mixed $value): void
     {
         throw new \UnexpectedValueException("Offset $offset cannot be set.");
     }
@@ -205,12 +210,12 @@ class SubSpec implements SubSpecInterface, \JsonSerializable, \ArrayAccess, \Ite
      *
      * @param string $offset
      */
-    public function offsetUnset($offset)
+    public function offsetUnset(mixed $offset): void
     {
         throw new \BadMethodCallException("Offset $offset can not be unset.");
     }
 
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         return new SpecIterator(
             [
