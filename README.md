@@ -1,3 +1,27 @@
+## Fork (redcuillin)
+
+Fork of [MARCspec/php-marc-spec](https://github.com/MARCspec/php-marc-spec) for PHP 8.4 and 8.5 support.
+
+### Using this fork with Composer
+
+Add the following to your `composer.json` `repositories` and `require` sections (merge with existing entries as needed):
+
+```json
+"repositories": [
+    {
+        "type": "vcs",
+        "url": "https://github.com/redcuillin/php-marc-spec"
+    }
+],
+"require": {
+    "ck/php-marcspec": "dev-master as 2.999.0"
+}
+```
+
+-----
+
+## Upstream readme:
+
 # PHP-MARCspec
 
 [![Build Status](https://travis-ci.org/MARCspec/php-marc-spec.svg?branch=master)](https://travis-ci.org/MARCspec/php-marc-spec)
@@ -14,7 +38,7 @@ Installation can be done by using [composer](https://getcomposer.org/doc/00-intr
 composer require ck/php-marcspec
 ```
 
-PHP-MARCspec requires PHP 7.4 or later.
+PHP-MARCspec requires PHP 8.2 or later and is compatible with PHP 8.4.
 
 # Usage
 

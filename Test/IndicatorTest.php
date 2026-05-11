@@ -11,6 +11,7 @@ namespace CK\MARCspec\Test;
 use CK\MARCspec\Indicator;
 use CK\MARCspec\MARCspec;
 use CK\MARCspec\SubSpec;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class IndicatorTest extends TestCase
@@ -22,19 +23,16 @@ class IndicatorTest extends TestCase
         return $ind->getPos();
     }
 
-    /**
-     * @dataProvider invalidFromTestSuiteProvider
-     *
-     * @expectedException Exception
-     */
+    #[DataProvider('invalidFromTestSuiteProvider')]
     public function testInvalidFromTestSuite($test)
     {
+        $this->expectException(\Exception::class);
         new Indicator($test);
     }
 
-    public function invalidFromTestSuiteProvider()
+    public static function invalidFromTestSuiteProvider()
     {
-        $invalidTests = json_decode(file_get_contents(__DIR__.'/../'.'vendor/ck/marcspec-test-suite/invalid/invalidIndicators.json'));
+        $invalidTests = json_decode(file_get_contents(__DIR__ . '/../' . 'vendor/ck/marcspec-test-suite/invalid/invalidIndicators.json'));
         $data = [];
         foreach ($invalidTests->{'tests'} as $test) {
             $data[0][] = $test->{'data'};
@@ -45,7 +43,7 @@ class IndicatorTest extends TestCase
 
     public function testValidFromTestSuite()
     {
-        $validTests = json_decode(file_get_contents(__DIR__.'/../'.'vendor/ck/marcspec-test-suite/valid/validIndicators.json'));
+        $validTests = json_decode(file_get_contents(__DIR__ . '/../' . 'vendor/ck/marcspec-test-suite/valid/validIndicators.json'));
         foreach ($validTests->{'tests'} as $test) {
             $pos = $this->indicatorPos($test->{'data'});
             $this->assertTrue($pos === '1' or $pos === '2');
@@ -53,10 +51,10 @@ class IndicatorTest extends TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
      */
     public function testPosFail()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $ind = new Indicator('3');
     }
 
@@ -72,34 +70,34 @@ class IndicatorTest extends TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
      */
     public function testIndicatorFail1()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $ind = new Indicator(3);
     }
 
     /**
-     * @expectedException InvalidArgumentException
      */
     public function testIndicatorFail2()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $ind = new Indicator(['3']);
     }
 
     /**
-     * @expectedException InvalidArgumentException
      */
     public function testIndicatorFail3()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $ind = new Indicator('12');
     }
 
     /**
-     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testIndicatorFail4()
     {
+        $this->expectException(\CK\MARCspec\Exception\InvalidMARCspecException::class);
         $ind = new Indicator('1{$a}');
     }
 
@@ -115,7 +113,7 @@ class IndicatorTest extends TestCase
     }
 
     /**
-     * @covers CK\MARCspec\Indicator::jsonSerialize
+     * JSON encoding of an indicator spec.
      */
     public function testJson()
     {

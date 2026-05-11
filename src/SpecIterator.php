@@ -1,4 +1,5 @@
 <?php
+
 /**
  * MARCspec is the specification of a reference, encoded as string, to a set of data
  * from within a MARC record.
@@ -21,36 +22,28 @@ class SpecIterator implements \Iterator
         }
     }
 
-    public function rewind()
+    public function rewind(): void
     {
         reset($this->var);
     }
 
-    public function current()
+    public function current(): mixed
     {
-        $var = current($this->var);
-
-        return $var;
+        return current($this->var);
     }
 
-    public function key()
+    public function key(): mixed
     {
-        $var = key($this->var);
-
-        return $var;
+        return key($this->var);
     }
 
-    public function next()
+    public function next(): void
     {
-        $var = next($this->var);
-
-        return $var;
+        next($this->var);
     }
 
-    public function valid()
+    public function valid(): bool
     {
-        $var = $this->current() !== false;
-
-        return $var;
+        return key($this->var) !== null;
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * MARCspec is the specification of a reference, encoded as string, to a set of data
  * from within a MARC record.
@@ -32,13 +33,13 @@ class ComparisonString implements ComparisonStringInterface, \JsonSerializable, 
     {
         if (!is_string($raw)) {
             throw new \InvalidArgumentException('Argument must be of type string. Got '
-                .gettype($raw).'.');
+                . gettype($raw) . '.');
         }
 
         if (false !== strpos($raw, ' ')) {
             throw new InvalidMARCspecException(
-                InvalidMARCspecException::CS.
-                InvalidMARCspecException::SPACE,
+                InvalidMARCspecException::CS .
+                    InvalidMARCspecException::SPACE,
                 $raw
             );
         }
@@ -46,8 +47,8 @@ class ComparisonString implements ComparisonStringInterface, \JsonSerializable, 
         /* char of list ${}!=~?|\s must be escaped if not at index 0*/
         if (!preg_match('/^(.(?:[^${}!=~?| ]|(?<=\\\\)[${}!=~?|])*)$/', $raw)) {
             throw new InvalidMARCspecException(
-                InvalidMARCspecException::CS.
-                InvalidMARCspecException::ESCAPE,
+                InvalidMARCspecException::CS .
+                    InvalidMARCspecException::ESCAPE,
                 $raw
             );
         }
@@ -80,7 +81,7 @@ class ComparisonString implements ComparisonStringInterface, \JsonSerializable, 
     {
         $specialChars = ['{', '}', '!', '=', '~', '?'];
         for ($i = 0; $i < count($specialChars); $i++) {
-            $arg = str_replace($specialChars[$i], '\\'.$specialChars[$i], $arg);
+            $arg = str_replace($specialChars[$i], '\\' . $specialChars[$i], $arg);
         }
 
         return $arg = str_replace(' ', '\s', $arg);
@@ -91,13 +92,13 @@ class ComparisonString implements ComparisonStringInterface, \JsonSerializable, 
      */
     public function __toString()
     {
-        return '\\'.$this->raw;
+        return '\\' . $this->raw;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): mixed
     {
         return ['comparisonString' => $this->raw];
     }
@@ -109,13 +110,13 @@ class ComparisonString implements ComparisonStringInterface, \JsonSerializable, 
      *
      * @param string $offset Key raw|comparable
      */
-    public function offsetExists($offset)
+    public function offsetExists(mixed $offset): bool
     {
         switch ($offset) {
             case 'raw':
             case 'comparable':
                 return true;
-            break;
+                break;
             default:
                 return false;
         }
@@ -128,15 +129,15 @@ class ComparisonString implements ComparisonStringInterface, \JsonSerializable, 
      *
      * @param string $offset Key operator|leftSubTerm|rightSubTerm
      */
-    public function offsetGet($offset)
+    public function offsetGet(mixed $offset): mixed
     {
         switch ($offset) {
             case 'raw':
                 return $this->getRaw();
-            break;
+                break;
             case 'comparable':
                 return $this->getComparable();
-            break;
+                break;
             default:
                 throw new \UnexpectedValueException("Offset $offset does not exist.");
         }
@@ -149,7 +150,7 @@ class ComparisonString implements ComparisonStringInterface, \JsonSerializable, 
      *
      * @param string $offset
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet(mixed $offset, mixed $value): void
     {
         throw new \UnexpectedValueException("Offset $offset cannot be set.");
     }
@@ -159,7 +160,7 @@ class ComparisonString implements ComparisonStringInterface, \JsonSerializable, 
      *
      * @param string $offset
      */
-    public function offsetUnset($offset)
+    public function offsetUnset(mixed $offset): void
     {
         throw new \BadMethodCallException("Offset $offset can not be unset.");
     }

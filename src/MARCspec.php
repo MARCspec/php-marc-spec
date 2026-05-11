@@ -1,4 +1,5 @@
 <?php
+
 /**
  * MARCspec is the specification of a reference, encoded as string, to a set of data
  * from within a MARC record.
@@ -50,16 +51,16 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess, \I
             // check string length
             if (3 > $specLength) {
                 throw new InvalidMARCspecException(
-                    InvalidMARCspecException::MS.
-                    InvalidMARCspecException::LENGTH.
-                    InvalidMARCspecException::MINIMUM3,
+                    InvalidMARCspecException::MS .
+                        InvalidMARCspecException::LENGTH .
+                        InvalidMARCspecException::MINIMUM3,
                     $spec
                 );
             }
             if (preg_match('/\s/', $spec)) {
                 throw new InvalidMARCspecException(
-                    InvalidMARCspecException::MS.
-                    InvalidMARCspecException::SPACE,
+                    InvalidMARCspecException::MS .
+                        InvalidMARCspecException::SPACE,
                     $spec
                 );
             }
@@ -149,7 +150,7 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess, \I
     {
         if (1 < strlen($arg)) {
             throw new \UnexpectedValueException(
-                'Method only allows argument to be 1 character long. Got '.strlen($arg)
+                'Method only allows argument to be 1 character long. Got ' . strlen($arg)
             );
         }
 
@@ -181,16 +182,16 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess, \I
     {
         if (!is_null($this->getSubfields())) {
             throw new InvalidMARCspecException(
-                InvalidMARCspecException::MS.
-                InvalidMARCspecException::SFEX,
+                InvalidMARCspecException::MS .
+                    InvalidMARCspecException::SFEX,
                 $this->__toString()
             );
         }
 
         if (!is_null($this->field->getCharStart())) {
             throw new InvalidMARCspecException(
-                InvalidMARCspecException::MS.
-                InvalidMARCspecException::CSEX,
+                InvalidMARCspecException::MS .
+                    InvalidMARCspecException::CSEX,
                 $this->__toString()
             );
         }
@@ -259,16 +260,16 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess, \I
     {
         if (!is_null($this->getIndicator())) {
             throw new InvalidMARCspecException(
-                InvalidMARCspecException::MS.
-                InvalidMARCspecException::INEX,
+                InvalidMARCspecException::MS .
+                    InvalidMARCspecException::INEX,
                 $this->__toString()
             );
         }
 
         if (!is_null($this->field->getCharStart())) {
             throw new InvalidMARCspecException(
-                InvalidMARCspecException::MS.
-                InvalidMARCspecException::CSEX,
+                InvalidMARCspecException::MS .
+                    InvalidMARCspecException::CSEX,
                 $this->__toString()
             );
         }
@@ -279,16 +280,16 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess, \I
             $this->checkIfString($subfields);
             if (2 > strlen($subfields)) {
                 throw new InvalidMARCspecException(
-                    InvalidMARCspecException::SF.
-                    InvalidMARCspecException::LENGTH.
-                    InvalidSubfieldspecException::MINIMUM2,
+                    InvalidMARCspecException::SF .
+                        InvalidMARCspecException::LENGTH .
+                        InvalidSubfieldspecException::MINIMUM2,
                     $subfields
                 );
             }
             if ('$' !== $subfields[0]) {
                 throw new InvalidMARCspecException(
-                    InvalidMARCspecException::SF.
-                    InvalidSubfieldspecException::PREFIX,
+                    InvalidMARCspecException::SF .
+                        InvalidSubfieldspecException::PREFIX,
                     $subfields
                 );
             }
@@ -318,37 +319,37 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess, \I
     {
         if (strlen($arg) < 3) {
             throw new InvalidMARCspecException(
-                InvalidMARCspecException::SF.
-                InvalidMARCspecException::LENGTH3,
+                InvalidMARCspecException::SF .
+                    InvalidMARCspecException::LENGTH3,
                 $arg
             );
         }
 
         if (preg_match('/[a-z]/', $arg[0]) && !preg_match('/[a-z]/', $arg[2])) {
             throw new InvalidMARCspecException(
-                InvalidMARCspecException::SF.
-                InvalidMARCspecException::RANGE,
+                InvalidMARCspecException::SF .
+                    InvalidMARCspecException::RANGE,
                 $arg
             );
         }
         if (preg_match('/[A-Z]/', $arg[0]) && !preg_match('/[A-Z]/', $arg[2])) {
             throw new InvalidMARCspecException(
-                InvalidMARCspecException::SF.
-                InvalidMARCspecException::RANGE,
+                InvalidMARCspecException::SF .
+                    InvalidMARCspecException::RANGE,
                 $arg
             );
         }
         if (preg_match('/[0-9]/', $arg[0]) && !preg_match('/[0-9]/', $arg[2])) {
             throw new InvalidMARCspecException(
-                InvalidMARCspecException::SF.
-                InvalidMARCspecException::RANGE,
+                InvalidMARCspecException::SF .
+                    InvalidMARCspecException::RANGE,
                 $arg
             );
         }
         if ($arg[0] > $arg[2]) {
             throw new InvalidMARCspecException(
-                InvalidMARCspecException::SF.
-                InvalidMARCspecException::RANGE,
+                InvalidMARCspecException::SF .
+                    InvalidMARCspecException::RANGE,
                 $arg
             );
         }
@@ -368,8 +369,8 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess, \I
     private function checkIfString($arg)
     {
         if (!is_string($arg)) {
-            throw new \InvalidArgumentException('Method only accepts string as argument. '.
-                gettype($arg).' given.');
+            throw new \InvalidArgumentException('Method only accepts string as argument. ' .
+                gettype($arg) . ' given.');
         }
     }
 
@@ -390,40 +391,40 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess, \I
 
         if (1 > $posLength) {
             throw new InvalidMARCspecException(
-                InvalidMARCspecException::PR.
-                InvalidMARCspecException::PR1,
+                InvalidMARCspecException::PR .
+                    InvalidMARCspecException::PR1,
                 $pos
             );
         }
 
         if (preg_match('/[^0-9\-#]/', $pos)) { // alphabetic characters etc. are not valid
             throw new InvalidMARCspecException(
-                InvalidMARCspecException::PR.
-                InvalidMARCspecException::PR2,
+                InvalidMARCspecException::PR .
+                    InvalidMARCspecException::PR2,
                 $pos
             );
         }
 
         if (strpos($pos, '-') === $posLength - 1) { // something like 123- is not valid
             throw new InvalidMARCspecException(
-                InvalidMARCspecException::PR.
-                InvalidMARCspecException::PR3,
+                InvalidMARCspecException::PR .
+                    InvalidMARCspecException::PR3,
                 $pos
             );
         }
 
         if (0 === strpos($pos, '-')) { // something like -123 ist not valid
             throw new InvalidMARCspecException(
-                InvalidMARCspecException::PR.
-                InvalidMARCspecException::PR4,
+                InvalidMARCspecException::PR .
+                    InvalidMARCspecException::PR4,
                 $pos
             );
         }
 
         if (strpos($pos, '-') !== strrpos($pos, '-')) { // only one - is allowed
             throw new InvalidMARCspecException(
-                InvalidMARCspecException::PR.
-                InvalidMARCspecException::PR5,
+                InvalidMARCspecException::PR .
+                    InvalidMARCspecException::PR5,
                 $pos
             );
         }
@@ -432,8 +433,8 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess, \I
 
         if (2 < count($_pos)) {
             throw new InvalidMARCspecException(
-                InvalidMARCspecException::PR.
-                InvalidMARCspecException::PR6,
+                InvalidMARCspecException::PR .
+                    InvalidMARCspecException::PR6,
                 $pos
             );
         }
@@ -462,7 +463,7 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess, \I
         $fieldContext = $this->field->getBaseSpec();
         $context = $fieldContext;
         if (!is_null($Subfield)) {
-            $context = $fieldContext.$Subfield->getBaseSpec();
+            $context = $fieldContext . $Subfield->getBaseSpec();
             $subfieldContext = $Subfield->getBaseSpec();
         }
 
@@ -472,8 +473,8 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess, \I
             } else {
                 if (strpos('[/_$', $subTerm[0]) && is_null($context)) {
                     throw new InvalidMARCspecException(
-                        InvalidMARCspecException::SS.
-                        InvalidMARCspecException::MISSINGFIELD,
+                        InvalidMARCspecException::SS .
+                            InvalidMARCspecException::MISSINGFIELD,
                         $subTerm
                     );
                 }
@@ -482,35 +483,35 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess, \I
                     case '_':
                         if ($refPos = strpos($context, $subTerm[0])) {
                             if ('$' !== substr($context, $refPos - 1, 1)) {
-                                return new MARCspec(substr($context, 0, $refPos).$subTerm);
+                                return new MARCspec(substr($context, 0, $refPos) . $subTerm);
                             }
                         }
 
-                        return new MARCspec($fieldContext.$subTerm);
+                        return new MARCspec($fieldContext . $subTerm);
 
                     case '$':
-                        return new MARCspec($fieldContext.$subTerm);
+                        return new MARCspec($fieldContext . $subTerm);
 
                     case '/':
                         $refPos = strrpos($context, $subTerm[0]);
                         if ($refPos) {
                             if ('$' !== substr($context, $refPos - 1, 1)) {
-                                return new MARCspec(substr($context, 0, $refPos).$subTerm);
+                                return new MARCspec(substr($context, 0, $refPos) . $subTerm);
                             }
                         }
 
-                        return new MARCspec($context.$subTerm);
+                        return new MARCspec($context . $subTerm);
 
                     case '[':
                         $refPos = strrpos($context, $subTerm[0]);
                         if ($refPos) {
                             if ('$' !== substr($context, $refPos - 1, 1)) {
-                                return new MARCspec(substr($context, 0, $refPos).$subTerm);
+                                return new MARCspec(substr($context, 0, $refPos) . $subTerm);
                             } else {
-                                return new MARCspec($context.$subTerm);
+                                return new MARCspec($context . $subTerm);
                             }
                         } else {
-                            return new MARCspec(substr($context, 0, 3).$subTerm);
+                            return new MARCspec(substr($context, 0, 3) . $subTerm);
                         }
 
                     default:
@@ -535,7 +536,7 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess, \I
     /**
      * {@inheritdoc}
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): mixed
     {
         $_marcSpec['field'] = $this->field->jsonSerialize();
 
@@ -574,16 +575,18 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess, \I
      *
      * @param string $offset Key field|subfield
      */
-    public function offsetExists($offset)
+    public function offsetExists(mixed $offset): bool
     {
         switch ($offset) {
             case 'field':
                 return isset($this->field);
-            break;
-            case 'indicator': return isset($this->indicator);
-            break;
-            case 'subfields': return (0 < count($this->subfields)) ? true : false;
-            break;
+                break;
+            case 'indicator':
+                return isset($this->indicator);
+                break;
+            case 'subfields':
+                return (0 < count($this->subfields)) ? true : false;
+                break;
             default:
                 return false;
         }
@@ -596,16 +599,18 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess, \I
      *
      * @param string $offset Key field|subfield
      */
-    public function offsetGet($offset)
+    public function offsetGet(mixed $offset): mixed
     {
         switch ($offset) {
             case 'field':
                 return $this->getField();
-            break;
-            case 'indicator': return $this->getIndicator();
-            break;
-            case 'subfields': return $this->getSubfields();
-            break;
+                break;
+            case 'indicator':
+                return $this->getIndicator();
+                break;
+            case 'subfields':
+                return $this->getSubfields();
+                break;
             default:
                 return $this->getSubfield($offset);
         }
@@ -618,14 +623,17 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess, \I
      *
      * @param string $offset Key subfield
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet(mixed $offset, mixed $value): void
     {
         switch ($offset) {
-            case 'indicator': $this->addIndicator($value);
-            break;
-            case 'subfields': $this->addSubfields($value);
-            break;
-            default: throw new \UnexpectedValueException("Offset $offset cannot be set.");
+            case 'indicator':
+                $this->addIndicator($value);
+                break;
+            case 'subfields':
+                $this->addSubfields($value);
+                break;
+            default:
+                throw new \UnexpectedValueException("Offset $offset cannot be set.");
         }
     }
 
@@ -634,12 +642,12 @@ class MARCspec implements MARCspecInterface, \JsonSerializable, \ArrayAccess, \I
      *
      * @param string $offset
      */
-    public function offsetUnset($offset)
+    public function offsetUnset(mixed $offset): void
     {
         throw new \BadMethodCallException("Offset $offset can not be unset.");
     }
 
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         return new SpecIterator(['field' => $this->field, 'subfields' => $this->subfields, 'indicator' => $this->indicator]);
     }

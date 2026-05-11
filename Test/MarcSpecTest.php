@@ -10,23 +10,21 @@ namespace CK\MARCspec\Test;
 
 use CK\MARCspec\Field;
 use CK\MARCspec\MARCspec;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class MarcSpecTest extends TestCase
 {
-    /**
-     * @dataProvider invalidFromTestSuiteProvider
-     *
-     * @expectedException Exception
-     */
+    #[DataProvider('invalidFromTestSuiteProvider')]
     public function testInvalidFromTestSuite($test)
     {
+        $this->expectException(\Exception::class);
         new MARCspec($test);
     }
 
-    public function invalidFromTestSuiteProvider()
+    public static function invalidFromTestSuiteProvider()
     {
-        foreach (glob(__DIR__.'/../'.'vendor/ck/marcspec-test-suite/invalid/wildCombination_*.json') as $filename) {
+        foreach (glob(__DIR__ . '/../' . 'vendor/ck/marcspec-test-suite/invalid/wildCombination_*.json') as $filename) {
             $invalidTests = json_decode(file_get_contents($filename));
         }
         $data = [];
@@ -39,7 +37,7 @@ class MarcSpecTest extends TestCase
 
     public function testValidFromTestSuite()
     {
-        foreach (glob(__DIR__.'/../'.'vendor/ck/marcspec-test-suite/valid/wildCombination_*.json') as $filename) {
+        foreach (glob(__DIR__ . '/../' . 'vendor/ck/marcspec-test-suite/valid/wildCombination_*.json') as $filename) {
             $validTests = json_decode(file_get_contents($filename));
         }
         foreach ($validTests->{'tests'} as $test) {
@@ -53,38 +51,38 @@ class MarcSpecTest extends TestCase
     }
 
     /****
-    * invalid data types
-    ***/
+     * invalid data types
+     ***/
 
     /**
-     * @expectedException RuntimeException
      */
     public function testInvalidArgument01Decode()
     {
+        $this->expectException(\RuntimeException::class);
         $this->marcspec('24');
     }
 
     /**
-     * @expectedException InvalidArgumentException
      */
     public function testInvalidArgument1Decode()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $this->marcspec((int) '245$a');
     }
 
     /**
-     * @expectedException InvalidArgumentException
      */
     public function testInvalidArgument2Decode()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $this->marcspec(['245$a']);
     }
 
     /**
-     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidArgument3Decode()
     {
+        $this->expectException(\CK\MARCspec\Exception\InvalidMARCspecException::class);
         $this->marcspec('245/#$a');
     }
 
@@ -268,10 +266,10 @@ class MarcSpecTest extends TestCase
     }
 
     /**
-     * @expectedException BadMethodCallException
      */
     public function testOffsetUnset()
     {
+        $this->expectException(\BadMethodCallException::class);
         $ms = $this->marcspec('245');
         unset($ms['field']);
     }

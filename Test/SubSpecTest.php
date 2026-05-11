@@ -27,30 +27,30 @@ class SubSpecTest extends TestCase
     }
 
     /****
-    * invalid data types
-    ***/
+     * invalid data types
+     ***/
 
     /**
-     * @expectedException InvalidArgumentException
      */
     public function testInvalidSubSpec1Decode()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $this->subspec('245', '=', '300');
     }
 
     /**
-     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidSubSpec2Decode()
     {
+        $this->expectException(\CK\MARCspec\Exception\InvalidMARCspecException::class);
         $this->subspec(new Field('245'), '=', new Subfield('245'));
     }
 
     /**
-     * @expectedException CK\MARCspec\Exception\InvalidMARCspecException
      */
     public function testInvalidSubSpec3Decode()
     {
+        $this->expectException(\CK\MARCspec\Exception\InvalidMARCspecException::class);
         $this->marcspec('...{$a{$b}}');
     }
 
